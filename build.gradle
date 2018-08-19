@@ -73,7 +73,7 @@ task("deploy") {
         String screepsCode = new File("$buildDir/kotlin-js-min/main/main.js").getText('UTF-8')
         String travelerCode = new File("traveler/Traveler.js").getText('UTF-8')
 
-        String branchName = "kotlin"
+        String branchName = "testbranch1"
 
         RESTClient client = new RESTClient()
         client.uri = "https://screeps.com/api/user/code"

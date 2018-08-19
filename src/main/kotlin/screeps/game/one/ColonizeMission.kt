@@ -191,13 +191,3 @@ class ColonizeMissionMemory(var x: Int, var y: Int, val roomName: String) : Miss
 
     override fun isComplete() = state == ColonizeMission.State.DONE
 }
-
-sealed class ColonizeSubMission() {
-    abstract fun update()
-}
-
-class ClaimMission(val claimer: Creep, val position: RoomPosition) : ColonizeSubMission() {
-    override fun update() {
-        claimer.travelTo(position)
-    }
-}
