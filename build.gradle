@@ -77,7 +77,8 @@ task("deploy") {
 
         RESTClient client = new RESTClient()
         client.uri = "https://screeps.com/api/user/code"
-        client.headers["Authorization"] = 'Basic ' + ("$screepsUser:$screepsPassword".toString().bytes.encodeBase64())
+        client.headers["X-Token"] = "$screepsToken"
+//        client.headers["Authorization"] = 'Basic ' + ("$screepsUser:$screepsPassword".toString().bytes.encodeBase64())
         client.headers["Content-Type"] = "application/json"
         client.handler.success = { HttpResponseDecorator response, LazyMap data ->
             //screeps api is a bit weird, we get 200 OK even if branch does not exist

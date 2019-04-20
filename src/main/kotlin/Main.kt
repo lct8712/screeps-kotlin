@@ -1,4 +1,4 @@
-import screeps.game.one.gameLoop
+import chentian.gameLoopChentian
 
 @Suppress("unused")
 private object Traveler {
@@ -18,5 +18,6 @@ private object Traveler {
 @Suppress("unused")
 fun loop() {
     Traveler
-    gameLoop()
+//    gameLoop()
+    gameLoopChentian()
 }
