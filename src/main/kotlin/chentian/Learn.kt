@@ -1,5 +1,6 @@
 package chentian
 
+import screeps.game.one.houseKeeping
 import types.base.get
 import types.base.global.*
 import types.base.prototypes.*
@@ -19,6 +20,7 @@ const val MIN_CREEP_COUNT_FOR_CONTROLLER = 6
 fun gameLoopChentian() {
     val spawn = Game.spawns["Spawn1"]!!
 
+    houseKeeping()
     createCreepIfNecessary(spawn)
 
     val creeps = Game.creeps.toMap()
