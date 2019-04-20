@@ -30,3 +30,11 @@ fun Room.isFullEnergy(): Boolean {
 fun ConstructionSite.isBuildFinished(): Boolean {
     return progress == progressTotal
 }
+
+fun Creep.isWorking(): Boolean {
+    return memory.asDynamic().working != null
+}
+
+fun Creep.setWorking(isWorking: Boolean) {
+    memory.asDynamic().working = if (isWorking) "true" else null
+}

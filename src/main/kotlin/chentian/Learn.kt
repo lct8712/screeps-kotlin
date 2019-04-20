@@ -3,8 +3,10 @@ package chentian
 import types.base.get
 import types.base.global.*
 import types.base.prototypes.*
+import types.base.prototypes.structures.StructureExtension
 import types.base.prototypes.structures.StructureSpawn
 import types.base.toMap
+import kotlin.math.min
 
 /**
  *
@@ -12,22 +14,19 @@ import types.base.toMap
  * @author chentian
  */
 
-const val MAX_CREEP_COUNT = 16
 const val MIN_CREEP_COUNT_FOR_CONTROLLER = 6
 
 fun gameLoopChentian() {
     val spawn = Game.spawns["Spawn1"]!!
 
-    if (Game.creeps.toMap().count() < MAX_CREEP_COUNT) {
-        val result = spawn.spawnCreep(arrayOf(WORK, WORK, MOVE, CARRY), "creep_${Game.time}")
-        println("create new creep, code: $result")
-    }
+    createCreepIfNecessary(spawn)
 
-    var controllerCreepCount = 0
-    for ((_, creep) in Game.creeps.toMap()) {
-        if (controllerCreepCount < MIN_CREEP_COUNT_FOR_CONTROLLER || creep.memory.asDynamic().upgrade != null) {
+    val creeps = Game.creeps.toMap()
+    var controllerCreepCount = min(MIN_CREEP_COUNT_FOR_CONTROLLER, creeps.size / 2)
+    for ((_, creep) in creeps) {
+        if (controllerCreepCount > 0 || creep.memory.asDynamic().upgrade != null) {
             upgradeController(creep)
-            controllerCreepCount++
+            controllerCreepCount--
             continue
         }
 
@@ -55,9 +54,13 @@ fun gameLoopChentian() {
 private fun fillEnergy(creep: Creep) {
     harvestAndDoJob(creep) {
         val target = creep.room.findStructures()
-            .filter { (it.structureType == STRUCTURE_EXTENSION || it.structureType == STRUCTURE_SPAWN) }
-            .map { (it as StructureSpawn) }
-            .firstOrNull { it.energy < it.energyCapacity }
+            .firstOrNull {
+                when (it) {
+                    is StructureSpawn -> it.energy < it.energyCapacity
+                    is StructureExtension -> it.energy < it.energyCapacity
+                    else -> false
+                }
+            }
 
         target?.let {
             if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
@@ -106,7 +109,19 @@ private fun buildConstruction(creep: Creep) {
 }
 
 private fun harvestAndDoJob(creep: Creep, jobAction: () -> Unit) {
-    if (!creep.isFullEnergy()) {
+    if (creep.isFullEnergy()) {
+        creep.setWorking(true)
+        creep.say("full")
+        jobAction()
+        return
+    }
+
+    if (creep.isEmptyEnergy() || !creep.isWorking()) {
+        creep.setWorking(false)
+
+        val message = if (creep.isEmptyEnergy()) "empty" else "fill"
+        creep.say(message)
+
         val source: Source? = creep.pos.findClosestByPath(FIND_SOURCES)
         if (source == null) {
             creep.say("source not found")
@@ -117,7 +132,11 @@ private fun harvestAndDoJob(creep: Creep, jobAction: () -> Unit) {
             creep.moveTo(source.pos)
         }
         println("$creep is harvesting")
-    } else {
-        jobAction()
+        return
     }
+
+    creep.say("action")
+    jobAction()
+    return
 }
+
