@@ -3,10 +3,7 @@ package chentian
 import screeps.game.one.houseKeeping
 import types.base.get
 import types.base.global.*
-import types.base.prototypes.ConstructionSite
-import types.base.prototypes.Creep
-import types.base.prototypes.Source
-import types.base.prototypes.findStructures
+import types.base.prototypes.*
 import types.base.prototypes.structures.StructureExtension
 import types.base.prototypes.structures.StructureSpawn
 import types.base.prototypes.structures.StructureTower
@@ -19,13 +16,14 @@ import kotlin.math.min
  * @author chentian
  */
 
-const val MIN_CREEP_COUNT_FOR_CONTROLLER = 6
+const val MIN_CREEP_COUNT_FOR_CONTROLLER = 3
 const val MIN_CREEP_COUNT_FOR_DEFENCE = 2
 
 fun gameLoopChentian() {
     val spawn = Game.spawns["Spawn1"]!!
 
     houseKeeping()
+    towerAttack()
     createCreepIfNecessary(spawn)
 
     val creeps = Game.creeps.toMap()
@@ -61,8 +59,15 @@ fun gameLoopChentian() {
             continue
         }
 
-        if (creep.room.find<ConstructionSite>(FIND_CONSTRUCTION_SITES).isNotEmpty()) {
-            buildConstruction(creep)
+        val container = creep.room.findConstructionToBuild(STRUCTURE_CONTAINER)
+        if (container != null) {
+            buildConstructionSite(creep, container)
+            continue
+        }
+
+        val construction = creep.room.findConstructionSites().firstOrNull { !it.isBuildFinished() }
+        if (construction != null) {
+            buildConstructionSite(creep, construction)
             continue
         }
 
@@ -112,18 +117,6 @@ private fun upgradeController(creep: Creep) {
             creep.moveTo(controller.pos)
         }
         println("$creep is upgrading controller")
-    }
-}
-
-private fun buildConstruction(creep: Creep) {
-    harvestAndDoJob(creep) {
-        val targetPos = creep.pos
-        val construction: ConstructionSite = targetPos.findClosestByPath(FIND_CONSTRUCTION_SITES) ?: return@harvestAndDoJob
-
-        if (creep.build(construction) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(construction.pos)
-        }
-        println("$creep is building construction")
     }
 }
 

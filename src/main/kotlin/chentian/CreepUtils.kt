@@ -13,7 +13,7 @@ import types.base.toMap
  * @author chentian
  */
 
-const val MAX_CREEP_COUNT = 16
+const val MAX_CREEP_COUNT = 12
 
 fun createCreepIfNecessary(spawn: StructureSpawn) {
     if (Game.creeps.toMap().count() < MAX_CREEP_COUNT) {
