@@ -1,9 +1,15 @@
 package chentian
 
-import types.base.global.CARRY
-import types.base.global.Game
-import types.base.global.MOVE
-import types.base.global.WORK
+import chentian.extensions.isEmptyEnergy
+import chentian.extensions.isFullEnergy
+import chentian.extensions.isWorking
+import chentian.extensions.setWorking
+import types.base.global.*
+import types.base.prototypes.Creep
+import types.base.prototypes.Source
+import types.base.prototypes.structures.SpawnOptions
+import types.base.prototypes.structures.Structure
+import types.base.prototypes.structures.StructureContainer
 import types.base.prototypes.structures.StructureSpawn
 import types.base.toMap
 
@@ -21,8 +27,16 @@ fun createCreepIfNecessary(spawn: StructureSpawn) {
     }
 }
 
-private fun createSingleCreep(spawn: StructureSpawn) {
-    var workerCount = (spawn.room.energyCapacityAvailable - 100) / 100
+fun createCreepName(role: String): String {
+    return "creep_${role}_${Game.time}"
+}
+
+fun createSingleCreep(spawn: StructureSpawn, role: String = "") {
+    var workerCount = (spawn.room.energyAvailable - 100) / 100
+    if (workerCount <= 1) {
+        return
+    }
+
     val bodyList = mutableListOf(MOVE, CARRY).apply {
         if (workerCount > 2) {
             workerCount--
@@ -35,6 +49,54 @@ private fun createSingleCreep(spawn: StructureSpawn) {
         }
     }
 
-    val result = spawn.spawnCreep(bodyList.toTypedArray(), "creep_${Game.time}")
-    println("create new creep, $bodyList. code: $result")
+    val options = object : SpawnOptions {
+        @Suppress("unused")
+        override val memory = object : CreepMemory {
+            val role = role
+        }
+    }
+
+    val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(role), options)
+    println("create new creep $role. code: $result, $bodyList")
+}
+
+fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
+    if (creep.isFullEnergy()) {
+        creep.setWorking(true)
+        creep.say("full")
+        jobAction()
+        return
+    }
+
+    if (creep.isEmptyEnergy() || !creep.isWorking()) {
+        creep.setWorking(false)
+
+        val message = if (creep.isEmptyEnergy()) "empty" else "fill"
+        creep.say(message)
+
+        val source: Source? = creep.pos.findClosestByPath(FIND_SOURCES)
+        val container: StructureContainer? = source?.pos?.findInRange<Structure>(FIND_STRUCTURES, 1)?.firstOrNull {
+            it.structureType == STRUCTURE_CONTAINER
+        } as StructureContainer?
+        if (source == null && container == null) {
+            creep.say("container not found")
+            return
+        }
+
+        if (container != null) {
+            if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(container.pos)
+            }
+        } else if (source != null) {
+            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(source.pos)
+            }
+        }
+        println("harvesting")
+        return
+    }
+
+    creep.say("action")
+    jobAction()
+    return
 }

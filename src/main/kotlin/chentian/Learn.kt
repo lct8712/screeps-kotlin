@@ -1,5 +1,6 @@
 package chentian
 
+import chentian.extensions.*
 import screeps.game.one.houseKeeping
 import types.base.get
 import types.base.global.*
@@ -19,7 +20,7 @@ import kotlin.math.min
 const val MIN_CREEP_COUNT_FOR_CONTROLLER = 3
 const val MIN_CREEP_COUNT_FOR_DEFENCE = 2
 
-fun gameLoopChentian() {
+fun gameLoopChentianLearn() {
     val spawn = Game.spawns["Spawn1"]!!
 
     houseKeeping()
