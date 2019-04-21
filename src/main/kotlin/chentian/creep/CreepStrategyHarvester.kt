@@ -10,6 +10,7 @@ import types.base.prototypes.Source
 import types.base.prototypes.findStructures
 import types.base.prototypes.structures.EnergyContainingStructure
 import types.base.prototypes.structures.Structure
+import types.base.prototypes.structures.StructureContainer
 import types.base.prototypes.structures.StructureSpawn
 
 /**
@@ -42,6 +43,20 @@ class CreepStrategyHarvester(val room: Room): CreepStrategy {
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
     private fun fillEnergy(creep: Creep) {
         harvestEnergyAndDoJob(creep) {
+            val container = creep.pos.findInRange<Structure>(FIND_STRUCTURES, 2).firstOrNull {
+                it.structureType == STRUCTURE_CONTAINER
+            } as StructureContainer?
+            if (container != null && container.hits < container.hitsMax) {
+                val repair = creep.repair(container)
+                creep.say("repair")
+                if (repair != OK) {
+                    println("repair failed: $repair")
+                }
+                return@harvestEnergyAndDoJob
+            } else {
+                println("container not found to repair")
+            }
+
             STRUCTURE_PRIORITY.forEach { structureType ->
                 room.findStructures()
                     .filter { it.structureType == structureType }
