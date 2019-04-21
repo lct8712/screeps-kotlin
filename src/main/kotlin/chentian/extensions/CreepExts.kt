@@ -23,11 +23,3 @@ fun Creep.isWorking(): Boolean {
 fun Creep.setWorking(isWorking: Boolean) {
     memory.asDynamic().working = if (isWorking) "true" else null
 }
-
-fun Creep.getMemoryContainerId(): String {
-    return (memory.asDynamic().containerId as String?).orEmpty()
-}
-
-fun Creep.getMemoryRole(): String {
-    return (memory.asDynamic().role as String?).orEmpty()
-}

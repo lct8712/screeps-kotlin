@@ -53,8 +53,6 @@ class CreepStrategyHarvester(val room: Room): CreepStrategy {
                     println("repair failed: $repair")
                 }
                 return@harvestEnergyAndDoJob
-            } else {
-                println("container not found to repair")
             }
 
             STRUCTURE_PRIORITY.forEach { structureType ->

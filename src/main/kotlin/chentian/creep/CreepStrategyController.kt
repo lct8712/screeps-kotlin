@@ -22,7 +22,8 @@ object CreepStrategyController {
         listOf(
             CreepStrategyMiner(room),
             CreepStrategyHarvester(room),
-            CreepStrategyBuilder(room)
+            CreepStrategyBuilder(room),
+            CreepStrategyDefenceBuilder(room)
         ).forEach { strategy ->
             strategy.tryToCreate(spawn)
             strategy.runLoop()

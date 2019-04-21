@@ -66,6 +66,7 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
             STRUCTURE_TOWER,
             STRUCTURE_EXTENSION,
             STRUCTURE_CONTAINER,
+            STRUCTURE_WALL,
             STRUCTURE_ROAD
         )
     }

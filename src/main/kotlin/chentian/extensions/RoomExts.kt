@@ -26,7 +26,11 @@ fun Room.findFirstStructureByType(type: BuildableStructureConstant): Structure? 
         .firstOrNull { it.structureType == type }
 }
 
-fun Room.findStructureByType(type: BuildableStructureConstant): Map<String, Structure> {
+fun Room.findStructureByType(type: BuildableStructureConstant): List<Structure> {
+    return findStructures().filter { it.structureType == type }
+}
+
+fun Room.findStructureMapByType(type: BuildableStructureConstant): Map<String, Structure> {
     return findStructures()
         .filter { it.structureType == type }
         .map { it.id to it }
@@ -35,6 +39,6 @@ fun Room.findStructureByType(type: BuildableStructureConstant): Map<String, Stru
 
 fun Room.findCreepByRole(role: String): List<Creep> {
     return GameContext.creeps.values.filter {
-        it.room.name == this.name && it.getMemoryRole() == role
+        it.room.name == this.name && it.memory.role == role
     }
 }

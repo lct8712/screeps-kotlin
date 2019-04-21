@@ -1,9 +1,9 @@
 package chentian.creep
 
 import chentian.createCreepName
+import chentian.extensions.containerId
 import chentian.extensions.findCreepByRole
-import chentian.extensions.findStructureByType
-import chentian.extensions.getMemoryContainerId
+import chentian.extensions.findStructureMapByType
 import types.base.global.*
 import types.base.prototypes.Room
 import types.base.prototypes.Source
@@ -17,7 +17,7 @@ import types.base.prototypes.structures.StructureSpawn
  */
 class CreepStrategyMiner(room: Room): CreepStrategy {
 
-    private val containerMap = room.findStructureByType(STRUCTURE_CONTAINER)
+    private val containerMap = room.findStructureMapByType(STRUCTURE_CONTAINER)
     private val creeps = room.findCreepByRole(CREEP_ROLE_MINER)
 
     override fun tryToCreate(spawn: StructureSpawn) {
@@ -28,7 +28,7 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
 
     override fun runLoop() {
         creeps.forEach { creep ->
-            val container = containerMap[creep.getMemoryContainerId()]
+            val container = containerMap[creep.memory.containerId]
             val source = container?.pos?.findClosestByRange<Source>(FIND_SOURCES, 1)
             if (source == null) {
                 creep.say("error")
@@ -57,7 +57,7 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
         }
 
         val containerIds = containerMap.keys.toMutableSet()
-        creeps.forEach { containerIds.remove(it.getMemoryContainerId()) }
+        creeps.forEach { containerIds.remove(it.memory.containerId) }
         val targetId = containerIds.firstOrNull() ?: return
 
         val options = object : SpawnOptions {
