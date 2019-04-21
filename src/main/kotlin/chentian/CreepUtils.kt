@@ -86,6 +86,9 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         if (container != null) {
             if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(container.pos)
+            } else if (container.hits < container.hitsMax) {
+                creep.repair(container)
+                creep.say("repair")
             }
         } else if (source != null) {
             if (creep.harvest(source) == ERR_NOT_IN_RANGE) {

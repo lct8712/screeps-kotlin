@@ -12,6 +12,7 @@ import types.base.prototypes.Creep
 import types.base.prototypes.Room
 import types.base.prototypes.Source
 import types.base.prototypes.findStructures
+import types.base.prototypes.structures.StructureController
 import types.base.prototypes.structures.StructureExtension
 import types.base.prototypes.structures.StructureSpawn
 import types.base.prototypes.structures.StructureTower
@@ -45,6 +46,7 @@ class CreepStrategyHarvester(val room: Room) {
                     is StructureExtension -> it.energy < it.energyCapacity
                     is StructureSpawn -> it.energy < it.energyCapacity
                     is StructureTower -> it.energy < it.energyCapacity
+                    is StructureController -> true
                     else -> false
                 }
             }

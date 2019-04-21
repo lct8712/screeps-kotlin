@@ -13,11 +13,11 @@ import types.base.global.Game
 object CreepStrategyController {
 
     fun gameLoop() {
-        houseKeeping()
-        towerAttack()
-
         val spawn = Game.spawns["Spawn1"]!!
         val room = spawn.room
+
+        houseKeeping()
+        towerAttack(room)
 
         with(CreepStrategyMiner(room)) {
             if (shouldCreate()) {

@@ -1,8 +1,9 @@
 package chentian
 
 import types.base.global.FIND_HOSTILE_CREEPS
-import types.base.global.FIND_MY_CREEPS
 import types.base.prototypes.Creep
+import types.base.prototypes.Room
+import types.base.prototypes.findCreeps
 
 /**
  *
@@ -10,13 +11,16 @@ import types.base.prototypes.Creep
  * @author chentian
  */
 
-fun towerAttack() {
+fun towerAttack(room: Room) {
     GameContext.towers.forEach { tower ->
         tower.pos.findClosestByRange<Creep>(FIND_HOSTILE_CREEPS)?.let {
             tower.attack(it)
             return@forEach
         }
-        tower.pos.findClosestByRange<Creep>(FIND_MY_CREEPS)?.let {
+
+        room.findCreeps().firstOrNull {
+            it.my && it.hits < it.hitsMax
+        }?.let {
             tower.heal(it)
         }
     }
