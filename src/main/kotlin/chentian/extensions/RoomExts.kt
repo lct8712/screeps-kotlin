@@ -15,10 +15,15 @@ fun Room.isFullEnergy(): Boolean {
     return energyAvailable == energyCapacityAvailable
 }
 
-fun Room.findConstructionToBuild(type: BuildableStructureConstant): ConstructionSite? {
+fun Room.findFirstConstructionToBuild(type: BuildableStructureConstant): ConstructionSite? {
     return findConstructionSites()
         .filter { (it.structureType == type) }
         .firstOrNull { !it.isBuildFinished() }
+}
+
+fun Room.findFirstStructureByType(type: BuildableStructureConstant): Structure? {
+    return findStructures()
+        .firstOrNull { it.structureType == type }
 }
 
 fun Room.findStructureByType(type: BuildableStructureConstant): Map<String, Structure> {

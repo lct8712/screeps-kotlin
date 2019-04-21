@@ -15,16 +15,42 @@ import types.base.prototypes.structures.StructureSpawn
  *
  * @author chentian
  */
-class CreepStrategyMiner(room: Room) {
+class CreepStrategyMiner(room: Room): CreepStrategy {
 
     private val containerMap = room.findStructureByType(STRUCTURE_CONTAINER)
     private val creeps = room.findCreepByRole(CREEP_ROLE_MINER)
 
-    fun shouldCreate(): Boolean {
+    override fun tryToCreate(spawn: StructureSpawn) {
+        if (shouldCreate()) {
+            create(spawn)
+        }
+    }
+
+    override fun runLoop() {
+        creeps.forEach { creep ->
+            val container = containerMap[creep.getMemoryContainerId()]
+            val source = container?.pos?.findClosestByRange<Source>(FIND_SOURCES, 1)
+            if (source == null) {
+                creep.say("error")
+                println("source not found: ${creep.name}")
+                return@forEach
+            }
+
+            if (!creep.pos.isEqualTo(container.pos)) {
+                creep.moveTo(container.pos)
+                creep.say("move")
+            } else {
+                creep.harvest(source)
+                creep.say("mine")
+            }
+        }
+    }
+
+    private fun shouldCreate(): Boolean {
         return containerMap.size > creeps.size
     }
 
-    fun create(spawn: StructureSpawn) {
+    private fun create(spawn: StructureSpawn) {
         val workerCount = (spawn.room.energyAvailable - 50) / 100
         if (workerCount < MAX_WORKER_BODY_COUNT) {
             return
@@ -49,26 +75,6 @@ class CreepStrategyMiner(room: Room) {
         }
         val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(CREEP_ROLE_MINER), options)
         println("create new creep $CREEP_ROLE_MINER. code: $result, $bodyList")
-    }
-
-    fun runLoop() {
-        creeps.forEach { creep ->
-            val container = containerMap[creep.getMemoryContainerId()]
-            val source = container?.pos?.findClosestByRange<Source>(FIND_SOURCES, 1)
-            if (source == null) {
-                creep.say("error")
-                println("source not found: ${creep.name}")
-                return@forEach
-            }
-
-            if (!creep.pos.isEqualTo(container.pos)) {
-                creep.moveTo(container.pos)
-                creep.say("move")
-            } else {
-                creep.harvest(source)
-                creep.say("mine")
-            }
-        }
     }
 
     companion object {

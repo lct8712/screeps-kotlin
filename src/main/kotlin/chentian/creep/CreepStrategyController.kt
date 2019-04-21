@@ -19,18 +19,13 @@ object CreepStrategyController {
         houseKeeping()
         towerAttack(room)
 
-        with(CreepStrategyMiner(room)) {
-            if (shouldCreate()) {
-                create(spawn)
-            }
-            runLoop()
-        }
-
-        with(CreepStrategyHarvester(room)) {
-            if (shouldCreate()) {
-                create(spawn)
-            }
-            runLoop()
+        listOf(
+            CreepStrategyMiner(room),
+            CreepStrategyHarvester(room),
+            CreepStrategyBuilder(room)
+        ).forEach { strategy ->
+            strategy.tryToCreate(spawn)
+            strategy.runLoop()
         }
     }
 }

@@ -43,9 +43,9 @@ fun gameLoopChentianLearn() {
         }
 
         if (defenceCount > 0) {
-            var defence = creep.room.findConstructionToBuild(STRUCTURE_RAMPART)
+            var defence = creep.room.findFirstConstructionToBuild(STRUCTURE_RAMPART)
             if (defence == null) {
-                defence = creep.room.findConstructionToBuild(STRUCTURE_TOWER)
+                defence = creep.room.findFirstConstructionToBuild(STRUCTURE_TOWER)
             }
             if (defence != null) {
                 buildConstructionSite(creep, defence)
@@ -54,13 +54,13 @@ fun gameLoopChentianLearn() {
             }
         }
 
-        val extension = creep.room.findConstructionToBuild(STRUCTURE_EXTENSION)
+        val extension = creep.room.findFirstConstructionToBuild(STRUCTURE_EXTENSION)
         if (extension != null) {
             buildConstructionSite(creep, extension)
             continue
         }
 
-        val container = creep.room.findConstructionToBuild(STRUCTURE_CONTAINER)
+        val container = creep.room.findFirstConstructionToBuild(STRUCTURE_CONTAINER)
         if (container != null) {
             buildConstructionSite(creep, container)
             continue
