@@ -3,9 +3,13 @@ package chentian
 import screeps.game.one.houseKeeping
 import types.base.get
 import types.base.global.*
-import types.base.prototypes.*
+import types.base.prototypes.ConstructionSite
+import types.base.prototypes.Creep
+import types.base.prototypes.Source
+import types.base.prototypes.findStructures
 import types.base.prototypes.structures.StructureExtension
 import types.base.prototypes.structures.StructureSpawn
+import types.base.prototypes.structures.StructureTower
 import types.base.toMap
 import kotlin.math.min
 
@@ -16,6 +20,7 @@ import kotlin.math.min
  */
 
 const val MIN_CREEP_COUNT_FOR_CONTROLLER = 6
+const val MIN_CREEP_COUNT_FOR_DEFENCE = 2
 
 fun gameLoopChentian() {
     val spawn = Game.spawns["Spawn1"]!!
@@ -25,6 +30,7 @@ fun gameLoopChentian() {
 
     val creeps = Game.creeps.toMap()
     var controllerCreepCount = min(MIN_CREEP_COUNT_FOR_CONTROLLER, creeps.size / 2)
+    var defenceCount = min(MIN_CREEP_COUNT_FOR_DEFENCE, creeps.size / 2)
     for ((_, creep) in creeps) {
         if (controllerCreepCount > 0 || creep.memory.asDynamic().upgrade != null) {
             upgradeController(creep)
@@ -37,10 +43,21 @@ fun gameLoopChentian() {
             continue
         }
 
-        val extension = creep.room.findConstructionSites()
-            .filter { (it.structureType == STRUCTURE_EXTENSION) }.firstOrNull { !it.isBuildFinished() }
+        if (defenceCount > 0) {
+            var defence = creep.room.findConstructionToBuild(STRUCTURE_RAMPART)
+            if (defence == null) {
+                defence = creep.room.findConstructionToBuild(STRUCTURE_TOWER)
+            }
+            if (defence != null) {
+                buildConstructionSite(creep, defence)
+                defenceCount--
+                continue
+            }
+        }
+
+        val extension = creep.room.findConstructionToBuild(STRUCTURE_EXTENSION)
         if (extension != null) {
-            buildExtension(creep, extension)
+            buildConstructionSite(creep, extension)
             continue
         }
 
@@ -58,8 +75,9 @@ private fun fillEnergy(creep: Creep) {
         val target = creep.room.findStructures()
             .firstOrNull {
                 when (it) {
-                    is StructureSpawn -> it.energy < it.energyCapacity
+                    is StructureTower -> it.energy < it.energyCapacity
                     is StructureExtension -> it.energy < it.energyCapacity
+                    is StructureSpawn -> it.energy < it.energyCapacity
                     else -> false
                 }
             }
@@ -73,12 +91,12 @@ private fun fillEnergy(creep: Creep) {
     }
 }
 
-private fun buildExtension(creep: Creep, extension: ConstructionSite) {
+private fun buildConstructionSite(creep: Creep, construction: ConstructionSite) {
     harvestAndDoJob(creep) {
-        if (creep.build(extension) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(extension.pos)
+        if (creep.build(construction) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(construction.pos)
         }
-        println("$creep is building extension")
+        println("$creep is building ${construction.structureType}")
     }
 }
 
@@ -99,7 +117,6 @@ private fun upgradeController(creep: Creep) {
 
 private fun buildConstruction(creep: Creep) {
     harvestAndDoJob(creep) {
-//        val targetPos = RoomPosition(36, 22, creep.room.name)
         val targetPos = creep.pos
         val construction: ConstructionSite = targetPos.findClosestByPath(FIND_CONSTRUCTION_SITES) ?: return@harvestAndDoJob
 

@@ -22,8 +22,14 @@ fun createCreepIfNecessary(spawn: StructureSpawn) {
 }
 
 private fun createSingleCreep(spawn: StructureSpawn) {
-    val workerCount = (spawn.room.energyCapacityAvailable - 100) / 100
+    var workerCount = (spawn.room.energyCapacityAvailable - 100) / 100
     val bodyList = mutableListOf(MOVE, CARRY).apply {
+        if (workerCount > 2) {
+            workerCount--
+            add(MOVE)
+            add(CARRY)
+        }
+
         for (i in 0 until workerCount) {
             add(WORK)
         }
