@@ -65,7 +65,7 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
 
     val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(role), options)
     println("create new creep $role. code: $result, $bodyList")
-    if (result != OK) {
+    if (result != OK && result != ERR_BUSY) {
         Game.notify("create creep error: $result")
     }
 }
