@@ -2,26 +2,13 @@ package chentian.creep
 
 import chentian.createNormalCreep
 import chentian.extensions.findCreepByRole
+import chentian.extensions.isFullEnergy
 import chentian.harvestEnergyAndDoJob
-import types.base.global.ERR_NOT_IN_RANGE
-import types.base.global.FIND_SOURCES
-import types.base.global.FIND_STRUCTURES
-import types.base.global.OK
-import types.base.global.RESOURCE_ENERGY
-import types.base.global.STRUCTURE_CONTAINER
-import types.base.global.STRUCTURE_EXTENSION
-import types.base.global.STRUCTURE_ROAD
-import types.base.global.STRUCTURE_SPAWN
-import types.base.global.STRUCTURE_TOWER
-import types.base.prototypes.Creep
-import types.base.prototypes.Room
-import types.base.prototypes.Source
-import types.base.prototypes.findStructures
-import types.base.prototypes.structures.EnergyContainingStructure
-import types.base.prototypes.structures.Structure
-import types.base.prototypes.structures.StructureContainer
-import types.base.prototypes.structures.StructureRoad
-import types.base.prototypes.structures.StructureSpawn
+import types.base.global.*
+import types.base.prototypes.*
+import types.base.prototypes.structures.*
+import types.extensions.LineStyle
+import types.extensions.Style
 
 /**
  *
@@ -31,6 +18,7 @@ import types.base.prototypes.structures.StructureSpawn
 class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
     private val creeps = room.findCreepByRole(CREEP_ROLE_HARVESTER)
+    private val isFullEnergy = room.isFullEnergy()
 
     override fun tryToCreate(spawn: StructureSpawn) {
         if (shouldCreate()) {
@@ -102,6 +90,18 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
     private fun transferEnergy(creep: Creep): Boolean {
+        if (!isFullEnergy) {
+            creep.pos.findInRange<Structure>(FIND_STRUCTURES, 1)
+                .filter { it.structureType == STRUCTURE_EXTENSION }
+                .map { it as EnergyContainingStructure }
+                .firstOrNull { it.energy < it.energyCapacity }?.let {
+                    if (creep.transfer(it as Structure, RESOURCE_ENERGY) == OK) {
+                        println("$creep transfer to a near extension")
+                        return true
+                    }
+                }
+        }
+
         STRUCTURE_PRIORITY.forEach { structureType ->
             room.findStructures()
                 .filter { it.structureType == structureType }
@@ -109,7 +109,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
                 .firstOrNull { it.energy < it.energyCapacity }?.let { target ->
                     val transferResult = creep.transfer(target as Structure, RESOURCE_ENERGY)
                     if (transferResult == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target.pos)
+                        creep.moveTo(target.pos, MOVE_OPTION)
                         println("$creep is filling energy $target")
                         return true
                     } else if (transferResult != OK) {
@@ -144,7 +144,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         val controller = creep.room.controller
         if (controller != null) {
             if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(controller.pos)
+                creep.moveTo(controller.pos, MOVE_OPTION)
             }
             println("$creep is upgrading controller")
         }
@@ -153,6 +153,8 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
     companion object {
 
         private const val CREEP_ROLE_HARVESTER = "harvester"
+
+        private val MOVE_OPTION = MoveToOpts(visualizePathStyle = Style(stroke = "#aaff00", lineStyle = LineStyle.DOTTED))
 
         private val STRUCTURE_PRIORITY = listOf(
             STRUCTURE_EXTENSION,

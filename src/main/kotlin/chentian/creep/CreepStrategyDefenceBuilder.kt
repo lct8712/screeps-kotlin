@@ -10,12 +10,15 @@ import types.base.global.Game
 import types.base.global.STRUCTURE_RAMPART
 import types.base.global.STRUCTURE_WALL
 import types.base.prototypes.Creep
+import types.base.prototypes.MoveToOpts
 import types.base.prototypes.Room
 import types.base.prototypes.findStructures
 import types.base.prototypes.structures.OwnedStructure
 import types.base.prototypes.structures.Structure
 import types.base.prototypes.structures.StructureSpawn
 import types.base.prototypes.structures.StructureWall
+import types.extensions.LineStyle
+import types.extensions.Style
 
 /**
  *
@@ -69,7 +72,7 @@ class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
 
     private fun buildDefenceOrMove(creep: Creep, defence: Structure) {
         if (creep.repair(defence) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(defence.pos)
+            creep.moveTo(defence.pos, MOVE_OPTION)
         }
         println("$creep is building $defence")
     }
@@ -77,5 +80,6 @@ class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
     companion object {
 
         private const val CREEP_ROLE_DEFENCE_BUILDER = "defence-builder"
+        private val MOVE_OPTION = MoveToOpts(visualizePathStyle = Style(stroke = "#ffaa00", lineStyle = LineStyle.DOTTED))
     }
 }
