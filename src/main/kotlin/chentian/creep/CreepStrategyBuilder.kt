@@ -1,10 +1,16 @@
 package chentian.creep
 
-import chentian.createSingleCreep
+import chentian.createNormalCreep
 import chentian.extensions.findCreepByRole
 import chentian.extensions.findFirstConstructionToBuild
 import chentian.harvestEnergyAndDoJob
-import types.base.global.*
+import types.base.global.ERR_NOT_IN_RANGE
+import types.base.global.STRUCTURE_CONTAINER
+import types.base.global.STRUCTURE_EXTENSION
+import types.base.global.STRUCTURE_RAMPART
+import types.base.global.STRUCTURE_ROAD
+import types.base.global.STRUCTURE_TOWER
+import types.base.global.STRUCTURE_WALL
 import types.base.prototypes.Creep
 import types.base.prototypes.Room
 import types.base.prototypes.findConstructionSites
@@ -35,7 +41,7 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
     }
 
     private fun create(spawn: StructureSpawn) {
-        createSingleCreep(spawn, CREEP_ROLE_BUILDER)
+        createNormalCreep(spawn, CREEP_ROLE_BUILDER)
     }
 
     private fun fillEnergy(creep: Creep) {

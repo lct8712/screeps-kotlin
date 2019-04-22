@@ -4,6 +4,7 @@ import chentian.extensions.isEmptyEnergy
 import chentian.extensions.isFullEnergy
 import chentian.extensions.isWorking
 import chentian.extensions.setWorking
+import types.base.global.AcitveBodyPartConstant
 import types.base.global.CARRY
 import types.base.global.CreepMemory
 import types.base.global.ERR_NOT_IN_RANGE
@@ -11,6 +12,7 @@ import types.base.global.FIND_SOURCES
 import types.base.global.FIND_STRUCTURES
 import types.base.global.Game
 import types.base.global.MOVE
+import types.base.global.OK
 import types.base.global.RESOURCE_ENERGY
 import types.base.global.STRUCTURE_CONTAINER
 import types.base.global.WORK
@@ -32,7 +34,7 @@ const val MAX_CREEP_COUNT = 12
 
 fun createCreepIfNecessary(spawn: StructureSpawn) {
     if (Game.creeps.toMap().count() < MAX_CREEP_COUNT) {
-        createSingleCreep(spawn)
+        createNormalCreep(spawn)
     }
 }
 
@@ -40,20 +42,18 @@ fun createCreepName(role: String): String {
     return "creep_${role}_${Game.time}"
 }
 
-fun createSingleCreep(spawn: StructureSpawn, role: String = "") {
-    var workerCount = (spawn.room.energyAvailable - 100) / 100
-    if (workerCount <= 1) {
+fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
+    val partCount = spawn.room.energyAvailable / 300
+    if (partCount <= 0) {
         return
     }
 
-    val bodyList = mutableListOf(MOVE, CARRY).apply {
-        if (workerCount > 2) {
-            workerCount--
+    // 每 2 个 work 配 一对 carry & move
+    val bodyList = mutableListOf<AcitveBodyPartConstant>().apply {
+        for (i in 0 until partCount) {
             add(MOVE)
             add(CARRY)
-        }
-
-        for (i in 0 until workerCount) {
+            add(WORK)
             add(WORK)
         }
     }
@@ -67,6 +67,9 @@ fun createSingleCreep(spawn: StructureSpawn, role: String = "") {
 
     val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(role), options)
     println("create new creep $role. code: $result, $bodyList")
+    if (result != OK) {
+        Game.notify("create creep error: $result")
+    }
 }
 
 fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {

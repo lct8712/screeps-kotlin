@@ -1,6 +1,6 @@
 package chentian.creep
 
-import chentian.createSingleCreep
+import chentian.createNormalCreep
 import chentian.extensions.findCreepByRole
 import chentian.harvestEnergyAndDoJob
 import types.base.global.ERR_NOT_IN_RANGE
@@ -64,7 +64,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
     }
 
     private fun create(spawn: StructureSpawn) {
-        createSingleCreep(spawn, CREEP_ROLE_HARVESTER)
+        createNormalCreep(spawn, CREEP_ROLE_HARVESTER)
     }
 
     private fun fillEnergy(creep: Creep) {

@@ -1,6 +1,6 @@
 package chentian.creep
 
-import chentian.createSingleCreep
+import chentian.createNormalCreep
 import chentian.extensions.findCreepByRole
 import chentian.extensions.isEmptyEnergy
 import chentian.extensions.targetDefenceId
@@ -44,7 +44,7 @@ class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
     }
 
     private fun create(spawn: StructureSpawn) {
-        createSingleCreep(spawn, CREEP_ROLE_DEFENCE_BUILDER)
+        createNormalCreep(spawn, CREEP_ROLE_DEFENCE_BUILDER)
     }
 
     private fun build(creep: Creep) {
