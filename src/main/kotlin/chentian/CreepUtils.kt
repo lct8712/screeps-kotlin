@@ -4,7 +4,16 @@ import chentian.extensions.isEmptyEnergy
 import chentian.extensions.isFullEnergy
 import chentian.extensions.isWorking
 import chentian.extensions.setWorking
-import types.base.global.*
+import types.base.global.CARRY
+import types.base.global.CreepMemory
+import types.base.global.ERR_NOT_IN_RANGE
+import types.base.global.FIND_SOURCES
+import types.base.global.FIND_STRUCTURES
+import types.base.global.Game
+import types.base.global.MOVE
+import types.base.global.RESOURCE_ENERGY
+import types.base.global.STRUCTURE_CONTAINER
+import types.base.global.WORK
 import types.base.prototypes.Creep
 import types.base.prototypes.Source
 import types.base.prototypes.structures.SpawnOptions
@@ -92,7 +101,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
                 creep.moveTo(source.pos)
             }
         }
-        println("harvesting")
+        println("$creep is harvesting")
         return
     }
 

@@ -10,6 +10,7 @@ import types.base.global.OK
 import types.base.global.RESOURCE_ENERGY
 import types.base.global.STRUCTURE_CONTAINER
 import types.base.global.STRUCTURE_EXTENSION
+import types.base.global.STRUCTURE_ROAD
 import types.base.global.STRUCTURE_SPAWN
 import types.base.global.STRUCTURE_TOWER
 import types.base.prototypes.Creep
@@ -19,6 +20,7 @@ import types.base.prototypes.findStructures
 import types.base.prototypes.structures.EnergyContainingStructure
 import types.base.prototypes.structures.Structure
 import types.base.prototypes.structures.StructureContainer
+import types.base.prototypes.structures.StructureRoad
 import types.base.prototypes.structures.StructureSpawn
 
 /**
@@ -75,6 +77,10 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
                 return@harvestEnergyAndDoJob
             }
 
+            if (repairRoad(creep)) {
+                return@harvestEnergyAndDoJob
+            }
+
             upgradeController(creep)
         }
     }
@@ -87,7 +93,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
             val repair = creep.repair(container)
             creep.say("repair")
             if (repair != OK) {
-                println("repair failed: $repair")
+                println("repair container failed: $repair")
             }
             return true
         }
@@ -110,6 +116,26 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
                         println("$creep transfer failed: $transferResult")
                     }
                 }
+        }
+        return false
+    }
+
+    private fun repairRoad(creep: Creep): Boolean {
+        val road = creep.pos.findInRange<Structure>(FIND_STRUCTURES, 2).filter {
+            it.structureType == STRUCTURE_ROAD
+        }.firstOrNull {
+            val road = it as StructureRoad
+            road.hits < road.hitsMax
+        } as StructureRoad?
+        if (road != null && road.hits < road.hitsMax) {
+            val repair = creep.repair(road)
+            creep.say("repair")
+            if (repair != OK) {
+                println("$creep repair road failed: $repair")
+            }
+            return true
+        } else {
+            println("$creep not found road to repair")
         }
         return false
     }
