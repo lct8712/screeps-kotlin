@@ -40,7 +40,6 @@ class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
     }
 
     private fun shouldCreate(): Boolean {
-        println("${creeps.size}, ${structureList.size}")
         return creeps.isEmpty() && structureList.isNotEmpty()
     }
 

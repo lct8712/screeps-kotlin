@@ -77,6 +77,7 @@ task("deploy") {
 
         RESTClient client = new RESTClient()
         client.uri = "https://screeps.com/api/user/code"
+        // in gradle.properties
         client.headers["X-Token"] = "$screepsToken"
 //        client.headers["Authorization"] = 'Basic ' + ("$screepsUser:$screepsPassword".toString().bytes.encodeBase64())
         client.headers["Content-Type"] = "application/json"
