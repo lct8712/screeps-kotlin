@@ -32,12 +32,12 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
     private fun shouldCreate(): Boolean {
         val sourceSize = room.find<Source>(FIND_SOURCES).size
-        // 最少三倍
-        if (creeps.size < sourceSize * 3) {
+        // 最少 2.5 倍
+        if (creeps.size < sourceSize * 2.5) {
             println("less then 3")
             return true
         }
-        // 最多五倍
+        // 最多 5 倍
         if (creeps.size > sourceSize * 5) {
             println("more then 5")
             return false
