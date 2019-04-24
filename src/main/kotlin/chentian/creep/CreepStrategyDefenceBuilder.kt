@@ -27,9 +27,7 @@ import types.extensions.Style
  */
 class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
 
-    private val structureList = room.findStructures().filter {
-        (it.structureType == STRUCTURE_RAMPART || it.structureType == STRUCTURE_WALL) && it is OwnedStructure && it.my
-    }
+    private var structureList: List<Structure>? = null
     private val creeps = room.findCreepByRole(CREEP_ROLE_DEFENCE_BUILDER)
 
     override fun tryToCreate(spawn: StructureSpawn) {
@@ -43,7 +41,14 @@ class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
     }
 
     private fun shouldCreate(): Boolean {
-        return creeps.isEmpty() && structureList.isNotEmpty()
+        if (creeps.isNotEmpty() || Game.time % 128 != 0) {
+            return false
+        }
+        structureList = room.findStructures().filter {
+            (it.structureType == STRUCTURE_RAMPART || it.structureType == STRUCTURE_WALL) && it is OwnedStructure && it.my
+        }
+        // 修到 2M 就不修了
+        return structureList!!.isNotEmpty() && structureList!!.minBy { it.hits }!!.hits <= 2_000_000L
     }
 
     private fun create(spawn: StructureSpawn) {
@@ -63,7 +68,7 @@ class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
                 }
             }
 
-            structureList.minBy { it.hits }?.let { defence ->
+            structureList?.minBy { it.hits }?.let { defence ->
                 creep.memory.targetDefenceId = defence.id
                 buildDefenceOrMove(creep, defence)
             }
