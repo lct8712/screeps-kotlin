@@ -49,7 +49,7 @@ class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
             return false
         }
         // 修到 2M 就不修了
-        return structureList.isNotEmpty() && structureList.minBy { it.hits }!!.hits <= 2_000_000L
+        return structureList.isNotEmpty() && structureList.minBy { it.hits }!!.hits <= 3_000_000L
     }
 
     private fun create(spawn: StructureSpawn) {
