@@ -20,3 +20,7 @@ var CreepMemory.role: String
 var CreepMemory.targetDefenceId: String
     get() = (asDynamic().targetDefenceId as String?).orEmpty()
     set(value) = run { this.asDynamic().targetDefenceId = value }
+
+var CreepMemory.targetRoomName: String
+    get() = (asDynamic().targetRoomName as String?).orEmpty()
+    set(value) = run { this.asDynamic().targetRoomName = value }

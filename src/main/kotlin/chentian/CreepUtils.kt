@@ -29,13 +29,13 @@ fun createCreepName(role: String): String {
     return "creep_${role}_${Game.time}"
 }
 
-fun createFastCreep(spawn: StructureSpawn, role: String = "") {
+fun createRemoteCreep(spawn: StructureSpawn, roomName: String, role: String = "") {
     if (spawn.room.energyAvailable < 300) {
         return
     }
 
-    val bodyList = mutableListOf(MOVE, MOVE, CARRY, CARRY, WORK)
-    doCreateCreep(role, spawn, bodyList)
+    val bodyList = mutableListOf(MOVE, CARRY, WORK)
+    doCreateCreep(role, roomName, spawn, bodyList)
 }
 
 fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
@@ -59,14 +59,15 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
         }
     }
 
-    doCreateCreep(role, spawn, bodyList)
+    doCreateCreep(role, "", spawn, bodyList)
 }
 
-private fun doCreateCreep(role: String, spawn: StructureSpawn, bodyList: MutableList<AcitveBodyPartConstant>) {
+private fun doCreateCreep(role: String, targetRoomName: String, spawn: StructureSpawn, bodyList: MutableList<AcitveBodyPartConstant>) {
     val options = object : SpawnOptions {
         @Suppress("unused")
         override val memory = object : CreepMemory {
             val role = role
+            val targetRoomName = targetRoomName
         }
     }
 
@@ -134,7 +135,6 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
 }
 
 const val ROOM_NAME_HOME = "E18S19"
-const val ROOM_NAME_TARGET = "E17S19"
 
 fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
     if (creep.isFullEnergy()) {
@@ -154,7 +154,8 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         val message = if (creep.isEmptyEnergy()) "empty" else "fill"
         creep.say(message)
 
-        if (creep.isInTargetRoom(ROOM_NAME_TARGET)) {
+        val roomNameTarget = creep.memory.targetRoomName
+        if (creep.isInTargetRoom(roomNameTarget)) {
             println("$creep in target room now")
             val source = creep.room.findEnergy().getOrNull(0)
             if (source == null) {
@@ -167,7 +168,7 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
                 creep.moveTo(source.pos, moveToOpts)
             }
         } else {
-            creep.moveToTargetRoom(ROOM_NAME_TARGET)
+            creep.moveToTargetRoom(roomNameTarget)
         }
 
         println("$creep is harvesting remote")
