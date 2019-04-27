@@ -23,7 +23,8 @@ object CreepStrategyController {
             CreepStrategyMiner(room),
             CreepStrategyHarvester(room),
             CreepStrategyBuilder(room),
-            CreepStrategyDefenceBuilder(room)
+            CreepStrategyDefenceBuilder(room),
+            CreepStrategyHarvesterRemote(room)
         ).forEach { strategy ->
             strategy.tryToCreate(spawn)
             strategy.runLoop()

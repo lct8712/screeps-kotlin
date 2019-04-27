@@ -1,14 +1,8 @@
 package chentian
 
-import chentian.extensions.isEmptyEnergy
-import chentian.extensions.isFullEnergy
-import chentian.extensions.isWorking
-import chentian.extensions.setWorking
+import chentian.extensions.*
 import types.base.global.*
-import types.base.prototypes.Creep
-import types.base.prototypes.MoveToOpts
-import types.base.prototypes.Source
-import types.base.prototypes.findStructures
+import types.base.prototypes.*
 import types.base.prototypes.structures.SpawnOptions
 import types.base.prototypes.structures.Structure
 import types.base.prototypes.structures.StructureContainer
@@ -35,6 +29,15 @@ fun createCreepName(role: String): String {
     return "creep_${role}_${Game.time}"
 }
 
+fun createFastCreep(spawn: StructureSpawn, role: String = "") {
+    if (spawn.room.energyAvailable < 300) {
+        return
+    }
+
+    val bodyList = mutableListOf(MOVE, MOVE, CARRY, CARRY, WORK)
+    doCreateCreep(role, spawn, bodyList)
+}
+
 fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
     val partCount = spawn.room.energyAvailable / 300
     if (partCount <= 0) {
@@ -56,6 +59,10 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
         }
     }
 
+    doCreateCreep(role, spawn, bodyList)
+}
+
+private fun doCreateCreep(role: String, spawn: StructureSpawn, bodyList: MutableList<AcitveBodyPartConstant>) {
     val options = object : SpawnOptions {
         @Suppress("unused")
         override val memory = object : CreepMemory {
@@ -118,6 +125,52 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
             }
         }
         println("$creep is harvesting")
+        return
+    }
+
+    creep.say("action")
+    jobAction()
+    return
+}
+
+const val ROOM_NAME_HOME = "E18S19"
+const val ROOM_NAME_TARGET = "E17S19"
+
+fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
+    if (creep.isFullEnergy()) {
+        creep.setWorking(true)
+        creep.say("full")
+        if (creep.isInTargetRoom(ROOM_NAME_HOME)) {
+            jobAction()
+        } else {
+            creep.moveToTargetRoom(ROOM_NAME_HOME)
+        }
+        return
+    }
+
+    if (creep.isEmptyEnergy() || !creep.isWorking()) {
+        creep.setWorking(false)
+
+        val message = if (creep.isEmptyEnergy()) "empty" else "fill"
+        creep.say(message)
+
+        if (creep.isInTargetRoom(ROOM_NAME_TARGET)) {
+            println("$creep in target room now")
+            val source = creep.room.findEnergy().getOrNull(0)
+            if (source == null) {
+                creep.say("source not found")
+                println("$creep source in room not found harvesting")
+                return
+            }
+
+            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(source.pos, moveToOpts)
+            }
+        } else {
+            creep.moveToTargetRoom(ROOM_NAME_TARGET)
+        }
+
+        println("$creep is harvesting remote")
         return
     }
 
