@@ -30,11 +30,11 @@ fun createCreepName(role: String): String {
 }
 
 fun createRemoteCreep(spawn: StructureSpawn, roomName: String, role: String = "") {
-    if (spawn.room.energyAvailable < 300) {
+    if (spawn.room.energyAvailable < 250) {
         return
     }
 
-    val bodyList = mutableListOf(MOVE, CARRY, WORK)
+    val bodyList = mutableListOf(MOVE, CARRY, CARRY, WORK)
     doCreateCreep(role, roomName, spawn, bodyList)
 }
 
