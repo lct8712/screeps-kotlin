@@ -1,15 +1,18 @@
 package chentian.creep
 
-import chentian.createNormalCreep
 import chentian.extensions.findCreepByRole
 import chentian.extensions.isEmptyEnergy
 import chentian.extensions.targetDefenceId
-import chentian.harvestEnergyAndDoJob
+import chentian.utils.harvestEnergyAndDoJob
+import chentian.utils.createMoveOptions
+import chentian.utils.createNormalCreep
+import chentian.utils.harvestEnergyAndDoJob
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.Game
 import screeps.api.STRUCTURE_RAMPART
 import screeps.api.STRUCTURE_WALL
 import screeps.api.Creep
+import screeps.api.FIND_MY_STRUCTURES
 import screeps.api.FIND_STRUCTURES
 import screeps.api.MoveToOptions
 import screeps.api.Room
@@ -26,8 +29,8 @@ import screeps.api.structures.StructureWall
 class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
 
     private val structureList by lazy {
-        room.find(FIND_STRUCTURES).filter {
-            (it.structureType == STRUCTURE_RAMPART || it.structureType == STRUCTURE_WALL) && it is OwnedStructure && it.my
+        room.find(FIND_MY_STRUCTURES).filter {
+            (it.structureType == STRUCTURE_RAMPART || it.structureType == STRUCTURE_WALL)
         }
     }
     private val creeps = room.findCreepByRole(CREEP_ROLE_DEFENCE_BUILDER)
@@ -84,6 +87,6 @@ class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
     companion object {
 
         private const val CREEP_ROLE_DEFENCE_BUILDER = "defence-builder"
-        private val MOVE_OPTION = MoveToOptions(visualizePathStyle = RoomVisual.Style(stroke = "#ffaa00", lineStyle = RoomVisual.LineStyle.DOTTED))
+        private val MOVE_OPTION = createMoveOptions("#ffaa00")
     }
 }

@@ -1,9 +1,9 @@
 package chentian.creep
 
-import chentian.createNormalCreep
+import chentian.utils.createNormalCreep
 import chentian.extensions.findCreepByRole
 import chentian.extensions.findFirstConstructionToBuild
-import chentian.harvestEnergyAndDoJob
+import chentian.utils.harvestEnergyAndDoJob
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.FIND_CONSTRUCTION_SITES

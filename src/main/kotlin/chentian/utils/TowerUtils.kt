@@ -1,7 +1,8 @@
-package chentian
+package chentian.utils
 
+import chentian.GameContext
+import screeps.api.FIND_CREEPS
 import screeps.api.FIND_HOSTILE_CREEPS
-import screeps.api.Creep
 import screeps.api.Room
 
 /**
@@ -12,12 +13,12 @@ import screeps.api.Room
 
 fun towerAttack(room: Room) {
     GameContext.towers.forEach { tower ->
-        tower.pos.findClosestByRange<Creep>(FIND_HOSTILE_CREEPS)?.let {
+        tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS)?.let {
             tower.attack(it)
             return@forEach
         }
 
-        room.findCreeps().firstOrNull {
+        room.find(FIND_CREEPS).firstOrNull {
             it.my && it.hits < it.hitsMax
         }?.let {
             tower.heal(it)

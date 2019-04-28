@@ -1,14 +1,13 @@
 package chentian.creep
 
-import chentian.createRemoteCreep
 import chentian.extensions.role
 import chentian.extensions.targetRoomName
-import chentian.harvestEnergyAndDoJobRemote
+import chentian.utils.createMoveOptions
+import chentian.utils.createRemoteCreep
+import chentian.utils.harvestEnergyAndDoJobRemote
 import screeps.api.*
 import screeps.api.structures.StructureSpawn
 import screeps.utils.toMap
-import types.extensions.LineStyle
-import types.extensions.Style
 
 /**
  *
@@ -61,7 +60,7 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
 
         private const val CREEP_ROLE_HARVESTER_REMOTE = "harvester-remote"
 
-        private val MOVE_OPTION = MoveToOptions(visualizePathStyle = RoomVisual.Style(stroke = "#aaffaa", lineStyle = RoomVisual.LineStyle.DOTTED))
+        private val MOVE_OPTION = createMoveOptions("#aaffaa")
 
         private const val CREEP_PER_TARGET_ROOM = 4
 

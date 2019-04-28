@@ -190,7 +190,7 @@ class RefillEnergy {
         if (shouldContinueMininig(creep)) {
             var assignedSource = creep.memory.assignedEnergySource
             if (assignedSource == null) {
-                val energySources = creep.room.findEnergy()
+                val energySources = creep.room.find(FIND_SOURCES)
                 val source = creep.requestSource(energySources)
                 if (source == null) {
                     println("no energy sources available for creep ${creep.name} in ${creep.room}")

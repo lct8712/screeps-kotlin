@@ -1,12 +1,37 @@
-package chentian
+package chentian.utils
 
-import chentian.extensions.*
-import screeps.api.structures.StructureSpawn
-import screeps.utils.toMap
-import screeps.api.*
+import chentian.extensions.isEmptyEnergy
+import chentian.extensions.isFullEnergy
+import chentian.extensions.isInTargetRoom
+import chentian.extensions.isWorking
+import chentian.extensions.moveToTargetRoom
+import chentian.extensions.setWorking
+import chentian.extensions.targetRoomName
+import screeps.api.ActiveBodyPartConstant
+import screeps.api.CARRY
+import screeps.api.Creep
+import screeps.api.CreepMemory
+import screeps.api.DirectionConstant
+import screeps.api.ERR_BUSY
+import screeps.api.ERR_NOT_IN_RANGE
+import screeps.api.FIND_SOURCES
+import screeps.api.FIND_STRUCTURES
+import screeps.api.Game
+import screeps.api.LINE_STYLE_DOTTED
+import screeps.api.LineStyleConstant
+import screeps.api.MOVE
+import screeps.api.MoveToOptions
+import screeps.api.OK
+import screeps.api.RESOURCE_ENERGY
+import screeps.api.RoomVisual
+import screeps.api.STRUCTURE_CONTAINER
+import screeps.api.Source
+import screeps.api.WORK
 import screeps.api.structures.SpawnOptions
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureContainer
+import screeps.api.structures.StructureSpawn
+import screeps.utils.toMap
 
 /**
  *
@@ -47,7 +72,7 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
     }
 
     // 每 2 个 work 配 一对 carry & move
-    val bodyList = mutableListOf<AcitveBodyPartConstant>().apply {
+    val bodyList = mutableListOf<ActiveBodyPartConstant>().apply {
         for (i in 0 until partCount) {
             add(MOVE)
             add(CARRY)
@@ -59,20 +84,27 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
     doCreateCreep(role, "", spawn, bodyList)
 }
 
-private fun doCreateCreep(role: String, targetRoomName: String, spawn: StructureSpawn, bodyList: MutableList<AcitveBodyPartConstant>) {
+fun createMoveOptions(color: String): MoveToOptions {
+    return object : MoveToOptions {
+        override val visualizePathStyle: RoomVisual.Style?
+            get() = object : RoomVisual.Style {
+                override var lineStyle: LineStyleConstant?
+                    get() = LINE_STYLE_DOTTED
+                    set(value) {}
+                override var opacity: Double?
+                    get() = 0.3
+                    set(value) {}
+            }
+    }
+}
+
+private fun doCreateCreep(role: String, targetRoomName: String, spawn: StructureSpawn, bodyList: MutableList<ActiveBodyPartConstant>) {
     if (spawn.spawning != null) {
         println("spawning, existing")
         return
     }
 
-    val options = object : SpawnOptions {
-        @Suppress("unused")
-        override val memory = object : CreepMemory {
-            val role = role
-            val targetRoomName = targetRoomName
-        }
-    }
-
+    val options = createSpawnOption(role, targetRoomName)
     val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(role), options)
     println("create new creep $role. code: $result, $bodyList")
     if (result != OK && result != ERR_BUSY) {
@@ -80,7 +112,32 @@ private fun doCreateCreep(role: String, targetRoomName: String, spawn: Structure
     }
 }
 
-private val MoveToOptions = MoveToOptions(visualizePathStyle = RoomVisual.Style(stroke = "#00aaff", lineStyle = LineStyle.DOTTED))
+fun createSpawnOption(memory: CreepMemory): SpawnOptions {
+    return object : SpawnOptions {
+        override var directions: Array<DirectionConstant>?
+            get() = null
+            set(value) {}
+        override var dryRun: Boolean?
+            get() = null
+            set(value) {}
+        override var energyStructures: Array<Structure>?
+            get() = null
+            set(value) {}
+        override var memory: CreepMemory?
+            get() = memory
+            set(value) {}
+    }
+}
+
+private fun createSpawnOption(role: String, targetRoomName: String): SpawnOptions {
+    val memory = object : CreepMemory {
+        val role = role
+        val targetRoomName = targetRoomName
+    }
+    return createSpawnOption(memory)
+}
+
+private val moveToOptions = createMoveOptions("00aaff")
 
 fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
     if (creep.isFullEnergy()) {
@@ -96,21 +153,21 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         val message = if (creep.isEmptyEnergy()) "empty" else "fill"
         creep.say(message)
 
-        val containers = creep.room.findStructures().filter {
+        val containers = creep.room.find(FIND_STRUCTURES).filter {
             it.structureType == STRUCTURE_CONTAINER
         }.map { it as StructureContainer }
         val minContainer = containers.minBy { it.store.energy }
         val maxContainer = containers.maxBy { it.store.energy }
         if (minContainer != null && maxContainer != null && minContainer.store.energy * 10 < maxContainer.store.energy) {
             if (creep.withdraw(maxContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(maxContainer.pos, MoveToOptions)
+                creep.moveTo(maxContainer.pos, moveToOptions)
             }
             println("$creep to full container $maxContainer")
             return
         }
 
         val source: Source? = creep.pos.findClosestByPath(FIND_SOURCES)
-        val container: StructureContainer? = source?.pos?.findInRange<Structure>(FIND_STRUCTURES, 1)?.firstOrNull {
+        val container: StructureContainer? = source?.pos?.findInRange(FIND_STRUCTURES, 1)?.firstOrNull {
             it.structureType == STRUCTURE_CONTAINER
         } as StructureContainer?
         if (source == null && container == null) {
@@ -120,11 +177,11 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
 
         if (container != null) {
             if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(container.pos, MoveToOptions)
+                creep.moveTo(container.pos, moveToOptions)
             }
         } else if (source != null) {
             if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source.pos, MoveToOptions)
+                creep.moveTo(source.pos, moveToOptions)
             }
         }
         println("$creep is harvesting")
@@ -159,7 +216,7 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         val roomNameTarget = creep.memory.targetRoomName
         if (creep.isInTargetRoom(roomNameTarget)) {
             println("$creep in target room now")
-            val source = creep.room.findEnergy().getOrNull(0)
+            val source = creep.room.find(FIND_SOURCES).getOrNull(0)
             if (source == null) {
                 creep.say("source not found")
                 println("$creep source in room not found harvesting")
@@ -167,7 +224,7 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
             }
 
             if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source.pos, MoveToOptions)
+                creep.moveTo(source.pos, moveToOptions)
             }
         } else {
             creep.moveToTargetRoom(roomNameTarget)

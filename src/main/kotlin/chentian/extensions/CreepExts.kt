@@ -1,8 +1,6 @@
 package chentian.extensions
 
-import screeps.api.FindConstant
 import screeps.api.Creep
-import screeps.api.RoomObject
 import screeps.api.RoomPosition
 
 /**
@@ -33,13 +31,7 @@ fun Creep.isInTargetRoom(roomName: String): Boolean {
 
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE", "CAST_NEVER_SUCCEEDS")
 fun Creep.moveToTargetRoom(roomName: String) {
-    val exit = room.findExitTo(roomName) as FindConstant
-    val target = pos.findClosestByRange<RoomObject>(exit) as RoomPosition
+    val exit = room.findExitTo(roomName)
+    val target = pos.findClosestByRange(exit) as RoomPosition
     moveTo(target)
-//    println("$pos $target ${pos.isEqualTo(target)}")
-//    if (pos.isEqualTo(target)) {
-//        move(exit as DirectionConstant)
-//    } else {
-//        moveTo(target)
-//    }
 }

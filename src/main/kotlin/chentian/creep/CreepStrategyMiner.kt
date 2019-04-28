@@ -1,13 +1,17 @@
 package chentian.creep
 
-import chentian.createCreepName
 import chentian.extensions.containerId
 import chentian.extensions.findCreepByRole
 import chentian.extensions.findStructureMapByType
-import screeps.api.*
+import chentian.utils.createCreepName
+import chentian.utils.createSpawnOption
+import screeps.api.CreepMemory
+import screeps.api.FIND_SOURCES
+import screeps.api.MOVE
 import screeps.api.Room
+import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.Source
-import screeps.api.structures.SpawnOptions
+import screeps.api.WORK
 import screeps.api.structures.StructureSpawn
 
 /**
@@ -29,7 +33,7 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
     override fun runLoop() {
         creeps.forEach { creep ->
             val container = containerMap[creep.memory.containerId]
-            val source = container?.pos?.findClosestByRange<Source>(FIND_SOURCES, 1)
+            val source: Source? = container?.pos?.findInRange(FIND_SOURCES, 1)?.getOrNull(0)
             if (source == null) {
                 creep.say("error")
                 println("source not found: ${creep.name}")
@@ -60,13 +64,11 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
         creeps.forEach { containerIds.remove(it.memory.containerId) }
         val targetId = containerIds.firstOrNull() ?: return
 
-        val options = object : SpawnOptions {
-            @Suppress("unused")
-            override val memory = object : CreepMemory {
-                val role = CREEP_ROLE_MINER
-                val containerId = targetId
-            }
+        val memory = object : CreepMemory {
+            val role = CREEP_ROLE_MINER
+            val containerId = targetId
         }
+        val options = createSpawnOption(memory)
 
         val bodyList = mutableListOf(MOVE).apply {
             for (i in 0 until MAX_WORKER_BODY_COUNT) {

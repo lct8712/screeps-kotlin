@@ -54,7 +54,7 @@ fun gameLoop() {
 
     }
 
-    val energySources = mainSpawn.room.findEnergy()
+    val energySources = mainSpawn.room.find(FIND_SOURCES)
     val minWorkers = energySources.size * 2
     val minMiners = energySources.size
 
@@ -103,9 +103,9 @@ fun gameLoop() {
             }
         }
 
-        if (room.memory.lastEnergy != room.energyAvailable) {
-            room.memory.lastEnergy = room.energyAvailable
-        }
+//        if (room.memory.lastEnergy != room.energyAvailable) {
+//            room.memory.lastEnergy = room.energyAvailable
+//        }
     }
 
     val refillEnergy = RefillEnergy()

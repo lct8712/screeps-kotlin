@@ -1,6 +1,6 @@
 package chentian.creep
 
-import chentian.towerAttack
+import chentian.utils.towerAttack
 import screeps.api.Game
 import screeps.api.get
 import screeps.game.one.houseKeeping

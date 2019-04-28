@@ -1,22 +1,44 @@
 package screeps.game.one.behaviours
 
-import screeps.game.one.*
-import screeps.game.one.building.buildRoads
-import screeps.game.one.kreeps.BodyDefinition
-import traveler.travelTo
-import screeps.api.*
+import screeps.api.BOTTOM
+import screeps.api.BOTTOM_LEFT
+import screeps.api.BOTTOM_RIGHT
 import screeps.api.Creep
+import screeps.api.ERR_NOT_IN_RANGE
+import screeps.api.EnergyContainer
+import screeps.api.FIND_CONSTRUCTION_SITES
+import screeps.api.FIND_STRUCTURES
+import screeps.api.Game
+import screeps.api.LEFT
+import screeps.api.OK
+import screeps.api.RESOURCE_ENERGY
+import screeps.api.RIGHT
 import screeps.api.Room
-import screeps.api.findConstructionSites
-import screeps.api.findStructures
-import screeps.api.structures.*
+import screeps.api.STRUCTURE_EXTENSION
+import screeps.api.STRUCTURE_SPAWN
+import screeps.api.TOP
+import screeps.api.TOP_LEFT
+import screeps.api.TOP_RIGHT
+import screeps.api.structures.Structure
+import screeps.api.structures.StructureController
+import screeps.api.structures.StructureRoad
+import screeps.api.structures.StructureSpawn
+import screeps.game.one.Context
+import screeps.game.one.CreepState
+import screeps.game.one.building.buildRoads
+import screeps.game.one.findClosest
+import screeps.game.one.kreeps.BodyDefinition
+import screeps.game.one.missionId
+import screeps.game.one.state
+import screeps.game.one.targetId
+import traveler.travelTo
 import kotlin.js.Math.random
 
 class IdleBehaviour {
     fun structuresThatNeedRepairing(): List<Structure> {
         val room = Context.rooms.values.first { it.storage != null }
 
-        return room.findStructures().filterNot { Context.targets.containsKey(it.id) }
+        return room.find(FIND_STRUCTURES).filterNot { Context.targets.containsKey(it.id) }
             .filter { it.hits < it.hitsMax / 2 && it.hits < 2_000_000 }
             .sortedBy { it.hits }
             .take(5) //TODO only repairing 5 is arbitrary
@@ -30,7 +52,7 @@ class IdleBehaviour {
         creep.memory.targetId = null //just making sure it is reset
 
 
-        val constructionSite = creep.findClosest(creep.room.findConstructionSites())
+        val constructionSite = creep.findClosest(creep.room.find(FIND_CONSTRUCTION_SITES))
         val controller = creep.room.controller
 
         val towersInNeedOfRefill = Context.towers.filter { it.room == creep.room && it.energy < it.energyCapacity }
@@ -129,9 +151,9 @@ object BusyBehaviour {
 
         if (creep.memory.state == CreepState.TRANSFERRING_ENERGY) {
             fun findTarget(): Structure? {
-                val targets = creep.room.findStructures()
+                val targets = creep.room.find(FIND_STRUCTURES)
                     .filter { (it.structureType == STRUCTURE_EXTENSION || it.structureType == STRUCTURE_SPAWN) }
-                    .map { (it as EnergyContainingStructure) }
+                    .map { (it as EnergyContainer) }
                     .filter { it.energy < it.energyCapacity }
 
                 if (targets.isNotEmpty()) {

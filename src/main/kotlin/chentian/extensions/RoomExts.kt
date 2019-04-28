@@ -1,7 +1,6 @@
 package chentian.extensions
 
 import chentian.GameContext
-import chentian.isBuildFinished
 import screeps.api.*
 import screeps.api.structures.Structure
 
