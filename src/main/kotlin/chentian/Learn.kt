@@ -1,12 +1,34 @@
 package chentian
 
-import chentian.extensions.*
-import screeps.api.*
-import screeps.game.one.houseKeeping
+import chentian.extensions.findFirstConstructionToBuild
+import chentian.extensions.isBuildFinished
+import chentian.extensions.isEmptyEnergy
+import chentian.extensions.isFullEnergy
+import chentian.extensions.isWorking
+import chentian.extensions.setWorking
+import chentian.utils.createCreepIfNecessary
+import chentian.utils.towerAttack
+import screeps.api.ConstructionSite
+import screeps.api.Creep
+import screeps.api.ERR_NOT_IN_RANGE
+import screeps.api.FIND_CONSTRUCTION_SITES
+import screeps.api.FIND_SOURCES
+import screeps.api.FIND_STRUCTURES
+import screeps.api.Game
+import screeps.api.RESOURCE_ENERGY
+import screeps.api.STRUCTURE_CONTAINER
+import screeps.api.STRUCTURE_EXTENSION
+import screeps.api.STRUCTURE_RAMPART
+import screeps.api.STRUCTURE_TOWER
+import screeps.api.Source
+import screeps.api.get
 import screeps.api.structures.StructureExtension
 import screeps.api.structures.StructureSpawn
 import screeps.api.structures.StructureTower
+import screeps.game.one.houseKeeping
 import screeps.utils.toMap
+import kotlin.collections.component1
+import kotlin.collections.component2
 import kotlin.math.min
 
 /**
@@ -64,7 +86,7 @@ fun gameLoopChentianLearn() {
             continue
         }
 
-        val construction = creep.room.findConstructionSites().firstOrNull { !it.isBuildFinished() }
+        val construction = creep.room.find(FIND_CONSTRUCTION_SITES).firstOrNull { !it.isBuildFinished() }
         if (construction != null) {
             buildConstructionSite(creep, construction)
             continue
@@ -76,7 +98,7 @@ fun gameLoopChentianLearn() {
 
 private fun fillEnergy(creep: Creep) {
     harvestAndDoJob(creep) {
-        val target = creep.room.findStructures()
+        val target = creep.room.find(FIND_STRUCTURES)
             .firstOrNull {
                 when (it) {
                     is StructureTower -> it.energy < it.energyCapacity
