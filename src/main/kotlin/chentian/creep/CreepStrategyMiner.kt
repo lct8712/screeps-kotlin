@@ -4,11 +4,11 @@ import chentian.createCreepName
 import chentian.extensions.containerId
 import chentian.extensions.findCreepByRole
 import chentian.extensions.findStructureMapByType
-import types.base.global.*
-import types.base.prototypes.Room
-import types.base.prototypes.Source
-import types.base.prototypes.structures.SpawnOptions
-import types.base.prototypes.structures.StructureSpawn
+import screeps.api.*
+import screeps.api.Room
+import screeps.api.Source
+import screeps.api.structures.SpawnOptions
+import screeps.api.structures.StructureSpawn
 
 /**
  *

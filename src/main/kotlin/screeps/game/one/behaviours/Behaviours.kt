@@ -4,12 +4,12 @@ import screeps.game.one.*
 import screeps.game.one.building.buildRoads
 import screeps.game.one.kreeps.BodyDefinition
 import traveler.travelTo
-import types.base.global.*
-import types.base.prototypes.Creep
-import types.base.prototypes.Room
-import types.base.prototypes.findConstructionSites
-import types.base.prototypes.findStructures
-import types.base.prototypes.structures.*
+import screeps.api.*
+import screeps.api.Creep
+import screeps.api.Room
+import screeps.api.findConstructionSites
+import screeps.api.findStructures
+import screeps.api.structures.*
 import kotlin.js.Math.random
 
 class IdleBehaviour {

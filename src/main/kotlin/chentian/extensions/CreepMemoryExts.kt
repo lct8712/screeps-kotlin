@@ -1,6 +1,6 @@
 package chentian.extensions
 
-import types.base.global.CreepMemory
+import screeps.api.CreepMemory
 
 /**
  *

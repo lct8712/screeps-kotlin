@@ -1,9 +1,8 @@
 package chentian
 
-import types.base.global.FIND_HOSTILE_CREEPS
-import types.base.prototypes.Creep
-import types.base.prototypes.Room
-import types.base.prototypes.findCreeps
+import screeps.api.FIND_HOSTILE_CREEPS
+import screeps.api.Creep
+import screeps.api.Room
 
 /**
  *

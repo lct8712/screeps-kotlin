@@ -4,17 +4,17 @@ import chentian.createNormalCreep
 import chentian.extensions.findCreepByRole
 import chentian.extensions.findFirstConstructionToBuild
 import chentian.harvestEnergyAndDoJob
-import types.base.global.ERR_NOT_IN_RANGE
-import types.base.global.STRUCTURE_CONTAINER
-import types.base.global.STRUCTURE_EXTENSION
-import types.base.global.STRUCTURE_RAMPART
-import types.base.global.STRUCTURE_ROAD
-import types.base.global.STRUCTURE_TOWER
-import types.base.global.STRUCTURE_WALL
-import types.base.prototypes.Creep
-import types.base.prototypes.Room
-import types.base.prototypes.findConstructionSites
-import types.base.prototypes.structures.StructureSpawn
+import screeps.api.Creep
+import screeps.api.ERR_NOT_IN_RANGE
+import screeps.api.FIND_CONSTRUCTION_SITES
+import screeps.api.Room
+import screeps.api.STRUCTURE_CONTAINER
+import screeps.api.STRUCTURE_EXTENSION
+import screeps.api.STRUCTURE_RAMPART
+import screeps.api.STRUCTURE_ROAD
+import screeps.api.STRUCTURE_TOWER
+import screeps.api.STRUCTURE_WALL
+import screeps.api.structures.StructureSpawn
 
 /**
  *
@@ -23,7 +23,7 @@ import types.base.prototypes.structures.StructureSpawn
  */
 class CreepStrategyBuilder(val room: Room): CreepStrategy {
 
-    private val constructionSites = room.findConstructionSites()
+    private val constructionSites = room.find(FIND_CONSTRUCTION_SITES)
     private val creeps = room.findCreepByRole(CREEP_ROLE_BUILDER)
 
     override fun tryToCreate(spawn: StructureSpawn) {
@@ -46,7 +46,7 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
 
     private fun fillEnergy(creep: Creep) {
         harvestEnergyAndDoJob(creep) {
-            if (room.findConstructionSites().isEmpty()) {
+            if (constructionSites.isEmpty()) {
                 return@harvestEnergyAndDoJob
             }
 

@@ -1,14 +1,10 @@
 package chentian
 
-import types.base.global.Game
-import types.base.global.STRUCTURE_TOWER
-import types.base.prototypes.ConstructionSite
-import types.base.prototypes.Creep
-import types.base.prototypes.Room
-import types.base.prototypes.structures.Structure
-import types.base.prototypes.structures.StructureTower
-import types.base.toMap
-import types.extensions.lazyPerTick
+import screeps.api.*
+import screeps.api.structures.Structure
+import screeps.api.structures.StructureTower
+import screeps.utils.lazyPerTick
+import screeps.utils.toMap
 
 /**
  *

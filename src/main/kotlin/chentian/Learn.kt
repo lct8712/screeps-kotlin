@@ -1,14 +1,12 @@
 package chentian
 
 import chentian.extensions.*
+import screeps.api.*
 import screeps.game.one.houseKeeping
-import types.base.get
-import types.base.global.*
-import types.base.prototypes.*
-import types.base.prototypes.structures.StructureExtension
-import types.base.prototypes.structures.StructureSpawn
-import types.base.prototypes.structures.StructureTower
-import types.base.toMap
+import screeps.api.structures.StructureExtension
+import screeps.api.structures.StructureSpawn
+import screeps.api.structures.StructureTower
+import screeps.utils.toMap
 import kotlin.math.min
 
 /**

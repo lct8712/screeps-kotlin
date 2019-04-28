@@ -5,20 +5,18 @@ import chentian.extensions.findCreepByRole
 import chentian.extensions.isEmptyEnergy
 import chentian.extensions.targetDefenceId
 import chentian.harvestEnergyAndDoJob
-import types.base.global.ERR_NOT_IN_RANGE
-import types.base.global.Game
-import types.base.global.STRUCTURE_RAMPART
-import types.base.global.STRUCTURE_WALL
-import types.base.prototypes.Creep
-import types.base.prototypes.MoveToOpts
-import types.base.prototypes.Room
-import types.base.prototypes.findStructures
-import types.base.prototypes.structures.OwnedStructure
-import types.base.prototypes.structures.Structure
-import types.base.prototypes.structures.StructureSpawn
-import types.base.prototypes.structures.StructureWall
-import types.extensions.LineStyle
-import types.extensions.Style
+import screeps.api.ERR_NOT_IN_RANGE
+import screeps.api.Game
+import screeps.api.STRUCTURE_RAMPART
+import screeps.api.STRUCTURE_WALL
+import screeps.api.Creep
+import screeps.api.FIND_STRUCTURES
+import screeps.api.MoveToOptions
+import screeps.api.Room
+import screeps.api.RoomVisual
+import screeps.api.structures.Structure
+import screeps.api.structures.StructureSpawn
+import screeps.api.structures.StructureWall
 
 /**
  *
@@ -28,7 +26,7 @@ import types.extensions.Style
 class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
 
     private val structureList by lazy {
-        room.findStructures().filter {
+        room.find(FIND_STRUCTURES).filter {
             (it.structureType == STRUCTURE_RAMPART || it.structureType == STRUCTURE_WALL) && it is OwnedStructure && it.my
         }
     }
@@ -86,6 +84,6 @@ class CreepStrategyDefenceBuilder(val room: Room): CreepStrategy {
     companion object {
 
         private const val CREEP_ROLE_DEFENCE_BUILDER = "defence-builder"
-        private val MOVE_OPTION = MoveToOpts(visualizePathStyle = Style(stroke = "#ffaa00", lineStyle = LineStyle.DOTTED))
+        private val MOVE_OPTION = MoveToOptions(visualizePathStyle = RoomVisual.Style(stroke = "#ffaa00", lineStyle = RoomVisual.LineStyle.DOTTED))
     }
 }

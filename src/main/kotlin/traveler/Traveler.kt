@@ -9,9 +9,9 @@
 
 package traveler
 
-import types.base.global.ScreepsReturnCode
-import types.base.prototypes.CostMatrix
-import types.base.prototypes.RoomPosition
+import screeps.api.CostMatrix
+import screeps.api.RoomPosition
+import screeps.api.ScreepsReturnCode
 
 external interface PathfinderReturn {
     var path: Array<RoomPosition>

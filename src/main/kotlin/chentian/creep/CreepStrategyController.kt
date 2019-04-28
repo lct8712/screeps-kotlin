@@ -1,9 +1,9 @@
 package chentian.creep
 
 import chentian.towerAttack
+import screeps.api.Game
+import screeps.api.get
 import screeps.game.one.houseKeeping
-import types.base.get
-import types.base.global.Game
 
 /**
  *

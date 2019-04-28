@@ -1,11 +1,11 @@
 package screeps.game.one.building
 
 import screeps.game.one.Context
-import types.base.global.*
-import types.base.prototypes.*
-import types.base.prototypes.structures.Structure
-import types.base.prototypes.structures.StructureController
-import types.base.prototypes.structures.StructureSpawn
+import screeps.api.*
+import screeps.api.*
+import screeps.api.structures.Structure
+import screeps.api.structures.StructureController
+import screeps.api.structures.StructureSpawn
 import types.extensions.copy
 
 val StructureController.availableStorage

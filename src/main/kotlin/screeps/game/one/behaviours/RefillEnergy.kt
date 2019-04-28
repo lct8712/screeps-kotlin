@@ -1,14 +1,17 @@
 package screeps.game.one.behaviours
 
-import screeps.game.one.*
+import screeps.api.*
 import screeps.game.one.kreeps.BodyDefinition
 import traveler.travelTo
-import types.base.global.*
-import types.base.prototypes.*
-import types.base.prototypes.structures.Structure
-import types.base.prototypes.structures.StructureContainer
-import types.base.prototypes.structures.StructureStorage
-import types.extensions.lazyPerTick
+import screeps.api.structures.Structure
+import screeps.api.structures.StructureContainer
+import screeps.api.structures.StructureStorage
+import screeps.game.one.Context
+import screeps.game.one.CreepState
+import screeps.game.one.assignedEnergySource
+import screeps.game.one.findClosest
+import screeps.game.one.state
+import screeps.utils.lazyPerTick
 
 class RefillEnergy {
     companion object {
@@ -49,7 +52,7 @@ class RefillEnergy {
 
          */
         if (shouldContinueMininig(creep)) {
-            val source: GameObject? = getSourceFromMemory(creep) ?: creep.requestEnergy()
+            val source: Identifiable? = getSourceFromMemory(creep) ?: creep.requestEnergy()
 
             if (source == null) {
                 println("no energy available for worker ${creep.name}")
@@ -74,8 +77,8 @@ class RefillEnergy {
         }
     }
 
-    private fun getSourceFromMemory(creep: Creep): GameObject? {
-        val assigned = Game.getObjectById<GameObject>(creep.memory.assignedEnergySource)
+    private fun getSourceFromMemory(creep: Creep): Identifiable? {
+        val assigned = Game.getObjectById<Identifiable>(creep.memory.assignedEnergySource)
         if (assigned == null) {
             creep.memory.assignedEnergySource = null
         }
@@ -122,12 +125,12 @@ class RefillEnergy {
         }
     }
 
-    private fun Creep.requestEnergy(): GameObject? {
+    private fun Creep.requestEnergy(): Identifiable? {
 
         val isHauler = name.startsWith(BodyDefinition.HAULER.name)
 
         val droppedEnergy = droppedEnergyByRoom.getOrPut(room, {
-            room.findDroppedEnergy().sortedBy { it.amount }
+            room.find(FIND_DROPPED_ENERGY).sortedBy { it.amount }
         })
 
         //find a source that is close and has some free spots
@@ -175,7 +178,7 @@ class RefillEnergy {
             }
         }
 
-        val containers = room.findStructures().filter { it.structureType == STRUCTURE_CONTAINER }
+        val containers = room.find(FIND_STRUCTURES).filter { it.structureType == STRUCTURE_CONTAINER }
             .filter { (it as StructureContainer).store.energy > 0 }
         if (containers.isNotEmpty()) {
             println("assigning creep $name's energysource to a container")

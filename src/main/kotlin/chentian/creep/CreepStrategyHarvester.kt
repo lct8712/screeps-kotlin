@@ -4,9 +4,9 @@ import chentian.createNormalCreep
 import chentian.extensions.findCreepByRole
 import chentian.extensions.isFullEnergy
 import chentian.harvestEnergyAndDoJob
-import types.base.global.*
-import types.base.prototypes.*
-import types.base.prototypes.structures.*
+import screeps.api.*
+import screeps.api.*
+import screeps.api.structures.*
 import types.extensions.LineStyle
 import types.extensions.Style
 
@@ -152,7 +152,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
         private const val CREEP_ROLE_HARVESTER = "harvester"
 
-        private val MOVE_OPTION = MoveToOpts(visualizePathStyle = Style(stroke = "#aaff00", lineStyle = LineStyle.DOTTED))
+        private val MOVE_OPTION = MoveToOptions(visualizePathStyle = Style(stroke = "#aaff00", lineStyle = LineStyle.DOTTED))
 
         private val STRUCTURE_PRIORITY = listOf(
             STRUCTURE_EXTENSION,

@@ -1,8 +1,7 @@
 package screeps.game.one.kreeps
 
 import kotlinx.serialization.Serializable
-import types.base.get
-import types.base.global.*
+import screeps.api.*
 
 @Serializable
 enum class BodyDefinition(val body: Array<BodyPartConstant>, val maxSize: Int = 0) {

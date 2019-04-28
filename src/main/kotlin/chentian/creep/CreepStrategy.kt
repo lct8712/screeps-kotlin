@@ -1,6 +1,6 @@
 package chentian.creep
 
-import types.base.prototypes.structures.StructureSpawn
+import screeps.api.structures.StructureSpawn
 
 /**
  *

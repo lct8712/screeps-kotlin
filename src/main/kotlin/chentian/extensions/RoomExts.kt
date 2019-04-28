@@ -2,9 +2,8 @@ package chentian.extensions
 
 import chentian.GameContext
 import chentian.isBuildFinished
-import types.base.global.BuildableStructureConstant
-import types.base.prototypes.*
-import types.base.prototypes.structures.Structure
+import screeps.api.*
+import screeps.api.structures.Structure
 
 /**
  *
@@ -16,22 +15,22 @@ fun Room.isFullEnergy(): Boolean {
 }
 
 fun Room.findFirstConstructionToBuild(type: BuildableStructureConstant): ConstructionSite? {
-    return findConstructionSites()
+    return find(FIND_CONSTRUCTION_SITES)
         .filter { (it.structureType == type) }
         .firstOrNull { !it.isBuildFinished() }
 }
 
 fun Room.findFirstStructureByType(type: BuildableStructureConstant): Structure? {
-    return findStructures()
+    return find(FIND_STRUCTURES)
         .firstOrNull { it.structureType == type }
 }
 
 fun Room.findStructureByType(type: BuildableStructureConstant): List<Structure> {
-    return findStructures().filter { it.structureType == type }
+    return find(FIND_STRUCTURES).filter { it.structureType == type }
 }
 
 fun Room.findStructureMapByType(type: BuildableStructureConstant): Map<String, Structure> {
-    return findStructures()
+    return find(FIND_STRUCTURES)
         .filter { it.structureType == type }
         .map { it.id to it }
         .toMap()

@@ -1,15 +1,12 @@
 package chentian
 
 import chentian.extensions.*
-import types.base.global.*
-import types.base.prototypes.*
-import types.base.prototypes.structures.SpawnOptions
-import types.base.prototypes.structures.Structure
-import types.base.prototypes.structures.StructureContainer
-import types.base.prototypes.structures.StructureSpawn
-import types.base.toMap
-import types.extensions.LineStyle
-import types.extensions.Style
+import screeps.api.structures.StructureSpawn
+import screeps.utils.toMap
+import screeps.api.*
+import screeps.api.structures.SpawnOptions
+import screeps.api.structures.Structure
+import screeps.api.structures.StructureContainer
 
 /**
  *
@@ -63,6 +60,11 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
 }
 
 private fun doCreateCreep(role: String, targetRoomName: String, spawn: StructureSpawn, bodyList: MutableList<AcitveBodyPartConstant>) {
+    if (spawn.spawning != null) {
+        println("spawning, existing")
+        return
+    }
+
     val options = object : SpawnOptions {
         @Suppress("unused")
         override val memory = object : CreepMemory {
@@ -78,7 +80,7 @@ private fun doCreateCreep(role: String, targetRoomName: String, spawn: Structure
     }
 }
 
-private val moveToOpts = MoveToOpts(visualizePathStyle = Style(stroke = "#00aaff", lineStyle = LineStyle.DOTTED))
+private val MoveToOptions = MoveToOptions(visualizePathStyle = RoomVisual.Style(stroke = "#00aaff", lineStyle = LineStyle.DOTTED))
 
 fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
     if (creep.isFullEnergy()) {
@@ -101,7 +103,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         val maxContainer = containers.maxBy { it.store.energy }
         if (minContainer != null && maxContainer != null && minContainer.store.energy * 10 < maxContainer.store.energy) {
             if (creep.withdraw(maxContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(maxContainer.pos, moveToOpts)
+                creep.moveTo(maxContainer.pos, MoveToOptions)
             }
             println("$creep to full container $maxContainer")
             return
@@ -118,11 +120,11 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
 
         if (container != null) {
             if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(container.pos, moveToOpts)
+                creep.moveTo(container.pos, MoveToOptions)
             }
         } else if (source != null) {
             if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source.pos, moveToOpts)
+                creep.moveTo(source.pos, MoveToOptions)
             }
         }
         println("$creep is harvesting")
@@ -165,7 +167,7 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
             }
 
             if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source.pos, moveToOpts)
+                creep.moveTo(source.pos, MoveToOptions)
             }
         } else {
             creep.moveToTargetRoom(roomNameTarget)

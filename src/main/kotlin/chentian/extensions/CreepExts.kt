@@ -1,9 +1,9 @@
 package chentian.extensions
 
-import types.base.global.FindConstant
-import types.base.prototypes.Creep
-import types.base.prototypes.RoomObject
-import types.base.prototypes.RoomPosition
+import screeps.api.FindConstant
+import screeps.api.Creep
+import screeps.api.RoomObject
+import screeps.api.RoomPosition
 
 /**
  *

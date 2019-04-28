@@ -1,7 +1,7 @@
 package chentian
 
-import types.base.prototypes.ConstructionSite
-import types.base.prototypes.structures.StructureSpawn
+import screeps.api.ConstructionSite
+import screeps.api.structures.StructureSpawn
 
 fun StructureSpawn.isFullEnergy(): Boolean {
     return energy == energyCapacity
