@@ -45,7 +45,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
     }
 
     private fun shouldCreate(): Boolean {
-        val sourceSize = room.find<Source>(FIND_SOURCES).size
+        val sourceSize = room.find(FIND_SOURCES).size
         // 最少 2 倍
         if (creeps.size < sourceSize * 2) {
             println("less then 3")

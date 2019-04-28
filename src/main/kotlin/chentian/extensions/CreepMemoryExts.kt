@@ -1,6 +1,7 @@
 package chentian.extensions
 
 import screeps.api.CreepMemory
+import screeps.utils.memory.memory
 
 /**
  *
@@ -9,18 +10,7 @@ import screeps.api.CreepMemory
  */
 
 
-var CreepMemory.containerId: String
-    get() = (asDynamic().containerId as String?).orEmpty()
-    set(value) = run { this.asDynamic().containerId = value }
-
-var CreepMemory.role: String
-    get() = (asDynamic().role as String?).orEmpty()
-    set(value) = run { this.asDynamic().role = value }
-
-var CreepMemory.targetDefenceId: String
-    get() = (asDynamic().targetDefenceId as String?).orEmpty()
-    set(value) = run { this.asDynamic().targetDefenceId = value }
-
-var CreepMemory.targetRoomName: String
-    get() = (asDynamic().targetRoomName as String?).orEmpty()
-    set(value) = run { this.asDynamic().targetRoomName = value }
+var CreepMemory.containerId: String by memory { "" }
+var CreepMemory.targetDefenceId: String by memory { "" }
+var CreepMemory.targetRoomName: String by memory { "" }
+var CreepMemory.role: String by memory {""}

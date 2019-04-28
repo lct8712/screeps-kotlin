@@ -5,7 +5,10 @@ import chentian.extensions.targetRoomName
 import chentian.utils.createMoveOptions
 import chentian.utils.createRemoteCreep
 import chentian.utils.harvestEnergyAndDoJobRemote
-import screeps.api.*
+import screeps.api.Creep
+import screeps.api.ERR_NOT_IN_RANGE
+import screeps.api.Game
+import screeps.api.Room
 import screeps.api.structures.StructureSpawn
 import screeps.utils.toMap
 
@@ -62,7 +65,7 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
 
         private val MOVE_OPTION = createMoveOptions("#aaffaa")
 
-        private const val CREEP_PER_TARGET_ROOM = 4
+        private const val CREEP_PER_TARGET_ROOM = 5
 
         private val TARGET_ROOM_LIST = listOf(
             "E17S19",

@@ -5,13 +5,13 @@ import chentian.extensions.isFullEnergy
 import chentian.extensions.isInTargetRoom
 import chentian.extensions.isWorking
 import chentian.extensions.moveToTargetRoom
+import chentian.extensions.role
 import chentian.extensions.setWorking
 import chentian.extensions.targetRoomName
 import screeps.api.ActiveBodyPartConstant
 import screeps.api.CARRY
 import screeps.api.Creep
 import screeps.api.CreepMemory
-import screeps.api.DirectionConstant
 import screeps.api.ERR_BUSY
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.FIND_SOURCES
@@ -27,11 +27,12 @@ import screeps.api.RoomVisual
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.Source
 import screeps.api.WORK
-import screeps.api.structures.SpawnOptions
-import screeps.api.structures.Structure
+import screeps.api.options
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureSpawn
+import screeps.api.value
 import screeps.utils.toMap
+import screeps.utils.unsafe.jsObject
 
 /**
  *
@@ -104,37 +105,16 @@ private fun doCreateCreep(role: String, targetRoomName: String, spawn: Structure
         return
     }
 
-    val options = createSpawnOption(role, targetRoomName)
-    val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(role), options)
+    val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(role), options {
+        memory = jsObject<CreepMemory> {
+            this.role = role
+            this.targetRoomName = targetRoomName
+        }
+    })
     println("create new creep $role. code: $result, $bodyList")
     if (result != OK && result != ERR_BUSY) {
-        Game.notify("create creep error: $result")
+        Game.notify("create creep error: ${result.value}")
     }
-}
-
-fun createSpawnOption(memory: CreepMemory): SpawnOptions {
-    return object : SpawnOptions {
-        override var directions: Array<DirectionConstant>?
-            get() = null
-            set(value) {}
-        override var dryRun: Boolean?
-            get() = null
-            set(value) {}
-        override var energyStructures: Array<Structure>?
-            get() = null
-            set(value) {}
-        override var memory: CreepMemory?
-            get() = memory
-            set(value) {}
-    }
-}
-
-private fun createSpawnOption(role: String, targetRoomName: String): SpawnOptions {
-    val memory = object : CreepMemory {
-        val role = role
-        val targetRoomName = targetRoomName
-    }
-    return createSpawnOption(memory)
 }
 
 private val moveToOptions = createMoveOptions("00aaff")
