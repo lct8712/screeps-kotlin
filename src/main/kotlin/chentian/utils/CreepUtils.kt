@@ -16,9 +16,9 @@ import screeps.api.ERR_BUSY
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES
+import screeps.api.FIND_TOMBSTONES
 import screeps.api.Game
 import screeps.api.LINE_STYLE_DOTTED
-import screeps.api.LineStyleConstant
 import screeps.api.MOVE
 import screeps.api.MoveToOptions
 import screeps.api.OK
@@ -86,16 +86,15 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
 }
 
 fun createMoveOptions(color: String): MoveToOptions {
+    val pathStyle = jsObject<RoomVisual.LineStyle> {
+        this.color = color
+        this.width = 1.0
+        this.opacity = .5
+        this.lineStyle = LINE_STYLE_DOTTED
+    }
     return object : MoveToOptions {
-        override val visualizePathStyle: RoomVisual.Style?
-            get() = object : RoomVisual.Style {
-                override var lineStyle: LineStyleConstant?
-                    get() = LINE_STYLE_DOTTED
-                    set(value) {}
-                override var opacity: Double?
-                    get() = 0.3
-                    set(value) {}
-            }
+        override val visualizePathStyle: RoomVisual.LineStyle?
+            get() = pathStyle
     }
 }
 
@@ -132,6 +131,14 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
 
         val message = if (creep.isEmptyEnergy()) "empty" else "fill"
         creep.say(message)
+
+        creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy > 0 }?.let { tombstone ->
+            if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(tombstone.pos)
+            }
+            println("$creep is withdraw tombstone")
+            return
+        }
 
         val containers = creep.room.find(FIND_STRUCTURES).filter {
             it.structureType == STRUCTURE_CONTAINER
@@ -192,6 +199,14 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
 
         val message = if (creep.isEmptyEnergy()) "empty" else "fill"
         creep.say(message)
+
+        creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy > 0 }?.let { tombstone ->
+            if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(tombstone.pos)
+            }
+            println("$creep is withdraw tombstone")
+            return
+        }
 
         val roomNameTarget = creep.memory.targetRoomName
         if (creep.isInTargetRoom(roomNameTarget)) {
