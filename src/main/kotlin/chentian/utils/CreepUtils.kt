@@ -13,6 +13,7 @@ import screeps.api.CARRY
 import screeps.api.Creep
 import screeps.api.CreepMemory
 import screeps.api.ERR_BUSY
+import screeps.api.ERR_NAME_EXISTS
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES
@@ -111,7 +112,7 @@ private fun doCreateCreep(role: String, targetRoomName: String, spawn: Structure
         }
     })
     println("create new creep $role. code: $result, $bodyList")
-    if (result != OK && result != ERR_BUSY) {
+    if (result != OK && result != ERR_BUSY && result != ERR_NAME_EXISTS) {
         Game.notify("create creep error: ${result.value}")
     }
 }
