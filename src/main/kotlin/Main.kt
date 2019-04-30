@@ -1,4 +1,4 @@
-import chentian.creep.CreepStrategyController
+import chentian.CreepStrategyController
 
 @Suppress("unused")
 private object Traveler {

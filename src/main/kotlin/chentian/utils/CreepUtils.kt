@@ -70,6 +70,7 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
 
     // 储备不够，等待
     if (spawn.room.energyAvailable < spawn.room.energyCapacityAvailable / 2 && !spawn.isFullEnergy()) {
+        println("spawn: not enough energy")
         return
     }
 

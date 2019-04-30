@@ -18,7 +18,6 @@ import screeps.api.STRUCTURE_EXTENSION
 import screeps.api.STRUCTURE_ROAD
 import screeps.api.STRUCTURE_SPAWN
 import screeps.api.STRUCTURE_TOWER
-import screeps.api.Source
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureRoad
@@ -61,7 +60,6 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         val containers = room.find(FIND_STRUCTURES).filter { it.structureType == STRUCTURE_CONTAINER }
         val totalStore = containers.sumBy { (it as StructureContainer).store.energy }
         val totalCapacity = containers.sumBy { (it as StructureContainer).storeCapacity }
-        println("$totalStore, $totalCapacity, ${totalStore.toFloat() / totalCapacity.toFloat() > 0.6f}")
         return totalStore.toFloat() / totalCapacity.toFloat() > 0.6f
     }
 
@@ -71,11 +69,11 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
     private fun fillEnergy(creep: Creep) {
         harvestEnergyAndDoJob(creep) {
-            if (repairContainer(creep)) {
+            if (transferEnergy(creep)) {
                 return@harvestEnergyAndDoJob
             }
 
-            if (transferEnergy(creep)) {
+            if (repairContainer(creep)) {
                 return@harvestEnergyAndDoJob
             }
 
@@ -88,7 +86,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
     }
 
     private fun repairContainer(creep: Creep): Boolean {
-        val container = creep.pos.findInRange<Structure>(FIND_STRUCTURES, 2).firstOrNull {
+        val container = creep.pos.findInRange(FIND_STRUCTURES, 2).firstOrNull {
             it.structureType == STRUCTURE_CONTAINER
         } as StructureContainer?
         if (container != null && container.hits < container.hitsMax) {
@@ -164,7 +162,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
     companion object {
 
-        private const val CREEP_ROLE_HARVESTER = "harvester"
+        const val CREEP_ROLE_HARVESTER = "harvester"
 
         private val MOVE_OPTION = createMoveOptions("#aaff00")
 

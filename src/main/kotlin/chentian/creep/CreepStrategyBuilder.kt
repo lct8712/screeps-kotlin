@@ -1,8 +1,9 @@
 package chentian.creep
 
-import chentian.utils.createNormalCreep
 import chentian.extensions.findCreepByRole
 import chentian.extensions.findFirstConstructionToBuild
+import chentian.extensions.role
+import chentian.utils.createNormalCreep
 import chentian.utils.harvestEnergyAndDoJob
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
@@ -47,6 +48,8 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
     private fun fillEnergy(creep: Creep) {
         harvestEnergyAndDoJob(creep) {
             if (constructionSites.isEmpty()) {
+                // 转换为 Harvester
+                creep.memory.role = CreepStrategyHarvester.CREEP_ROLE_HARVESTER
                 return@harvestEnergyAndDoJob
             }
 

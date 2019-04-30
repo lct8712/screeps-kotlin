@@ -1,5 +1,6 @@
 package chentian.creep
 
+import chentian.extensions.findCreepByRole
 import chentian.extensions.role
 import chentian.extensions.targetRoomName
 import chentian.utils.createMoveOptions
@@ -7,8 +8,10 @@ import chentian.utils.createRemoteCreep
 import chentian.utils.harvestEnergyAndDoJobRemote
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
+import screeps.api.FIND_CREEPS
 import screeps.api.Game
 import screeps.api.Room
+import screeps.api.get
 import screeps.api.structures.StructureSpawn
 import screeps.utils.toMap
 
@@ -24,6 +27,10 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
     }
 
     override fun tryToCreate(spawn: StructureSpawn) {
+        if (Game.time % 64 != 0) {
+            return
+        }
+
         TARGET_ROOM_LIST.forEach { roomName ->
             if (shouldCreate(roomName)) {
                 create(spawn, roomName)
@@ -36,6 +43,15 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
     }
 
     private fun shouldCreate(roomName: String): Boolean {
+        val creepsHarvesterCount = room.findCreepByRole(CreepStrategyHarvester.CREEP_ROLE_HARVESTER).count()
+        if (creepsHarvesterCount <= 3) {
+            return false
+        }
+
+        val hasEnemy = Game.rooms[roomName]?.find(FIND_CREEPS)?.any { !it.my } ?: false
+        if (hasEnemy) {
+            return false
+        }
         return creeps.count { it.memory.targetRoomName == roomName } < CREEP_PER_TARGET_ROOM
     }
 
