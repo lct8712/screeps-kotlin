@@ -44,7 +44,7 @@ fun gameLoopChentianLearn() {
     val spawn = Game.spawns["Spawn1"]!!
 
     houseKeeping()
-    towerAttack(spawn.room)
+    towerAttack()
     createCreepIfNecessary(spawn)
 
     val creeps = Game.creeps.toMap()

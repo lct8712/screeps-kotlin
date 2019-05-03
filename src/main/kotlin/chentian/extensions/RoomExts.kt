@@ -1,7 +1,12 @@
 package chentian.extensions
 
 import chentian.GameContext
-import screeps.api.*
+import screeps.api.BuildableStructureConstant
+import screeps.api.ConstructionSite
+import screeps.api.Creep
+import screeps.api.FIND_CONSTRUCTION_SITES
+import screeps.api.FIND_STRUCTURES
+import screeps.api.Room
 import screeps.api.structures.Structure
 
 /**
@@ -39,4 +44,8 @@ fun Room.findCreepByRole(role: String): List<Creep> {
     return GameContext.creeps.values.filter {
         it.room.name == this.name && it.memory.role == role
     }
+}
+
+fun Room.isMine(): Boolean {
+    return GameContext.rooms.containsKey(name)
 }

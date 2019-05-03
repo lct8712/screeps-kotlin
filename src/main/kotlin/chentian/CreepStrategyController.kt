@@ -25,7 +25,7 @@ object CreepStrategyController {
         val spawn = Game.spawns["Spawn1"]!!
         val room = spawn.room
 
-        towerAttack(room)
+        towerAttack()
 
         listOf(
             CreepStrategyMiner(room),

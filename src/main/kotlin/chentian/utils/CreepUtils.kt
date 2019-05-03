@@ -3,6 +3,7 @@ package chentian.utils
 import chentian.extensions.isEmptyEnergy
 import chentian.extensions.isFullEnergy
 import chentian.extensions.isInTargetRoom
+import chentian.extensions.isMine
 import chentian.extensions.isWorking
 import chentian.extensions.moveToTargetRoom
 import chentian.extensions.role
@@ -188,7 +189,7 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
     if (creep.isFullEnergy()) {
         creep.setWorking(true)
         creep.say("full")
-        if (creep.isInTargetRoom(ROOM_NAME_HOME)) {
+        if (creep.room.isMine()) {
             jobAction()
         } else {
             creep.moveToTargetRoom(ROOM_NAME_HOME)

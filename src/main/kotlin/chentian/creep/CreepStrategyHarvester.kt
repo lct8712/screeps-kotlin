@@ -15,12 +15,10 @@ import screeps.api.RESOURCE_ENERGY
 import screeps.api.Room
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_EXTENSION
-import screeps.api.STRUCTURE_ROAD
 import screeps.api.STRUCTURE_SPAWN
 import screeps.api.STRUCTURE_TOWER
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureContainer
-import screeps.api.structures.StructureRoad
 import screeps.api.structures.StructureSpawn
 
 /**
@@ -77,10 +75,6 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
                 return@harvestEnergyAndDoJob
             }
 
-            if (repairRoad(creep)) {
-                return@harvestEnergyAndDoJob
-            }
-
             upgradeController(creep)
         }
     }
@@ -103,7 +97,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
     private fun transferEnergy(creep: Creep): Boolean {
         if (!isFullEnergy) {
-            creep.pos.findInRange<Structure>(FIND_STRUCTURES, 1)
+            creep.pos.findInRange(FIND_STRUCTURES, 1)
                 .filter { it.structureType == STRUCTURE_EXTENSION }
                 .map { it as EnergyContainer }
                 .firstOrNull { it.energy < it.energyCapacity }?.let {
@@ -128,24 +122,6 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
                         println("$creep transfer failed: $transferResult")
                     }
                 }
-        }
-        return false
-    }
-
-    private fun repairRoad(creep: Creep): Boolean {
-        val road = creep.pos.findInRange(FIND_STRUCTURES, 2).filter {
-            it.structureType == STRUCTURE_ROAD
-        }.firstOrNull {
-            val road = it as StructureRoad
-            road.hits < road.hitsMax
-        } as StructureRoad?
-        if (road != null && road.hits < road.hitsMax) {
-            val repair = creep.repair(road)
-            creep.say("repair")
-            if (repair != OK) {
-                println("$creep repair road failed: $repair")
-            }
-            return true
         }
         return false
     }
