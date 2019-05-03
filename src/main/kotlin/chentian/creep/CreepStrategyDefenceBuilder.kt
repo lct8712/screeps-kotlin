@@ -6,17 +6,13 @@ import chentian.extensions.targetDefenceId
 import chentian.utils.harvestEnergyAndDoJob
 import chentian.utils.createMoveOptions
 import chentian.utils.createNormalCreep
-import chentian.utils.harvestEnergyAndDoJob
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.Game
 import screeps.api.STRUCTURE_RAMPART
 import screeps.api.STRUCTURE_WALL
 import screeps.api.Creep
 import screeps.api.FIND_MY_STRUCTURES
-import screeps.api.FIND_STRUCTURES
-import screeps.api.MoveToOptions
 import screeps.api.Room
-import screeps.api.RoomVisual
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureSpawn
 import screeps.api.structures.StructureWall

@@ -11,6 +11,7 @@ import screeps.api.FIND_CONSTRUCTION_SITES
 import screeps.api.Room
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_EXTENSION
+import screeps.api.STRUCTURE_EXTRACTOR
 import screeps.api.STRUCTURE_RAMPART
 import screeps.api.STRUCTURE_ROAD
 import screeps.api.STRUCTURE_TOWER
@@ -75,6 +76,7 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
             STRUCTURE_TOWER,
             STRUCTURE_EXTENSION,
             STRUCTURE_CONTAINER,
+            STRUCTURE_EXTRACTOR,
             STRUCTURE_WALL,
             STRUCTURE_ROAD
         )
