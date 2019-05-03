@@ -1,8 +1,9 @@
 package chentian.creep
 
+import chentian.GameContext
+import chentian.extensions.findCreepByRole
 import chentian.extensions.findFirstConstructionToBuild
 import chentian.extensions.role
-import chentian.extensions.spawnBuilderRoomName
 import chentian.utils.createRemoteCreep
 import chentian.utils.harvestEnergyAndDoJobRemote
 import screeps.api.Creep
@@ -20,8 +21,8 @@ import screeps.utils.toMap
  */
 class CreepStrategyBuilderRemote(val room: Room): CreepStrategy {
 
-    private val creeps by lazy {
-        Game.creeps.toMap().values.filter { it.memory.role == CREEP_ROLE_BUILDER_REMOTE }
+    private val roomToBuild by lazy {
+        GameContext.rooms.values.firstOrNull { it.findFirstConstructionToBuild(STRUCTURE_SPAWN) != null }
     }
 
     override fun tryToCreate(spawn: StructureSpawn) {
@@ -31,17 +32,17 @@ class CreepStrategyBuilderRemote(val room: Room): CreepStrategy {
     }
 
     override fun runLoop() {
-        creeps.forEach { buildStructure(it) }
+        val creepsInAllRoom = Game.creeps.toMap().values.filter { it.memory.role == CREEP_ROLE_BUILDER_REMOTE }
+        creepsInAllRoom.forEach { buildStructure(it) }
     }
 
     private fun shouldCreate(): Boolean {
-        return room.memory.spawnBuilderRoomName.isNotEmpty()
+        val size = roomToBuild?.findCreepByRole(CREEP_ROLE_BUILDER_REMOTE)?.size ?: return false
+        return size < MAX_REMOTE_BUILDER_COUNT
     }
 
     private fun create(spawn: StructureSpawn) {
-        if (createRemoteCreep(spawn, CREEP_ROLE_BUILDER_REMOTE, room.memory.spawnBuilderRoomName)) {
-            room.memory.spawnBuilderRoomName = ""
-        }
+        createRemoteCreep(spawn, CREEP_ROLE_BUILDER_REMOTE, roomToBuild!!.name)
     }
 
     private fun buildStructure(creep: Creep) {
@@ -64,5 +65,6 @@ class CreepStrategyBuilderRemote(val room: Room): CreepStrategy {
     companion object {
 
         private const val CREEP_ROLE_BUILDER_REMOTE = "builder-remote"
+        private const val MAX_REMOTE_BUILDER_COUNT = 3
     }
 }
