@@ -23,8 +23,6 @@ object CreepStrategyController {
         houseKeeping()
         towerAttack()
 
-        println("${GameContext.myRooms.values}")
-
         println("Game Loop Start")
         Game.spawns.values.forEach { spawn ->
             val room = spawn.room

@@ -29,6 +29,7 @@ import screeps.api.RESOURCE_ENERGY
 import screeps.api.RoomVisual
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.Source
+import screeps.api.TOP
 import screeps.api.WORK
 import screeps.api.get
 import screeps.api.options
@@ -149,6 +150,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         val message = if (creep.isEmptyEnergy()) "empty" else "fill"
         creep.say(message)
 
+        // 捡地上掉的
         creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy > 0 }?.let { tombstone ->
             if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(tombstone.pos)
@@ -157,6 +159,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
             return
         }
 
+        // Container 存量不平衡
         val containers = creep.room.find(FIND_STRUCTURES).filter {
             it.structureType == STRUCTURE_CONTAINER
         }.map { it as StructureContainer }
@@ -183,6 +186,10 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         if (container != null) {
             if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(container.pos, moveToOptions)
+            }
+            // 让开采矿的位置
+            if (creep.pos == container.pos) {
+                creep.move(TOP)
             }
         } else if (source != null) {
             if (creep.harvest(source) == ERR_NOT_IN_RANGE) {

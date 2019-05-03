@@ -8,6 +8,7 @@ import chentian.utils.harvestEnergyAndDoJob
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.FIND_CONSTRUCTION_SITES
+import screeps.api.OK
 import screeps.api.Room
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_EXTENSION
@@ -17,6 +18,7 @@ import screeps.api.STRUCTURE_ROAD
 import screeps.api.STRUCTURE_TOWER
 import screeps.api.STRUCTURE_WALL
 import screeps.api.structures.StructureSpawn
+import kotlin.math.max
 
 /**
  *
@@ -39,7 +41,8 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
     }
 
     private fun shouldCreate(): Boolean {
-        return constructionSites.isNotEmpty() && creeps.size < MAX_BUILDER_COUNT
+        val maxCount = max(MAX_BUILDER_COUNT, constructionSites.size / 6)
+        return constructionSites.isNotEmpty() && creeps.size < maxCount
     }
 
     private fun create(spawn: StructureSpawn) {
@@ -56,9 +59,12 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
 
             STRUCTURE_PRIORITY.forEach { structureType ->
                 room.findFirstConstructionToBuild(structureType)?.let { target ->
-                    if (creep.build(target) == ERR_NOT_IN_RANGE) {
+                    val result = creep.build(target)
+                    println("$creep is building ${target.structureType} at ${target.pos}, result: $result")
+                    if (result == ERR_NOT_IN_RANGE) {
                         creep.moveTo(target.pos)
-                        println("$creep is building $target")
+                    }
+                    if (result == OK || result == ERR_NOT_IN_RANGE) {
                         return@harvestEnergyAndDoJob
                     }
                 }
@@ -72,11 +78,11 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
         private const val MAX_BUILDER_COUNT = 2
 
         private val STRUCTURE_PRIORITY = listOf(
-            STRUCTURE_RAMPART,
             STRUCTURE_TOWER,
             STRUCTURE_EXTENSION,
             STRUCTURE_CONTAINER,
             STRUCTURE_EXTRACTOR,
+            STRUCTURE_RAMPART,
             STRUCTURE_WALL,
             STRUCTURE_ROAD
         )

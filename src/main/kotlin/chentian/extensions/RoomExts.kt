@@ -4,7 +4,7 @@ import chentian.GameContext
 import screeps.api.BuildableStructureConstant
 import screeps.api.ConstructionSite
 import screeps.api.Creep
-import screeps.api.FIND_MY_CONSTRUCTION_SITES
+import screeps.api.FIND_CONSTRUCTION_SITES
 import screeps.api.FIND_STRUCTURES
 import screeps.api.Room
 import screeps.api.structures.Structure
@@ -14,13 +14,14 @@ import screeps.api.structures.Structure
  *
  * @author chentian
  */
+
 fun Room.isFullEnergy(): Boolean {
     return energyAvailable == energyCapacityAvailable
 }
 
 fun Room.findFirstConstructionToBuild(type: BuildableStructureConstant): ConstructionSite? {
-    return find(FIND_MY_CONSTRUCTION_SITES)
-        .filter { (it.structureType == type) }
+    return find(FIND_CONSTRUCTION_SITES)
+        .filter { it.structureType == type }
         .firstOrNull { !it.isBuildFinished() }
 }
 
