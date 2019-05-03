@@ -47,12 +47,10 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         val sourceSize = room.find(FIND_SOURCES).size
         // 最少 2 倍
         if (creeps.size < sourceSize * 2) {
-            println("less then 3")
             return true
         }
         // 最多 4 倍
         if (creeps.size > sourceSize * 4) {
-            println("more then 5")
             return false
         }
 
@@ -111,6 +109,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         }
 
         STRUCTURE_PRIORITY.forEach { structureType ->
+            // 找最近的一个建筑去充能
             val energyStructures = room.find(FIND_STRUCTURES)
                 .filter { it.structureType == structureType}
                 .map { it as EnergyContainer }

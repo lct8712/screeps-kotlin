@@ -64,8 +64,8 @@ fun createRemoteCreep(spawn: StructureSpawn, role: String, roomName: String): Bo
 }
 
 fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
-    val partCount = spawn.room.energyAvailable / 300
-    if (partCount <= 0) {
+    val partCount = spawn.room.energyAvailable / 350
+    if (partCount < 1) {
         return
     }
 
@@ -75,10 +75,11 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
         return
     }
 
-    // 每 2 个 work 配 一对 carry & move
+    // https://screeps.fandom.com/wiki/Creep#Fatigue
     val bodyList = mutableListOf<ActiveBodyPartConstant>().apply {
         for (i in 0 until partCount) {
             add(MOVE)
+            add(CARRY)
             add(CARRY)
             add(WORK)
             add(WORK)
@@ -162,6 +163,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
             return
         }
 
+        // 找最近的 source
         val source: Source? = creep.pos.findClosestByPath(FIND_SOURCES)
         val container: StructureContainer? = source?.pos?.findInRange(FIND_STRUCTURES, 1)?.firstOrNull {
             it.structureType == STRUCTURE_CONTAINER

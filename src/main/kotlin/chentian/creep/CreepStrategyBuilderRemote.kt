@@ -65,6 +65,6 @@ class CreepStrategyBuilderRemote(val room: Room): CreepStrategy {
     companion object {
 
         private const val CREEP_ROLE_BUILDER_REMOTE = "builder-remote"
-        private const val MAX_REMOTE_BUILDER_COUNT = 3
+        private const val MAX_REMOTE_BUILDER_COUNT = 8
     }
 }
