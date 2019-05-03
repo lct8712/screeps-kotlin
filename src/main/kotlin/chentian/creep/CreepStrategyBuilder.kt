@@ -35,7 +35,7 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
     }
 
     override fun runLoop() {
-        creeps.forEach { fillEnergy(it) }
+        creeps.forEach { buildStructure(it) }
     }
 
     private fun shouldCreate(): Boolean {
@@ -46,7 +46,7 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
         createNormalCreep(spawn, CREEP_ROLE_BUILDER)
     }
 
-    private fun fillEnergy(creep: Creep) {
+    private fun buildStructure(creep: Creep) {
         harvestEnergyAndDoJob(creep) {
             if (constructionSites.isEmpty()) {
                 // 转换为 Harvester

@@ -11,3 +11,4 @@ import screeps.utils.memory.memory
 
 
 var RoomMemory.claimerRoomName: String by memory { "" }
+var RoomMemory.spawnBuilderRoomName: String by memory { "" }

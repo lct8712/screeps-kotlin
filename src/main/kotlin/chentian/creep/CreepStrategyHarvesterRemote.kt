@@ -56,7 +56,7 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
     }
 
     private fun create(spawn: StructureSpawn, roomName: String) {
-        createRemoteCreep(spawn, roomName, CREEP_ROLE_HARVESTER_REMOTE)
+        createRemoteCreep(spawn, CREEP_ROLE_HARVESTER_REMOTE, roomName)
     }
 
     private fun fillEnergy(creep: Creep) {

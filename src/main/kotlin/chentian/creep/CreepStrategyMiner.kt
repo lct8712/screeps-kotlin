@@ -84,6 +84,5 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
 
         private const val CREEP_ROLE_MINER = "miner"
         private const val MAX_WORKER_BODY_COUNT = 5
-
     }
 }

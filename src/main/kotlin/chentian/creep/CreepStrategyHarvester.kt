@@ -13,6 +13,7 @@ import screeps.api.FIND_STRUCTURES
 import screeps.api.OK
 import screeps.api.RESOURCE_ENERGY
 import screeps.api.Room
+import screeps.api.RoomObject
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_EXTENSION
 import screeps.api.STRUCTURE_SPAWN
@@ -20,6 +21,7 @@ import screeps.api.STRUCTURE_TOWER
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureSpawn
+import screeps.game.one.findClosest
 
 /**
  *
@@ -109,19 +111,22 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         }
 
         STRUCTURE_PRIORITY.forEach { structureType ->
-            room.find(FIND_STRUCTURES)
-                .filter { it.structureType == structureType }
+            val energyStructures = room.find(FIND_STRUCTURES)
+                .filter { it.structureType == structureType}
                 .map { it as EnergyContainer }
-                .firstOrNull { it.energy < it.energyCapacity }?.let { target ->
-                    val transferResult = creep.transfer(target as Structure, RESOURCE_ENERGY)
-                    if (transferResult == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target.pos, MOVE_OPTION)
-                        println("$creep is filling energy $target")
-                        return true
-                    } else if (transferResult != OK) {
-                        println("$creep transfer failed: $transferResult")
-                    }
+                .filter { it.energy < it.energyCapacity }
+                .map { it as RoomObject }
+
+            creep.findClosest(energyStructures)?.let { target ->
+                val transferResult = creep.transfer(target as Structure, RESOURCE_ENERGY)
+                if (transferResult == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target.pos, MOVE_OPTION)
+                    println("$creep is filling energy $target")
+                    return true
+                } else if (transferResult != OK) {
+                    println("$creep transfer failed: $transferResult")
                 }
+            }
         }
         return false
     }

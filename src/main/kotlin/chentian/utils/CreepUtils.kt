@@ -54,13 +54,13 @@ fun createCreepName(role: String): String {
     return "creep_${role}_${Game.time}"
 }
 
-fun createRemoteCreep(spawn: StructureSpawn, roomName: String, role: String = "") {
+fun createRemoteCreep(spawn: StructureSpawn, role: String, roomName: String): Boolean {
     if (spawn.room.energyAvailable < 250) {
-        return
+        return false
     }
 
     val bodyList = mutableListOf(MOVE, CARRY, CARRY, WORK)
-    doCreateCreep(role, roomName, spawn, bodyList)
+    return doCreateCreep(role, roomName, spawn, bodyList)
 }
 
 fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
@@ -101,10 +101,15 @@ fun createMoveOptions(color: String): MoveToOptions {
     }
 }
 
-private fun doCreateCreep(role: String, targetRoomName: String, spawn: StructureSpawn, bodyList: MutableList<ActiveBodyPartConstant>) {
+private fun doCreateCreep(
+    role: String,
+    targetRoomName: String,
+    spawn: StructureSpawn,
+    bodyList: MutableList<ActiveBodyPartConstant>
+): Boolean {
     if (spawn.spawning != null) {
         println("spawning, existing")
-        return
+        return false
     }
 
     val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(role), options {
@@ -117,6 +122,7 @@ private fun doCreateCreep(role: String, targetRoomName: String, spawn: Structure
     if (result != OK && result != ERR_BUSY && result != ERR_NAME_EXISTS) {
         Game.notify("create creep error: ${result.value}")
     }
+    return result == OK
 }
 
 private val moveToOptions = createMoveOptions("00aaff")
@@ -213,7 +219,9 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
 
         val roomNameTarget = creep.memory.targetRoomName
         if (creep.isInTargetRoom(roomNameTarget)) {
-            val source = creep.room.find(FIND_SOURCES).getOrNull(0)
+            val sourceList = creep.room.find(FIND_SOURCES)
+            val index = creep.name[creep.name.length - 2].toInt() % sourceList.size
+            val source = sourceList.getOrNull(index)
             if (source == null) {
                 creep.say("source not found")
                 println("$creep source in room not found harvesting")
