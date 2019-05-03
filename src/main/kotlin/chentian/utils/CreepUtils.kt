@@ -10,6 +10,7 @@ import chentian.extensions.role
 import chentian.extensions.setWorking
 import chentian.extensions.targetRoomName
 import screeps.api.ActiveBodyPartConstant
+import screeps.api.BODYPART_COST
 import screeps.api.CARRY
 import screeps.api.Creep
 import screeps.api.CreepMemory
@@ -29,6 +30,7 @@ import screeps.api.RoomVisual
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.Source
 import screeps.api.WORK
+import screeps.api.get
 import screeps.api.options
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureSpawn
@@ -63,8 +65,17 @@ fun createRemoteCreep(spawn: StructureSpawn, role: String, roomName: String): Bo
     return doCreateCreep(role, roomName, spawn, bodyList)
 }
 
+val BODY_PART_FOR_NORMAL_CREEP = listOf(MOVE, CARRY, CARRY, WORK, WORK)
+val BODY_COST_FOR_NORMAL_CREEP = BODY_PART_FOR_NORMAL_CREEP.sumBy { (BODYPART_COST[it])!! }
+
 fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
-    val partCount = spawn.room.energyAvailable / 350
+    // 一个小房间，创建最基本的 creep
+    if (spawn.room.energyCapacityAvailable < BODY_COST_FOR_NORMAL_CREEP) {
+        doCreateCreep(role, "", spawn, mutableListOf(MOVE, CARRY, WORK))
+        return
+    }
+
+    val partCount = spawn.room.energyAvailable / BODY_COST_FOR_NORMAL_CREEP
     if (partCount < 1) {
         return
     }
@@ -78,11 +89,7 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
     // https://screeps.fandom.com/wiki/Creep#Fatigue
     val bodyList = mutableListOf<ActiveBodyPartConstant>().apply {
         for (i in 0 until partCount) {
-            add(MOVE)
-            add(CARRY)
-            add(CARRY)
-            add(WORK)
-            add(WORK)
+            addAll(BODY_PART_FOR_NORMAL_CREEP)
         }
     }
 

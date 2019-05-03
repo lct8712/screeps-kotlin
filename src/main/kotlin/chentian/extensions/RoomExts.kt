@@ -4,7 +4,7 @@ import chentian.GameContext
 import screeps.api.BuildableStructureConstant
 import screeps.api.ConstructionSite
 import screeps.api.Creep
-import screeps.api.FIND_CONSTRUCTION_SITES
+import screeps.api.FIND_MY_CONSTRUCTION_SITES
 import screeps.api.FIND_STRUCTURES
 import screeps.api.Room
 import screeps.api.structures.Structure
@@ -19,18 +19,9 @@ fun Room.isFullEnergy(): Boolean {
 }
 
 fun Room.findFirstConstructionToBuild(type: BuildableStructureConstant): ConstructionSite? {
-    return find(FIND_CONSTRUCTION_SITES)
+    return find(FIND_MY_CONSTRUCTION_SITES)
         .filter { (it.structureType == type) }
         .firstOrNull { !it.isBuildFinished() }
-}
-
-fun Room.findFirstStructureByType(type: BuildableStructureConstant): Structure? {
-    return find(FIND_STRUCTURES)
-        .firstOrNull { it.structureType == type }
-}
-
-fun Room.findStructureByType(type: BuildableStructureConstant): List<Structure> {
-    return find(FIND_STRUCTURES).filter { it.structureType == type }
 }
 
 fun Room.findStructureMapByType(type: BuildableStructureConstant): Map<String, Structure> {
@@ -47,5 +38,5 @@ fun Room.findCreepByRole(role: String): List<Creep> {
 }
 
 fun Room.isMine(): Boolean {
-    return GameContext.rooms.containsKey(name)
+    return GameContext.myRooms.containsKey(name)
 }
