@@ -2,10 +2,11 @@ package screeps.game.one
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JSON
+import screeps.api.*
+import screeps.api.structures.SpawnOptions
+import screeps.api.structures.Structure
+import screeps.api.structures.StructureSpawn
 import screeps.game.one.kreeps.BodyDefinition
-import types.base.global.*
-import types.base.prototypes.structures.SpawnOptions
-import types.base.prototypes.structures.StructureSpawn
 
 fun StructureSpawn.spawn(bodyDefinition: BodyDefinition, spawnOptions: KreepSpawnOptions? = null): ScreepsReturnCode {
     if (room.energyAvailable < bodyDefinition.cost) return ERR_NOT_ENOUGH_ENERGY
@@ -135,7 +136,19 @@ data class KreepSpawnOptions(
 ) {
     fun toSpawnOptions(): SpawnOptions {
         return object : SpawnOptions {
-            override val memory = object : CreepMemory {}.apply { transfer(this) }
+            override var memory: CreepMemory?
+                get() = object : CreepMemory {}.apply { transfer(this) }
+                set(value) {}
+            override var directions: Array<DirectionConstant>?
+                get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+                set(value) {}
+            override var dryRun: Boolean?
+                get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+                set(value) {}
+            override var energyStructures: Array<Structure>?
+                get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+                set(value) {}
+//            override var memory = object : CreepMemory {}.apply { transfer(this) }
         }
     }
 

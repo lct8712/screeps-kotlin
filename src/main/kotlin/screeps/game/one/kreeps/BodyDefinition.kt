@@ -1,8 +1,14 @@
 package screeps.game.one.kreeps
 
 import kotlinx.serialization.Serializable
-import types.base.get
-import types.base.global.*
+import screeps.api.BODYPART_COST
+import screeps.api.BodyPartConstant
+import screeps.api.CARRY
+import screeps.api.CLAIM
+import screeps.api.MOVE
+import screeps.api.WORK
+import screeps.api.get
+import screeps.api.value
 
 @Serializable
 enum class BodyDefinition(val body: Array<BodyPartConstant>, val maxSize: Int = 0) {
@@ -36,7 +42,7 @@ enum class BodyDefinition(val body: Array<BodyPartConstant>, val maxSize: Int = 
     CLAIMER(arrayOf(CLAIM, MOVE), maxSize = 1);
 
     val cost: Int
-        get() = body.sumBy { BODYPART_COST[it] }
+        get() = body.sumBy { (BODYPART_COST[it])!! }
 
     data class Body(val tier: Int, val body: List<BodyPartConstant>)
 
@@ -51,7 +57,7 @@ enum class BodyDefinition(val body: Array<BodyPartConstant>, val maxSize: Int = 
             body.addAll(this.body)
             size += 1
         }
-        body.sortBy { it.stringValue() }
+        body.sortBy { it.value }
 
         return Body(size, body)
     }

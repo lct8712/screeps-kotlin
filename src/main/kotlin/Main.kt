@@ -1,4 +1,4 @@
-import chentian.gameLoopChentian
+import chentian.CreepStrategyController
 
 @Suppress("unused")
 private object Traveler {
@@ -19,5 +19,6 @@ private object Traveler {
 fun loop() {
     Traveler
 //    gameLoop()
-    gameLoopChentian()
+//    gameLoopChentianLearn()
+    CreepStrategyController.gameLoop()
 }
