@@ -19,6 +19,10 @@ fun Room.isFullEnergy(): Boolean {
     return energyAvailable == energyCapacityAvailable
 }
 
+fun Room.findConstructionsToBuild(type: BuildableStructureConstant): List<ConstructionSite> {
+    return find(FIND_CONSTRUCTION_SITES).filter { it.structureType == type }
+}
+
 fun Room.findFirstConstructionToBuild(type: BuildableStructureConstant): ConstructionSite? {
     return find(FIND_CONSTRUCTION_SITES)
         .filter { it.structureType == type }

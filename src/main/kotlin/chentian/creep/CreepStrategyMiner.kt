@@ -43,9 +43,11 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
             }
 
             if (!creep.pos.isEqualTo(container.pos)) {
+                // 移动到 container 的位置
                 creep.moveTo(container.pos)
                 creep.say("move")
             } else {
+                // 正常采集
                 creep.harvest(source)
                 creep.say("mine")
             }

@@ -1,13 +1,17 @@
 package chentian.creep
 
+import chentian.extensions.buildTargetId
+import chentian.extensions.findConstructionsToBuild
 import chentian.extensions.findCreepByRole
-import chentian.extensions.findFirstConstructionToBuild
+import chentian.extensions.isBuildFinished
 import chentian.extensions.role
 import chentian.utils.createNormalCreep
 import chentian.utils.harvestEnergyAndDoJob
+import screeps.api.ConstructionSite
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.FIND_CONSTRUCTION_SITES
+import screeps.api.Game
 import screeps.api.OK
 import screeps.api.Room
 import screeps.api.STRUCTURE_CONTAINER
@@ -18,6 +22,7 @@ import screeps.api.STRUCTURE_ROAD
 import screeps.api.STRUCTURE_TOWER
 import screeps.api.STRUCTURE_WALL
 import screeps.api.structures.StructureSpawn
+import screeps.game.one.findClosest
 import kotlin.math.max
 
 /**
@@ -57,19 +62,38 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
                 return@harvestEnergyAndDoJob
             }
 
+            // 已经有要建造的目标
+            Game.getObjectById<ConstructionSite>(creep.memory.buildTargetId)?.let { target ->
+                if (target.isBuildFinished()) {
+                    creep.memory.buildTargetId = ""
+                } else if (tryToBuild(creep, target)) {
+                    return@harvestEnergyAndDoJob
+                }
+            }
+
+            // 重新选择
             STRUCTURE_PRIORITY.forEach { structureType ->
-                room.findFirstConstructionToBuild(structureType)?.let { target ->
-                    val result = creep.build(target)
-                    println("$creep is building ${target.structureType} at ${target.pos}, result: $result")
-                    if (result == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target.pos)
-                    }
-                    if (result == OK || result == ERR_NOT_IN_RANGE) {
+                val constructionList = room.findConstructionsToBuild(structureType)
+                creep.findClosest(constructionList)?.let { target ->
+                    creep.memory.buildTargetId = target.id
+                    if (tryToBuild(creep, target)) {
                         return@harvestEnergyAndDoJob
                     }
                 }
             }
         }
+    }
+
+    private fun tryToBuild(creep: Creep, target: ConstructionSite): Boolean {
+        val result = creep.build(target)
+        println("$creep is building ${target.structureType} at ${target.pos}, result: $result")
+        if (result == ERR_NOT_IN_RANGE) {
+            creep.moveTo(target.pos)
+        }
+        if (result == OK || result == ERR_NOT_IN_RANGE) {
+            return true
+        }
+        return false
     }
 
     companion object {
