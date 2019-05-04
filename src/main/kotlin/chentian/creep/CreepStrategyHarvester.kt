@@ -1,7 +1,9 @@
 package chentian.creep
 
+import chentian.extensions.containerTargetId
 import chentian.extensions.findCreepByRole
 import chentian.extensions.isFullEnergy
+import chentian.extensions.transferTargetId
 import chentian.utils.createMoveOptions
 import chentian.utils.createNormalCreep
 import chentian.utils.harvestEnergyAndDoJob
@@ -10,6 +12,7 @@ import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.EnergyContainer
 import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES
+import screeps.api.Game
 import screeps.api.OK
 import screeps.api.RESOURCE_ENERGY
 import screeps.api.Room
@@ -20,6 +23,7 @@ import screeps.api.STRUCTURE_SPAWN
 import screeps.api.STRUCTURE_TOWER
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureContainer
+import screeps.api.structures.StructureController
 import screeps.api.structures.StructureSpawn
 import screeps.game.one.findClosest
 
@@ -67,16 +71,13 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
     private fun fillEnergy(creep: Creep) {
         harvestEnergyAndDoJob(creep) {
-            if (transferEnergy(creep)) {
-                return@harvestEnergyAndDoJob
-            }
-
-            upgradeController(creep)
+            transferEnergy(creep)
         }
     }
 
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-    private fun transferEnergy(creep: Creep): Boolean {
+    private fun transferEnergy(creep: Creep) {
+        // 附近有扩展
         if (!isFullEnergy) {
             creep.pos.findInRange(FIND_STRUCTURES, 1)
                 .filter { it.structureType == STRUCTURE_EXTENSION }
@@ -84,9 +85,17 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
                 .firstOrNull { it.energy < it.energyCapacity }?.let {
                     if (creep.transfer(it as Structure, RESOURCE_ENERGY) == OK) {
                         println("$creep transfer to a near extension")
-                        return true
+                        return
                     }
                 }
+        }
+
+        // 已有 transfer 目标
+        Game.getObjectById<Structure>(creep.memory.transferTargetId)?.let { target ->
+            if (transferOrMove(creep, target)) {
+                println("###1")
+                return
+            }
         }
 
         STRUCTURE_PRIORITY.forEach { structureType ->
@@ -95,30 +104,50 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
                 .filter { it.structureType == structureType}
                 .map { it as EnergyContainer }
                 .filter { it.energy < it.energyCapacity }
-                .map { it as RoomObject }
+                .map { it as Structure }
 
             creep.findClosest(energyStructures)?.let { target ->
-                val transferResult = creep.transfer(target as Structure, RESOURCE_ENERGY)
-                if (transferResult == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target.pos, MOVE_OPTION)
-                    println("$creep is filling energy $target")
-                    return true
-                } else if (transferResult != OK) {
-                    println("$creep transfer failed: $transferResult")
+                creep.memory.transferTargetId = target.id
+                if (transferOrMove(creep, target)) {
+                    println("###2")
+                    return
                 }
             }
         }
-        return false
-    }
 
-    private fun upgradeController(creep: Creep) {
+        // 已有 controller 目标
+        Game.getObjectById<StructureController>(creep.memory.containerTargetId)?.let { target ->
+            upgradeOrMove(creep, target)
+            println("###3")
+            return
+        }
+
+        // 去升级 controller
         val controller = creep.room.controller
         if (controller != null) {
-            if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(controller.pos, MOVE_OPTION)
-            }
-            println("$creep is upgrading controller")
+            creep.memory.containerTargetId = controller.id
+            upgradeOrMove(creep, controller)
+            println("###4")
         }
+    }
+
+    private fun upgradeOrMove(creep: Creep, controller: StructureController) {
+        if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(controller.pos, MOVE_OPTION)
+        }
+        println("$creep is upgrading controller")
+    }
+
+    private fun transferOrMove(creep: Creep, target: RoomObject): Boolean {
+        val transferResult = creep.transfer(target as Structure, RESOURCE_ENERGY)
+        if (transferResult == ERR_NOT_IN_RANGE) {
+            creep.moveTo(target.pos, MOVE_OPTION)
+            println("$creep is filling energy $target")
+            return true
+        } else if (transferResult != OK) {
+            println("$creep transfer failed: $transferResult")
+        }
+        return false
     }
 
     companion object {

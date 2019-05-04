@@ -1,5 +1,6 @@
 package chentian.utils
 
+import chentian.extensions.containerTargetId
 import chentian.extensions.isEmptyEnergy
 import chentian.extensions.isFullEnergy
 import chentian.extensions.isInTargetRoom
@@ -9,6 +10,7 @@ import chentian.extensions.moveToTargetRoom
 import chentian.extensions.role
 import chentian.extensions.setWorking
 import chentian.extensions.targetRoomName
+import chentian.extensions.transferTargetId
 import chentian.extensions.withdrawTargetId
 import screeps.api.ActiveBodyPartConstant
 import screeps.api.BODYPART_COST
@@ -141,6 +143,8 @@ private val moveToOptions = createMoveOptions("00aaff")
 fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
     if (creep.isFullEnergy()) {
         creep.memory.withdrawTargetId = ""
+        creep.memory.transferTargetId = ""
+        creep.memory.containerTargetId = ""
         creep.setWorking(true)
         creep.say("full")
         jobAction()
