@@ -250,7 +250,8 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         }
 
         val roomNameTarget = creep.memory.targetRoomName
-        if (creep.isInTargetRoom(roomNameTarget)) {
+        val inTargetRoom = creep.isInTargetRoom(roomNameTarget)
+        if (inTargetRoom) {
             val sourceList = creep.room.find(FIND_SOURCES)
             val index = creep.name[creep.name.length - 2].toInt() % sourceList.size
             val source = sourceList.getOrNull(index)
@@ -267,7 +268,7 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
             creep.moveToTargetRoom(roomNameTarget)
         }
 
-        println("$creep is harvesting remote")
+        println("$creep is harvesting remote, in target room: $inTargetRoom")
         return
     }
 

@@ -1,19 +1,15 @@
 package chentian.creep
 
 import chentian.extensions.findCreepByRole
-import chentian.extensions.role
 import chentian.extensions.targetRoomName
 import chentian.utils.createMoveOptions
 import chentian.utils.createRemoteCreep
-import chentian.utils.harvestEnergyAndDoJobRemote
-import screeps.api.Creep
-import screeps.api.ERR_NOT_IN_RANGE
+import chentian.utils.remoteHarvesters
 import screeps.api.FIND_CREEPS
 import screeps.api.Game
 import screeps.api.Room
 import screeps.api.get
 import screeps.api.structures.StructureSpawn
-import screeps.utils.toMap
 
 /**
  *
@@ -22,16 +18,14 @@ import screeps.utils.toMap
  */
 class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
 
-    private val creeps by lazy {
-        Game.creeps.toMap().values.filter { it.memory.role == CREEP_ROLE_HARVESTER_REMOTE }
-    }
+    private val creeps by lazy { remoteHarvesters }
 
     override fun tryToCreate(spawn: StructureSpawn) {
         if (Game.time % 64 != 0) {
             return
         }
 
-        TARGET_ROOM_LIST.forEach { roomName ->
+        TARGET_ROOM_MAP[room.name]?.forEach { roomName ->
             if (shouldCreate(roomName)) {
                 create(spawn, roomName)
             }
@@ -39,7 +33,6 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
     }
 
     override fun runLoop() {
-        creeps.forEach { fillEnergy(it) }
     }
 
     private fun shouldCreate(roomName: String): Boolean {
@@ -59,32 +52,14 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
         createRemoteCreep(spawn, CREEP_ROLE_HARVESTER_REMOTE, roomName)
     }
 
-    private fun fillEnergy(creep: Creep) {
-        harvestEnergyAndDoJobRemote(creep) {
-            upgradeController(creep)
-        }
-    }
-
-    private fun upgradeController(creep: Creep) {
-        val controller = creep.room.controller
-        if (controller != null) {
-            if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(controller.pos, MOVE_OPTION)
-            }
-            println("$creep is upgrading controller")
-        }
-    }
-
     companion object {
 
-        private const val CREEP_ROLE_HARVESTER_REMOTE = "harvester-remote"
-
-        private val MOVE_OPTION = createMoveOptions("#aaffaa")
+        const val CREEP_ROLE_HARVESTER_REMOTE = "harvester-remote"
 
         private const val CREEP_PER_TARGET_ROOM = 5
 
-        private val TARGET_ROOM_LIST = listOf(
-            "E17S19"
+        private val TARGET_ROOM_MAP = mapOf(
+            "E18S19" to listOf("E17S19")
         )
     }
 }

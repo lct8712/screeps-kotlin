@@ -7,6 +7,7 @@ import chentian.creep.CreepStrategyDefenceBuilder
 import chentian.creep.CreepStrategyHarvester
 import chentian.creep.CreepStrategyHarvesterRemote
 import chentian.creep.CreepStrategyMiner
+import chentian.utils.runRemoteHarvesters
 import chentian.utils.towerAttack
 import screeps.api.Game
 import screeps.api.values
@@ -41,5 +42,7 @@ object CreepStrategyController {
                 strategy.runLoop()
             }
         }
+
+        runRemoteHarvesters()
     }
 }
