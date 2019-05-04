@@ -3,7 +3,7 @@ package chentian
 import chentian.creep.CreepStrategyBuilder
 import chentian.creep.CreepStrategyBuilderRemote
 import chentian.creep.CreepStrategyClaimer
-import chentian.creep.CreepStrategyDefenceBuilder
+import chentian.creep.CreepStrategyDefenceRepair
 import chentian.creep.CreepStrategyHarvester
 import chentian.creep.CreepStrategyHarvesterRemote
 import chentian.creep.CreepStrategyMiner
@@ -33,7 +33,7 @@ object CreepStrategyController {
                 CreepStrategyMiner(room),
                 CreepStrategyHarvester(room),
                 CreepStrategyBuilder(room),
-                CreepStrategyDefenceBuilder(room),
+                CreepStrategyDefenceRepair(room),
                 CreepStrategyHarvesterRemote(room),
                 CreepStrategyClaimer(room),
                 CreepStrategyBuilderRemote(room)
