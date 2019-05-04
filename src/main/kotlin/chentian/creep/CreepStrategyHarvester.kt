@@ -71,27 +71,8 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
                 return@harvestEnergyAndDoJob
             }
 
-            if (repairContainer(creep)) {
-                return@harvestEnergyAndDoJob
-            }
-
             upgradeController(creep)
         }
-    }
-
-    private fun repairContainer(creep: Creep): Boolean {
-        val container = creep.pos.findInRange(FIND_STRUCTURES, 2).firstOrNull {
-            it.structureType == STRUCTURE_CONTAINER
-        } as StructureContainer?
-        if (container != null && container.hits < container.hitsMax) {
-            val repair = creep.repair(container)
-            creep.say("repair")
-            if (repair != OK) {
-                println("repair container failed: $repair")
-            }
-            return true
-        }
-        return false
     }
 
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")

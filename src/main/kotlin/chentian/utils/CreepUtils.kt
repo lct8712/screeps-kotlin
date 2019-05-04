@@ -9,6 +9,7 @@ import chentian.extensions.moveToTargetRoom
 import chentian.extensions.role
 import chentian.extensions.setWorking
 import chentian.extensions.targetRoomName
+import chentian.extensions.transferTargetId
 import chentian.extensions.withdrawTargetId
 import screeps.api.ActiveBodyPartConstant
 import screeps.api.BODYPART_COST

@@ -5,8 +5,8 @@ import screeps.api.FIND_CREEPS
 import screeps.api.FIND_HOSTILE_CREEPS
 import screeps.api.FIND_STRUCTURES
 import screeps.api.Game
+import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_ROAD
-import screeps.api.structures.StructureRoad
 
 /**
  *
@@ -32,15 +32,14 @@ fun towerAttack() {
             return@forEach
         }
 
-        // Repair Road
+        // Repair
         if (Game.time % 64 == 0) {
             tower.room.find(FIND_STRUCTURES).filter {
-                it.structureType == STRUCTURE_ROAD
+                it.structureType == STRUCTURE_ROAD || it.structureType == STRUCTURE_CONTAINER
             }.firstOrNull {
-                val road = it as StructureRoad
-                road.hits < road.hitsMax - 1000
-            }?.let { road ->
-                val result = tower.repair(road)
+                it.hits < it.hitsMax - 1000
+            }?.let {
+                val result = tower.repair(it)
                 println("$tower is repairing road: $result")
                 return@forEach
             }
