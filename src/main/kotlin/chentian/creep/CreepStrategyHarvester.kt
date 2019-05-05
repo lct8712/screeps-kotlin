@@ -93,7 +93,6 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         // 已有 transfer 目标
         Game.getObjectById<Structure>(creep.memory.transferTargetId)?.let { target ->
             if (transferOrMove(creep, target)) {
-                println("###1")
                 return
             }
         }
@@ -109,7 +108,6 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
             creep.findClosest(energyStructures)?.let { target ->
                 creep.memory.transferTargetId = target.id
                 if (transferOrMove(creep, target)) {
-                    println("###2")
                     return
                 }
             }
@@ -118,7 +116,6 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         // 已有 controller 目标
         Game.getObjectById<StructureController>(creep.memory.containerTargetId)?.let { target ->
             upgradeOrMove(creep, target)
-            println("###3")
             return
         }
 
@@ -127,7 +124,6 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         if (controller != null) {
             creep.memory.containerTargetId = controller.id
             upgradeOrMove(creep, controller)
-            println("###4")
         }
     }
 

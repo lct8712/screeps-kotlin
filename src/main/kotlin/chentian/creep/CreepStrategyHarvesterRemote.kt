@@ -2,7 +2,6 @@ package chentian.creep
 
 import chentian.extensions.findCreepByRole
 import chentian.extensions.targetRoomName
-import chentian.utils.createMoveOptions
 import chentian.utils.createRemoteCreep
 import chentian.utils.remoteHarvesters
 import screeps.api.FIND_CREEPS
@@ -56,7 +55,7 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
 
         const val CREEP_ROLE_HARVESTER_REMOTE = "harvester-remote"
 
-        private const val CREEP_PER_TARGET_ROOM = 5
+        private const val CREEP_PER_TARGET_ROOM = 6
 
         private val TARGET_ROOM_MAP = mapOf(
             "E18S19" to listOf("E17S19")

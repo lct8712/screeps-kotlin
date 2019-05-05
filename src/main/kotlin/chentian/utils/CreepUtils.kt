@@ -1,6 +1,7 @@
 package chentian.utils
 
 import chentian.extensions.containerTargetId
+import chentian.extensions.homeRoomName
 import chentian.extensions.isEmptyEnergy
 import chentian.extensions.isFullEnergy
 import chentian.extensions.isInTargetRoom
@@ -61,13 +62,15 @@ fun createCreepName(role: String): String {
     return "creep_${role}_${Game.time}"
 }
 
+val BODY_PART_FOR_REMOTE_CREEP = mutableListOf(MOVE, MOVE, CARRY, CARRY, WORK, WORK)
+val BODY_COST_FOR_REMOTE_CREEP = BODY_PART_FOR_REMOTE_CREEP.sumBy { (BODYPART_COST[it])!! }
+
 fun createRemoteCreep(spawn: StructureSpawn, role: String, roomName: String): Boolean {
-    if (spawn.room.energyAvailable < 250) {
+    if (spawn.room.energyAvailable < BODY_COST_FOR_REMOTE_CREEP) {
         return false
     }
 
-    val bodyList = mutableListOf(MOVE, CARRY, CARRY, WORK)
-    return doCreateCreep(role, roomName, spawn, bodyList)
+    return doCreateCreep(role, roomName, spawn, BODY_PART_FOR_REMOTE_CREEP)
 }
 
 val BODY_PART_FOR_NORMAL_CREEP = listOf(MOVE, CARRY, CARRY, WORK, WORK)
@@ -129,6 +132,7 @@ private fun doCreateCreep(
         memory = jsObject<CreepMemory> {
             this.role = role
             this.targetRoomName = targetRoomName
+            this.homeRoomName = spawn.room.name
         }
     })
     println("create new creep $role. code: $result, $bodyList")
@@ -157,7 +161,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         val message = if (creep.isEmptyEnergy()) "empty" else "fill"
         creep.say(message)
 
-        // 捡地上掉的
+        // 捡坟墓上的
         creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy > 0 }?.let { tombstone ->
             if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(tombstone.pos)
@@ -165,6 +169,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
             println("$creep is withdrawing tombstone at $tombstone")
             return
         }
+        // 捡地上掉的
         creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.let { resource ->
             if (creep.pickup(resource) == OK) {
                 println("$creep is picking up resource at $resource")
@@ -234,7 +239,8 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         if (creep.room.isMine()) {
             jobAction()
         } else {
-            creep.moveToTargetRoom(ROOM_NAME_HOME)
+            val homeRoomName = if (creep.memory.homeRoomName.isEmpty()) ROOM_NAME_HOME else creep.memory.homeRoomName
+            creep.moveToTargetRoom(homeRoomName)
         }
         return
     }

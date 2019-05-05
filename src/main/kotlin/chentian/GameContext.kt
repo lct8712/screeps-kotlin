@@ -25,6 +25,7 @@ object GameContext {
     }
     val myStuctures: Map<String, Structure> by lazyPerTick { Game.structures.toMap() }
     val constructionSites: Map<String, ConstructionSite> by lazyPerTick { Game.constructionSites.toMap() }
+    val timeMod16Result: Int by lazyPerTick { Game.time % 16 }
 
     //val towers: List<StructureTower> by lazyPerTick {
     //    myStuctures.values.filter { it.structureType == STRUCTURE_TOWER }.map { it as StructureTower }

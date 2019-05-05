@@ -11,3 +11,5 @@ import screeps.utils.memory.memory
 
 
 var RoomMemory.claimerRoomName: String by memory { "" }
+var RoomMemory.repairTargetId: String by memory { "" }
+var RoomMemory.repairTargetCountDown: Int by memory { 0 }

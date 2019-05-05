@@ -5,8 +5,11 @@ import screeps.api.BuildableStructureConstant
 import screeps.api.ConstructionSite
 import screeps.api.Creep
 import screeps.api.FIND_CONSTRUCTION_SITES
+import screeps.api.FIND_DROPPED_RESOURCES
 import screeps.api.FIND_STRUCTURES
 import screeps.api.Room
+import screeps.api.STRUCTURE_CONTAINER
+import screeps.api.STRUCTURE_STORAGE
 import screeps.api.structures.Structure
 
 /**
@@ -44,4 +47,14 @@ fun Room.findCreepByRole(role: String): List<Creep> {
 
 fun Room.isMine(): Boolean {
     return GameContext.myRooms.containsKey(name)
+}
+
+fun Room.hasStructureStorage(): Boolean {
+    return find(FIND_STRUCTURES).any { it.structureType == STRUCTURE_STORAGE }
+}
+
+fun Room.extraResourceAmount(): Int {
+    return find(FIND_STRUCTURES).filter { it.structureType == STRUCTURE_CONTAINER }.sumBy { container ->
+        container.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.amount ?: 0
+    }
 }
