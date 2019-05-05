@@ -19,3 +19,4 @@ var CreepMemory.buildTargetId: String by memory {""}
 var CreepMemory.withdrawTargetId: String by memory {""}
 var CreepMemory.transferTargetId: String by memory {""}
 var CreepMemory.containerTargetId: String by memory {""}
+var CreepMemory.storageTargetId: String by memory {""}

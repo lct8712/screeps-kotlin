@@ -53,9 +53,8 @@ fun Room.hasStructureStorage(): Boolean {
     return find(FIND_STRUCTURES).any { it.structureType == STRUCTURE_STORAGE }
 }
 
-fun Room.hasExtraResource(): Boolean {
-    return find(FIND_STRUCTURES).filter { it.structureType == STRUCTURE_CONTAINER }.any { container ->
-        val resource = container.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()
-        (resource?.amount ?: 0) > 250
+fun Room.extraResourceAmount(): Int {
+    return find(FIND_STRUCTURES).filter { it.structureType == STRUCTURE_CONTAINER }.sumBy { container ->
+        container.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.amount ?: 0
     }
 }

@@ -35,3 +35,11 @@ fun Creep.moveToTargetRoom(roomName: String) {
     val target = pos.findClosestByRange(exit) as RoomPosition
     moveTo(target)
 }
+
+fun Creep.moveToTargetPos(pos: RoomPosition) {
+    if (room.name == pos.roomName) {
+        moveTo(pos)
+    } else {
+        moveToTargetRoom(pos.roomName)
+    }
+}

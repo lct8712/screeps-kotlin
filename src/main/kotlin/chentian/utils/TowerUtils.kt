@@ -33,7 +33,7 @@ fun towerAttack() {
         }
 
         // Repair
-        if (Game.time % 64 == 0) {
+        if (Game.time % 4 == 0) {
             tower.room.find(FIND_STRUCTURES).filter {
                 it.structureType == STRUCTURE_ROAD || it.structureType == STRUCTURE_CONTAINER
             }.firstOrNull {

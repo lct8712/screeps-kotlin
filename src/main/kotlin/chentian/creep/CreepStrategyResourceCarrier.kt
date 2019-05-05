@@ -1,7 +1,6 @@
 package chentian.creep
 
-import chentian.extensions.hasExtraResource
-import chentian.extensions.hasStructureStorage
+import chentian.extensions.extraResourceAmount
 import chentian.extensions.homeRoomName
 import chentian.extensions.role
 import chentian.extensions.targetRoomName
@@ -27,25 +26,24 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
     private val creeps by lazy { resourceCarriers }
 
     override fun tryToCreate(spawn: StructureSpawn) {
-        if (Game.time % 16 != 0) {
+        if (Game.time % 8 != 0) {
             return
         }
 
         TARGET_ROOM_MAP[room.name]?.forEach { roomName ->
-            if (shouldCreate(roomName)) {
+            if (creeps.size >= MAX_RESOURCE_CARRIER_COUNT) {
+                return
+            }
+
+            val extraResourceAmount = room.extraResourceAmount() + (Game.rooms[roomName]?.extraResourceAmount() ?: 0)
+            if (creeps.size < extraResourceAmount / 1000) {
+                println("extraResourceAmount: $extraResourceAmount")
                 create(spawn, roomName)
             }
         }
     }
 
     override fun runLoop() {
-    }
-
-    private fun shouldCreate(roomName: String): Boolean {
-        val targetRoom = Game.rooms[roomName]
-        return creeps.size < MAX_RESOURCE_CARRIER_COUNT &&
-            targetRoom?.hasStructureStorage() == true &&
-            targetRoom.hasExtraResource()
     }
 
     private fun create(spawn: StructureSpawn, roomName: String) {
@@ -63,7 +61,7 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
     companion object {
 
         const val CREEP_ROLE_RESOURCE_CARRIER = "resource-carrier"
-        private const val MAX_RESOURCE_CARRIER_COUNT = 2
+        private const val MAX_RESOURCE_CARRIER_COUNT = 8
 
         private val TARGET_ROOM_MAP = mapOf(
             "E18S19" to listOf("E18S18")
