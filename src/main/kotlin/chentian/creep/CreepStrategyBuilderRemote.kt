@@ -26,6 +26,10 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
     }
 
     override fun tryToCreate(spawn: StructureSpawn) {
+        if (GameContext.timeMod16Result != 3) {
+            return
+        }
+
         if (shouldCreate()) {
             create(spawn)
         }

@@ -62,13 +62,15 @@ fun createCreepName(role: String): String {
     return "creep_${role}_${Game.time}"
 }
 
+val BODY_PART_FOR_REMOTE_CREEP = mutableListOf(MOVE, MOVE, CARRY, CARRY, WORK, WORK)
+val BODY_COST_FOR_REMOTE_CREEP = BODY_PART_FOR_REMOTE_CREEP.sumBy { (BODYPART_COST[it])!! }
+
 fun createRemoteCreep(spawn: StructureSpawn, role: String, roomName: String): Boolean {
-    if (spawn.room.energyAvailable < 250) {
+    if (spawn.room.energyAvailable < BODY_COST_FOR_REMOTE_CREEP) {
         return false
     }
 
-    val bodyList = mutableListOf(MOVE, CARRY, CARRY, WORK)
-    return doCreateCreep(role, roomName, spawn, bodyList)
+    return doCreateCreep(role, roomName, spawn, BODY_PART_FOR_REMOTE_CREEP)
 }
 
 val BODY_PART_FOR_NORMAL_CREEP = listOf(MOVE, CARRY, CARRY, WORK, WORK)

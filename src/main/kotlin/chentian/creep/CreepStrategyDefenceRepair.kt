@@ -1,5 +1,6 @@
 package chentian.creep
 
+import chentian.GameContext
 import chentian.extensions.findCreepByRole
 import chentian.extensions.isEmptyEnergy
 import chentian.extensions.targetDefenceId
@@ -42,7 +43,7 @@ class CreepStrategyDefenceRepair(val room: Room): CreepStrategy {
 
     private fun shouldCreate(): Boolean {
         // 最多一个
-        if (creeps.isNotEmpty() || Game.time % 128 != 0) {
+        if (creeps.isNotEmpty() || GameContext.timeMod16Result != 2) {
             return false
         }
         // 修到 3M 就不修了
