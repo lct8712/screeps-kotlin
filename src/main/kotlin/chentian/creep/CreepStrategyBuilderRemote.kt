@@ -19,7 +19,7 @@ import screeps.utils.toMap
  *
  * @author chentian
  */
-class CreepStrategyBuilderRemote(val room: Room): CreepStrategy {
+class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
 
     private val roomToBuild by lazy {
         GameContext.rooms.values.firstOrNull { it.findFirstConstructionToBuild(STRUCTURE_SPAWN) != null }
