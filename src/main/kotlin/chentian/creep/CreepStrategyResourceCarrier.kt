@@ -26,7 +26,7 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
     private val creeps by lazy { resourceCarriers }
 
     override fun tryToCreate(spawn: StructureSpawn) {
-        if (Game.time % 8 != 0) {
+        if (Game.time % 8 != 1) {
             return
         }
 
@@ -36,8 +36,8 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
             }
 
             val extraResourceAmount = room.extraResourceAmount() + (Game.rooms[roomName]?.extraResourceAmount() ?: 0)
-            if (creeps.size < extraResourceAmount / 1000) {
                 println("extraResourceAmount: $extraResourceAmount")
+            if (creeps.size < extraResourceAmount / 1000) {
                 create(spawn, roomName)
             }
         }

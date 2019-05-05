@@ -46,7 +46,7 @@ class CreepStrategyDefenceRepair(val room: Room): CreepStrategy {
             return false
         }
         // 修到 3M 就不修了
-        return structureList.isNotEmpty() && structureList.minBy { it.hits }!!.hits <= 3_000_000L
+        return structureList.isNotEmpty() && structureList.minBy { it.hits }!!.hits <= MAX_HITS_TO_REPAIR
     }
 
     private fun create(spawn: StructureSpawn) {
@@ -82,6 +82,7 @@ class CreepStrategyDefenceRepair(val room: Room): CreepStrategy {
 
     companion object {
 
+        const val MAX_HITS_TO_REPAIR = 3_000_000L
         private const val CREEP_ROLE_DEFENCE_BUILDER = "defence-builder"
         private val MOVE_OPTION = createMoveOptions("#ffaa00")
     }
