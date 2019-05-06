@@ -2,6 +2,7 @@ package chentian.utils
 
 import chentian.GameContext
 import chentian.creep.CreepStrategyDefenceRepair
+import chentian.extensions.controlLevel
 import chentian.extensions.repairTargetCountDown
 import chentian.extensions.repairTargetId
 import screeps.api.FIND_CREEPS
@@ -89,9 +90,10 @@ private fun findStructureToRepair(tower: StructureTower) {
 }
 
 private fun needRepair(target: Structure): Boolean {
+    val maxHits = if (target.room.controlLevel() < 6) 1_000_000L else CreepStrategyDefenceRepair.MAX_HITS_TO_REPAIR
     return when(target.structureType) {
-        STRUCTURE_RAMPART -> target.hits < target.hitsMax && target.hits < CreepStrategyDefenceRepair.MAX_HITS_TO_REPAIR
-        STRUCTURE_WALL -> target.hits < CreepStrategyDefenceRepair.MAX_HITS_TO_REPAIR
+        STRUCTURE_RAMPART -> target.hits < target.hitsMax && target.hits < maxHits
+        STRUCTURE_WALL -> target.hits < maxHits
         else -> target.hits < target.hitsMax - 1000
     }
 }

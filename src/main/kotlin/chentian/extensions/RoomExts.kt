@@ -58,3 +58,7 @@ fun Room.extraResourceAmount(): Int {
         container.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.amount ?: 0
     }
 }
+
+fun Room.controlLevel(): Int {
+    return controller?.level ?: 0
+}
