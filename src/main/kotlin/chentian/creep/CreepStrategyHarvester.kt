@@ -16,7 +16,6 @@ import screeps.api.Game
 import screeps.api.OK
 import screeps.api.RESOURCE_ENERGY
 import screeps.api.Room
-import screeps.api.RoomObject
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_EXTENSION
 import screeps.api.STRUCTURE_SPAWN
@@ -36,6 +35,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
     private val creeps = room.findCreepByRole(CREEP_ROLE_HARVESTER)
     private val isFullEnergy = room.isFullEnergy()
+    private val towerTargetIdSet = mutableSetOf<String>()
 
     override fun tryToCreate(spawn: StructureSpawn) {
         if (shouldCreate()) {
@@ -44,6 +44,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
     }
 
     override fun runLoop() {
+        towerTargetIdSet.clear()
         creeps.forEach { fillEnergy(it) }
     }
 
@@ -98,13 +99,14 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         }
 
         STRUCTURE_PRIORITY.forEach { structureType ->
-            // 找最近的一个建筑去充能
+            // 所有可以充能的建筑列表
             val energyStructures = room.find(FIND_STRUCTURES)
-                .filter { it.structureType == structureType}
+                .filter { it.structureType == structureType && !towerTargetIdSet.contains(it.id) }
                 .map { it as EnergyContainer }
                 .filter { it.energy < it.energyCapacity }
                 .map { it as Structure }
 
+            // 找最近的一个建筑去充能
             creep.findClosest(energyStructures)?.let { target ->
                 creep.memory.transferTargetId = target.id
                 if (transferOrMove(creep, target)) {
@@ -134,8 +136,12 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         println("$creep is upgrading controller")
     }
 
-    private fun transferOrMove(creep: Creep, target: RoomObject): Boolean {
-        val transferResult = creep.transfer(target as Structure, RESOURCE_ENERGY)
+    private fun transferOrMove(creep: Creep, target: Structure): Boolean {
+        if (target.structureType == STRUCTURE_TOWER) {
+            towerTargetIdSet.add(target.id)
+        }
+
+        val transferResult = creep.transfer(target, RESOURCE_ENERGY)
         if (transferResult == ERR_NOT_IN_RANGE) {
             creep.moveTo(target.pos, MOVE_OPTION)
             println("$creep is filling energy $target")
