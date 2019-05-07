@@ -63,7 +63,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         val containers = room.find(FIND_STRUCTURES).filter { it.structureType == STRUCTURE_CONTAINER }
         val totalStore = containers.sumBy { (it as StructureContainer).store.energy }
         val totalCapacity = containers.sumBy { (it as StructureContainer).storeCapacity }
-        return totalStore.toFloat() / totalCapacity.toFloat() > 0.6f
+        return totalStore.toFloat() / totalCapacity.toFloat() >= 0.75f
     }
 
     private fun create(spawn: StructureSpawn) {
