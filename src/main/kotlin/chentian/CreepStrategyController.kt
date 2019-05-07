@@ -12,6 +12,7 @@ import chentian.utils.runResourceCarriers
 import chentian.utils.towerAttack
 import screeps.api.Game
 import screeps.api.values
+import screeps.game.one.Stats
 import screeps.game.one.houseKeeping
 
 /**
@@ -22,12 +23,15 @@ import screeps.game.one.houseKeeping
 object CreepStrategyController {
 
     fun gameLoop() {
+        Stats.tickStarts()
+
         houseKeeping()
         towerAttack()
 
         println("Game Loop Start")
         Game.spawns.values.forEach { spawn ->
             val room = spawn.room
+            Stats.write(room)
             println("Room $room")
 
             listOf(
@@ -47,5 +51,7 @@ object CreepStrategyController {
 
         runRemoteHarvesters()
         runResourceCarriers()
+
+        Stats.tickEnds()
     }
 }
