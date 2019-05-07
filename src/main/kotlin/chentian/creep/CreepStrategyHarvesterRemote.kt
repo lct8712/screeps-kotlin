@@ -45,7 +45,7 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
         if (hasEnemy) {
             return false
         }
-        return creeps.count { it.memory.targetRoomName == roomName } < CREEP_PER_TARGET_ROOM
+        return creeps.count { it.memory.targetRoomName == roomName } <= CREEP_PER_TARGET_ROOM
     }
 
     private fun create(spawn: StructureSpawn, roomName: String) {
@@ -56,7 +56,7 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
 
         const val CREEP_ROLE_HARVESTER_REMOTE = "harvester-remote"
 
-        private const val CREEP_PER_TARGET_ROOM = 6
+        private const val CREEP_PER_TARGET_ROOM = 7
 
         private val TARGET_ROOM_MAP = mapOf(
             "E18S19" to listOf("E17S19")
