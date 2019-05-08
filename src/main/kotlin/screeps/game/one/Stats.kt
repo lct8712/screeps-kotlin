@@ -1,8 +1,11 @@
 package screeps.game.one
 
+import screeps.api.FIND_SOURCES
 import screeps.api.Game
 import screeps.api.Memory
 import screeps.api.Room
+import screeps.api.structures.StructureController
+import screeps.game.one.Stats.stats
 
 object Stats {
 
@@ -10,6 +13,7 @@ object Stats {
     private const val RESET_TICK_TIMEOUT = 19 // 60s / 3.2 (s/tick) = 19 ticks
     private var globalreset = true // is initialized on global reset
     private var resetInTicks = RESET_TICK_TIMEOUT
+    private val efficiencyStats = UpgradeEfficiencyStats()
 
     var Memory.stats: dynamic
         get() = this.asDynamic().stats
@@ -22,20 +26,23 @@ object Stats {
     }
 
     fun write(room: Room) {
+        efficiencyStats.record(room)
 
-        val r = "rooms.${room.name}"
+        val roomName = "rooms.${room.name}"
 
-        Memory.stats["$r.mine"] = room.controller?.level ?: 0
-        Memory.stats["$r.energyAvailable"] = room.energyAvailable
-        Memory.stats["$r.energyCapacityAvailable"] = room.energyCapacityAvailable
+        Memory.stats["$roomName.mine"] = room.controller?.level ?: 0
+        Memory.stats["$roomName.energyAvailable"] = room.energyAvailable
+        Memory.stats["$roomName.energyCapacityAvailable"] = room.energyCapacityAvailable
         room.storage?.let {
-            Memory.stats["$r.storage"] = it.store
+            Memory.stats["$roomName.storage"] = it.store
         }
+
         room.controller?.let {
-            val r = "$r.controller"
-            Memory.stats["$r.level"] = it.level
-            Memory.stats["$r.progress"] = it.progress
-            Memory.stats["$r.progressTotal"] = it.progressTotal
+
+            val controllerName = "$roomName.controller"
+            Memory.stats["$controllerName.level"] = it.level
+            Memory.stats["$controllerName.progress"] = it.progress
+            Memory.stats["$controllerName.progressTotal"] = it.progressTotal
         }
     }
 
@@ -71,6 +78,54 @@ object Stats {
         val cpuUsed = Game.cpu.getUsed() - cpuBefore
         Memory.stats[key] = cpuUsed
         return result
+    }
+}
+
+class UpgradeEfficiencyStats {
+
+    private val roomMap = mutableMapOf<String, UpgradeEfficiencyStatsRoom>()
+
+    fun record(room: Room) {
+        val roomName: String = room.name
+        var stats = roomMap[roomName]
+        if (stats == null) {
+            stats = UpgradeEfficiencyStatsRoom(roomName, room.find(FIND_SOURCES).size)
+            roomMap[roomName] = stats
+        }
+        room.controller?.let { stats.record(it) }
+    }
+}
+
+class UpgradeEfficiencyStatsRoom(val roomName: String, sourceCount: Int) {
+
+    private val controllerName = "$roomName.controller"
+    private val energyExpected: Float = ENERGY_PER_SOURCE * COUNT_PER_STATS * sourceCount
+
+    private var recordCount = 0
+    private var totalDiffProgress = 0
+
+    fun record(controller: StructureController) {
+        (Memory.stats["$controllerName.progress"] as Int?)?.let { lastProgress ->
+            val diff: Int = controller.progress - lastProgress
+            totalDiffProgress += diff
+        }
+        if (recordCount++ >= COUNT_PER_STATS) {
+            Memory.stats["$controllerName.efficiency"] = totalDiffProgress / energyExpected
+            totalDiffProgress = 0
+            recordCount = 0
+        }
+    }
+
+    companion object {
+        /**
+         * 每 100 tick 记录一次
+         */
+        private const val COUNT_PER_STATS = 100
+
+        /**
+         * 每 tick 每个 source 的产出
+         */
+        private const val ENERGY_PER_SOURCE = 10f
     }
 }
 
