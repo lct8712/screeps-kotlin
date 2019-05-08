@@ -86,7 +86,7 @@ class UpgradeEfficiencyStats {
     private val roomMap = mutableMapOf<String, UpgradeEfficiencyStatsRoom>()
 
     fun record(room: Room) {
-        val roomName: String = room.name
+        val roomName = "rooms.${room.name}"
         var stats = roomMap[roomName]
         if (stats == null) {
             stats = UpgradeEfficiencyStatsRoom(roomName, room.find(FIND_SOURCES).size)
