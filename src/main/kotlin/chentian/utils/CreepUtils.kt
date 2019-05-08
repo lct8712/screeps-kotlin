@@ -251,12 +251,20 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         val message = if (creep.isEmptyEnergy()) "empty" else "fill"
         creep.say(message)
 
+        // 捡坟墓上的
         creep.pos.findInRange(FIND_TOMBSTONES, 3).firstOrNull { it.store.energy > 0 }?.let { tombstone ->
             if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(tombstone.pos)
             }
-            println("$creep is withdraw tombstone")
+            println("$creep is withdrawing tombstone at $tombstone")
             return
+        }
+        // 捡地上掉的
+        creep.pos.findInRange(FIND_DROPPED_RESOURCES, 2).firstOrNull()?.let { resource ->
+            if (creep.pickup(resource) == OK) {
+                println("$creep is picking up resource at $resource")
+                return
+            }
         }
 
         val roomNameTarget = creep.memory.targetRoomName
