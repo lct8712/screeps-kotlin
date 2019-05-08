@@ -5,7 +5,7 @@ import chentian.extensions.findCreepByRole
 import chentian.extensions.targetRoomName
 import chentian.utils.createRemoteCreep
 import chentian.utils.remoteHarvesters
-import screeps.api.FIND_CREEPS
+import screeps.api.FIND_HOSTILE_CREEPS
 import screeps.api.Game
 import screeps.api.Room
 import screeps.api.get
@@ -41,7 +41,7 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
             return false
         }
 
-        val hasEnemy = Game.rooms[roomName]?.find(FIND_CREEPS)?.any { !it.my } ?: false
+        val hasEnemy = (Game.rooms[roomName]?.find(FIND_HOSTILE_CREEPS)?.size ?: 0) > 0
         if (hasEnemy) {
             return false
         }
