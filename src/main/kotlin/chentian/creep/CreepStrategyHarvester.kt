@@ -2,7 +2,8 @@ package chentian.creep
 
 import chentian.extensions.containerTargetId
 import chentian.extensions.findCreepByRole
-import chentian.extensions.isFullEnergy
+import chentian.extensions.isFullCarry
+import chentian.extensions.transferAllTypeOrMove
 import chentian.extensions.transferTargetId
 import chentian.utils.createMoveOptions
 import chentian.utils.createNormalCreep
@@ -35,7 +36,7 @@ import screeps.game.one.findClosest
 class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
     private val creeps = room.findCreepByRole(CREEP_ROLE_HARVESTER)
-    private val isFullEnergy = room.isFullEnergy()
+    private val isFullEnergy = room.isFullCarry()
     private val towerTargetIdSet = mutableSetOf<String>()
 
     override fun tryToCreate(spawn: StructureSpawn) {
@@ -142,23 +143,8 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
             towerTargetIdSet.add(target.id)
         }
 
-        creep.carry.keys.forEach { resourceType ->
-            val transferResult = creep.transfer(target, resourceType)
-            when (transferResult) {
-                ERR_NOT_IN_RANGE -> {
-                    creep.moveTo(target.pos, MOVE_OPTION)
-                    println("$creep is filling energy $target")
-                    return true
-                }
-                OK -> {
-                    return true
-                }
-                else -> {
-                    println("$creep transfer failed: $transferResult")
-                }
-            }
-        }
-        return false
+
+        return creep.transferAllTypeOrMove(target)
     }
 
     companion object {

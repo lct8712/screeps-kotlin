@@ -18,7 +18,7 @@ import screeps.api.structures.Structure
  * @author chentian
  */
 
-fun Room.isFullEnergy(): Boolean {
+fun Room.isFullCarry(): Boolean {
     return energyAvailable == energyCapacityAvailable
 }
 

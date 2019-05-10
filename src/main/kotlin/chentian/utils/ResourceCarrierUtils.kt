@@ -3,20 +3,20 @@ package chentian.utils
 import chentian.creep.CreepStrategyResourceCarrier
 import chentian.extensions.containerTargetId
 import chentian.extensions.homeRoomName
-import chentian.extensions.isEmptyEnergy
-import chentian.extensions.isFullEnergy
+import chentian.extensions.isEmptyCarry
+import chentian.extensions.isFullCarry
 import chentian.extensions.moveToTargetPos
 import chentian.extensions.moveToTargetRoom
 import chentian.extensions.role
 import chentian.extensions.storageTargetId
 import chentian.extensions.targetRoomName
+import chentian.extensions.transferAllTypeOrMove
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.FIND_DROPPED_RESOURCES
 import screeps.api.FIND_STRUCTURES
 import screeps.api.Game
 import screeps.api.OK
-import screeps.api.RESOURCE_ENERGY
 import screeps.api.Room
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_STORAGE
@@ -46,7 +46,7 @@ fun runResourceCarriers() {
 
 fun runSingleResourceCarriers(creep: Creep) {
     // 已满，回家
-    if (creep.isFullEnergy()) {
+    if (creep.isFullCarry()) {
         creep.say("full")
         creep.memory.containerTargetId = ""
         if (creep.room.name == creep.memory.homeRoomName) {
@@ -58,7 +58,7 @@ fun runSingleResourceCarriers(creep: Creep) {
         return
     }
 
-    val message = if (creep.isEmptyEnergy()) "empty" else "fill"
+    val message = if (creep.isEmptyCarry()) "empty" else "fill"
     creep.say(message)
 
     // 捡地上掉的
@@ -81,22 +81,16 @@ fun runSingleResourceCarriers(creep: Creep) {
 }
 
 private fun transferResourceToStorage(creep: Creep) {
-    fun transferOrMoveTo(creep: Creep, storage: Structure) {
-        if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(storage.pos, MOVE_OPTION)
-        }
-    }
-
     // 已有 storage 目标
     Game.getObjectById<StructureStorage>(creep.memory.storageTargetId)?.let { storage ->
-        transferOrMoveTo(creep, storage)
+        creep.transferAllTypeOrMove(storage)
         return
     }
 
     // 找新的 storage
     creep.room.find(FIND_STRUCTURES).firstOrNull { it.structureType == STRUCTURE_STORAGE }?.let { storage ->
         creep.memory.storageTargetId = storage.id
-        transferOrMoveTo(creep, storage)
+        creep.transferAllTypeOrMove(storage)
         return
     }
 }

@@ -8,7 +8,7 @@ import screeps.api.structures.StructureSpawn
  *
  * @author chentian
  */
-fun StructureSpawn.isFullEnergy(): Boolean {
+fun StructureSpawn.isFullCarry(): Boolean {
     return energy == energyCapacity
 }
 

@@ -2,7 +2,7 @@ package chentian.creep
 
 import chentian.GameContext
 import chentian.extensions.findCreepByRole
-import chentian.extensions.isEmptyEnergy
+import chentian.extensions.isEmptyCarry
 import chentian.extensions.targetDefenceId
 import chentian.utils.createMoveOptions
 import chentian.utils.createNormalCreep
@@ -55,7 +55,7 @@ class CreepStrategyDefenceRepair(val room: Room): CreepStrategy {
     }
 
     private fun build(creep: Creep) {
-        if (creep.isEmptyEnergy()) {
+        if (creep.isEmptyCarry()) {
             creep.memory.targetDefenceId = ""
         }
 

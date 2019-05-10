@@ -2,8 +2,8 @@ package chentian.utils
 
 import chentian.extensions.containerTargetId
 import chentian.extensions.homeRoomName
-import chentian.extensions.isEmptyEnergy
-import chentian.extensions.isFullEnergy
+import chentian.extensions.isEmptyCarry
+import chentian.extensions.isFullCarry
 import chentian.extensions.isInTargetRoom
 import chentian.extensions.isMine
 import chentian.extensions.isWorking
@@ -89,7 +89,7 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
     }
 
     // 储备不够，等待
-    if (spawn.room.energyAvailable < spawn.room.energyCapacityAvailable / 2 && !spawn.isFullEnergy()) {
+    if (spawn.room.energyAvailable < spawn.room.energyCapacityAvailable / 2 && !spawn.isFullCarry()) {
         println("spawn: not enough energy")
         return
     }
@@ -145,7 +145,7 @@ private fun doCreateCreep(
 private val moveToOptions = createMoveOptions("00aaff")
 
 fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
-    if (creep.isFullEnergy()) {
+    if (creep.isFullCarry()) {
         creep.memory.withdrawTargetId = ""
         creep.memory.transferTargetId = ""
         creep.memory.containerTargetId = ""
@@ -155,10 +155,10 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         return
     }
 
-    if (creep.isEmptyEnergy() || !creep.isWorking()) {
+    if (creep.isEmptyCarry() || !creep.isWorking()) {
         creep.setWorking(false)
 
-        val message = if (creep.isEmptyEnergy()) "empty" else "fill"
+        val message = if (creep.isEmptyCarry()) "empty" else "fill"
         creep.say(message)
 
         // 捡坟墓上的
@@ -233,7 +233,7 @@ private fun tryToWithdraw(creep: Creep, maxContainer: StructureContainer) {
 const val ROOM_NAME_HOME = "E18S19"
 
 fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
-    if (creep.isFullEnergy()) {
+    if (creep.isFullCarry()) {
         creep.setWorking(true)
         creep.say("full")
         if (creep.room.isMine()) {
@@ -245,10 +245,10 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         return
     }
 
-    if (creep.isEmptyEnergy() || !creep.isWorking()) {
+    if (creep.isEmptyCarry() || !creep.isWorking()) {
         creep.setWorking(false)
 
-        val message = if (creep.isEmptyEnergy()) "empty" else "fill"
+        val message = if (creep.isEmptyCarry()) "empty" else "fill"
         creep.say(message)
 
         // 捡坟墓上的
