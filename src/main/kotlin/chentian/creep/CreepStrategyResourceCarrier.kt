@@ -24,25 +24,30 @@ import screeps.utils.unsafe.jsObject
  */
 class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
 
-    private val creeps by lazy { resourceCarriers }
+    private val targetRoomIno by lazy { TARGET_ROOM_MAP[room.name] }
 
     override fun tryToCreate(spawn: StructureSpawn) {
         if (GameContext.timeMod16Result != 1) {
             return
         }
 
-        TARGET_ROOM_MAP[room.name]?.forEach { targetRoomName ->
-            if (creeps.size >= MAX_RESOURCE_CARRIER_COUNT) {
+        targetRoomIno?.let { targetRoomIno ->
+            val creeps by lazy { resourceCarriers.filter {
+                val creepRoom = it.room.name
+                creepRoom == room.name || creepRoom == targetRoomIno.targetRoom
+            } }
+
+            if (creeps.size >= targetRoomIno.creepCount) {
                 return
             }
 
             var extraResourceAmount = room.extraResourceAmount()
-            if (targetRoomName != room.name) {
-                extraResourceAmount += (Game.rooms[targetRoomName]?.extraResourceAmount() ?: 0)
+            if (targetRoomIno.targetRoom != room.name) {
+                extraResourceAmount += (Game.rooms[targetRoomIno.targetRoom]?.extraResourceAmount() ?: 0)
             }
             println("extraResourceAmount: $extraResourceAmount")
-            if (creeps.size < extraResourceAmount / 1500) {
-                create(spawn, targetRoomName)
+            if (creeps.size < extraResourceAmount / targetRoomIno.extraResourceAmount) {
+                create(spawn, targetRoomIno.targetRoom)
             }
         }
     }
@@ -62,14 +67,21 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
         println("create new creep $CREEP_ROLE_RESOURCE_CARRIER. code: $result, $bodyList")
     }
 
+    private class TargetRoomInfo(
+        val targetRoom: String,
+        val creepCount: Int,
+        val extraResourceAmount: Int
+    )
+
     companion object {
 
         const val CREEP_ROLE_RESOURCE_CARRIER = "resource-carrier"
-        private const val MAX_RESOURCE_CARRIER_COUNT = 6
+        private const val MAX_COUNT_PER_ROOM = 3
+        private const val EXTRA_RESOURCE_PER_ROOM = 750
 
         private val TARGET_ROOM_MAP = mapOf(
-            "E18S19" to listOf("E18S19"),
-            "E18S18" to listOf("E18S18")
+            "E18S19" to TargetRoomInfo("E18S19", MAX_COUNT_PER_ROOM, EXTRA_RESOURCE_PER_ROOM),
+            "E18S18" to TargetRoomInfo("E18S18", MAX_COUNT_PER_ROOM, EXTRA_RESOURCE_PER_ROOM)
         )
     }
 }
