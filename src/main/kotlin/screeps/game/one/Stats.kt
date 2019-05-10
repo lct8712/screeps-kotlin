@@ -1,9 +1,12 @@
 package screeps.game.one
 
 import screeps.api.FIND_SOURCES
+import screeps.api.FIND_STRUCTURES
 import screeps.api.Game
 import screeps.api.Memory
 import screeps.api.Room
+import screeps.api.STRUCTURE_CONTAINER
+import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureController
 import screeps.game.one.Stats.stats
 
@@ -38,11 +41,19 @@ object Stats {
         }
 
         room.controller?.let {
-
             val controllerName = "$roomName.controller"
             Memory.stats["$controllerName.level"] = it.level
             Memory.stats["$controllerName.progress"] = it.progress
             Memory.stats["$controllerName.progressTotal"] = it.progressTotal
+
+            room.find(FIND_STRUCTURES).filter { structure ->
+                structure.structureType == STRUCTURE_CONTAINER
+            }.map { structure ->
+                structure as StructureContainer
+            }.forEachIndexed { index, structureContainer ->
+                val containerName = "$roomName.container$index"
+                Memory.stats["$containerName.energy"] = structureContainer.store.energy
+            }
         }
     }
 
