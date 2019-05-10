@@ -2,6 +2,7 @@ package chentian.extensions
 
 import screeps.api.Creep
 import screeps.api.RoomPosition
+import screeps.api.values
 
 /**
  *
@@ -10,11 +11,11 @@ import screeps.api.RoomPosition
  */
 
 fun Creep.isFullEnergy(): Boolean {
-    return carry.energy == carryCapacity
+    return totalCarry() == carryCapacity
 }
 
 fun Creep.isEmptyEnergy(): Boolean {
-    return carry.energy == 0
+    return totalCarry() == 0
 }
 
 fun Creep.isWorking(): Boolean {
@@ -42,4 +43,8 @@ fun Creep.moveToTargetPos(pos: RoomPosition) {
     } else {
         moveToTargetRoom(pos.roomName)
     }
+}
+
+fun Creep.totalCarry(): Int {
+    return carry.values.sum()
 }

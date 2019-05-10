@@ -20,6 +20,7 @@ import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_EXTENSION
 import screeps.api.STRUCTURE_SPAWN
 import screeps.api.STRUCTURE_TOWER
+import screeps.api.keys
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureController
@@ -141,13 +142,21 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
             towerTargetIdSet.add(target.id)
         }
 
-        val transferResult = creep.transfer(target, RESOURCE_ENERGY)
-        if (transferResult == ERR_NOT_IN_RANGE) {
-            creep.moveTo(target.pos, MOVE_OPTION)
-            println("$creep is filling energy $target")
-            return true
-        } else if (transferResult != OK) {
-            println("$creep transfer failed: $transferResult")
+        creep.carry.keys.forEach { resourceType ->
+            val transferResult = creep.transfer(target, resourceType)
+            when (transferResult) {
+                ERR_NOT_IN_RANGE -> {
+                    creep.moveTo(target.pos, MOVE_OPTION)
+                    println("$creep is filling energy $target")
+                    return true
+                }
+                OK -> {
+                    return true
+                }
+                else -> {
+                    println("$creep transfer failed: $transferResult")
+                }
+            }
         }
         return false
     }

@@ -31,15 +31,18 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
             return
         }
 
-        TARGET_ROOM_MAP[room.name]?.forEach { roomName ->
+        TARGET_ROOM_MAP[room.name]?.forEach { targetRoomName ->
             if (creeps.size >= MAX_RESOURCE_CARRIER_COUNT) {
                 return
             }
 
-            val extraResourceAmount = room.extraResourceAmount() + (Game.rooms[roomName]?.extraResourceAmount() ?: 0)
-                println("extraResourceAmount: $extraResourceAmount")
+            var extraResourceAmount = room.extraResourceAmount()
+            if (targetRoomName != room.name) {
+                extraResourceAmount += (Game.rooms[targetRoomName]?.extraResourceAmount() ?: 0)
+            }
+            println("extraResourceAmount: $extraResourceAmount")
             if (creeps.size < extraResourceAmount / 1500) {
-                create(spawn, roomName)
+                create(spawn, targetRoomName)
             }
         }
     }
@@ -65,7 +68,8 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
         private const val MAX_RESOURCE_CARRIER_COUNT = 6
 
         private val TARGET_ROOM_MAP = mapOf(
-            "E18S19" to listOf("E18S18")
+            "E18S19" to listOf("E18S19"),
+            "E18S18" to listOf("E18S18")
         )
     }
 }
