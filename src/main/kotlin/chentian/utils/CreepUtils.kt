@@ -189,7 +189,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         }.map { it as StructureContainer }
         val minContainer = containers.minBy { it.store.energy }
         val maxContainer = containers.maxBy { it.store.energy }
-        if (minContainer != null && maxContainer != null && minContainer.store.energy * 10 < maxContainer.store.energy) {
+        if (minContainer != null && maxContainer != null && minContainer.store.energy * 6 < maxContainer.store.energy) {
             tryToWithdraw(creep, maxContainer)
             creep.memory.withdrawTargetId = maxContainer.id
             println("$creep to full container $maxContainer")
