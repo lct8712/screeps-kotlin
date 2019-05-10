@@ -5,9 +5,11 @@ import chentian.extensions.containerTargetId
 import chentian.extensions.homeRoomName
 import chentian.extensions.isEmptyCarry
 import chentian.extensions.isFullCarry
+import chentian.extensions.isWorking
 import chentian.extensions.moveToTargetPos
 import chentian.extensions.moveToTargetRoom
 import chentian.extensions.role
+import chentian.extensions.setWorking
 import chentian.extensions.storageTargetId
 import chentian.extensions.targetRoomName
 import chentian.extensions.transferAllTypeOrMove
@@ -36,8 +38,6 @@ val resourceCarriers: List<Creep> by lazyPerTick {
     Game.creeps.toMap().values.filter { it.memory.role == CreepStrategyResourceCarrier.CREEP_ROLE_RESOURCE_CARRIER }
 }
 
-private val MOVE_OPTION = createMoveOptions("#ffaaaa")
-
 fun runResourceCarriers() {
     resourceCarriers.forEach {
         runSingleResourceCarriers(it)
@@ -48,6 +48,7 @@ fun runSingleResourceCarriers(creep: Creep) {
     // 已满，回家
     if (creep.isFullCarry()) {
         creep.say("full")
+        creep.setWorking(true)
         creep.memory.containerTargetId = ""
         if (creep.room.name == creep.memory.homeRoomName) {
             transferResourceToStorage(creep)
@@ -58,24 +59,33 @@ fun runSingleResourceCarriers(creep: Creep) {
         return
     }
 
-    val message = if (creep.isEmptyCarry()) "empty" else "fill"
-    creep.say(message)
+    if (creep.isEmptyCarry() || !creep.isWorking()) {
+        creep.setWorking(false)
 
-    // 捡地上掉的
-    creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.let { resource ->
-        if (creep.pickup(resource) == OK) {
-            println("$creep is picking up resource at $resource")
+        val message = if (creep.isEmptyCarry()) "empty" else "fill"
+        creep.say(message)
+
+        // 捡地上掉的
+        creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.let { resource ->
+            if (creep.pickup(resource) == OK) {
+                println("$creep is picking up resource at $resource")
+                return
+            }
+        }
+
+        // 找地方捡能量
+        val targetContainer = findContainerToCarrier(creep)
+        targetContainer?.pos?.findInRange(FIND_DROPPED_RESOURCES, 1)?.maxBy { it.amount }?.let { resource ->
+            if (creep.pickup(resource) == ERR_NOT_IN_RANGE) {
+                creep.moveToTargetPos(resource.pos)
+            }
+            println("$creep is carrying resource, in room: $targetContainer")
             return
         }
     }
 
-    // 找地方捡能量
-    val targetContainer = findContainerToCarrier(creep)
-    targetContainer?.pos?.findInRange(FIND_DROPPED_RESOURCES, 1)?.maxBy { it.amount }?.let { resource ->
-        if (creep.pickup(resource) == ERR_NOT_IN_RANGE) {
-            creep.moveToTargetPos(resource.pos)
-        }
-        println("$creep is carrying resource, in room: $targetContainer")
+    if (creep.isWorking()) {
+        transferResourceToStorage(creep)
         return
     }
 }
