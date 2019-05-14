@@ -52,7 +52,11 @@ fun towerAttack() {
             return@forEach
         }
 
-        // Repair
+        if (tower.energy <= tower.energyCapacity / 3) {
+            return@forEach
+        }
+
+        // Repair only when energy more than half
         val repairTarget = Game.getObjectById<Structure>(tower.room.memory.repairTargetId)
         repairTarget?.let {
             if (needRepair(repairTarget)) {
@@ -69,7 +73,7 @@ fun towerAttack() {
             }
         }
 
-        if (Game.time % 4 == 0) {
+        if (GameContext.timeMod16Result == 4) {
             findStructureToRepair(tower)
         }
     }
@@ -77,9 +81,9 @@ fun towerAttack() {
 
 private fun findStructureToRepair(tower: StructureTower) {
     STRUCTURE_PRIORITY.forEach { structureType ->
-        tower.room.find(FIND_STRUCTURES).firstOrNull {
+        tower.room.find(FIND_STRUCTURES).filter {
             it.structureType == structureType && needRepair(it)
-        }?.let {
+        }.minBy { it.hits }?.let {
             tower.room.memory.repairTargetId = it.id
             tower.room.memory.repairTargetCountDown = REPAIR_TARGET_COUNT_DOWN
             val result = tower.repair(it)
