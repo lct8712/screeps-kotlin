@@ -41,22 +41,14 @@ import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureSpawn
 import screeps.api.value
 import screeps.game.one.findClosest
-import screeps.utils.toMap
 import screeps.utils.unsafe.jsObject
+import kotlin.math.min
 
 /**
  *
  *
  * @author chentian
  */
-
-const val MAX_CREEP_COUNT = 12
-
-fun createCreepIfNecessary(spawn: StructureSpawn) {
-    if (Game.creeps.toMap().count() < MAX_CREEP_COUNT) {
-        createNormalCreep(spawn)
-    }
-}
 
 fun createCreepName(role: String): String {
     return "creep_${role}_${Game.time}"
@@ -73,8 +65,10 @@ fun createRemoteCreep(spawn: StructureSpawn, role: String, targetRoomName: Strin
     return doCreateCreep(role, targetRoomName, spawn, BODY_PART_FOR_REMOTE_CREEP)
 }
 
+const val MAX_BODY_PART = 50
 val BODY_PART_FOR_NORMAL_CREEP = listOf(MOVE, CARRY, CARRY, WORK, WORK)
 val BODY_COST_FOR_NORMAL_CREEP = BODY_PART_FOR_NORMAL_CREEP.sumBy { (BODYPART_COST[it])!! }
+val MAX_BODY_PART_COUNT_FOR_NORMAL_CREEP = MAX_BODY_PART / BODY_PART_FOR_NORMAL_CREEP.size
 
 fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
     // 一个小房间，创建最基本的 creep
@@ -83,7 +77,7 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
         return
     }
 
-    val partCount = spawn.room.energyAvailable / BODY_COST_FOR_NORMAL_CREEP
+    val partCount = min(spawn.room.energyAvailable / BODY_COST_FOR_NORMAL_CREEP, MAX_BODY_PART_COUNT_FOR_NORMAL_CREEP)
     if (partCount < 1) {
         return
     }
@@ -137,7 +131,7 @@ private fun doCreateCreep(
     })
     println("create new creep $role. code: $result, $bodyList")
     if (result != OK && result != ERR_BUSY && result != ERR_NAME_EXISTS) {
-        Game.notify("create creep error: ${result.value}")
+        Game.notify("create creep $role error at ${spawn.room.name}. body: $bodyList code: ${result.value}")
     }
     return result == OK
 }
