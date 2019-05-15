@@ -76,7 +76,7 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
     companion object {
 
         const val CREEP_ROLE_RESOURCE_CARRIER = "resource-carrier"
-        private const val MAX_COUNT_PER_ROOM = 3
+        private const val MAX_COUNT_PER_ROOM = 1
         private const val EXTRA_RESOURCE_PER_ROOM = 750
 
         private val TARGET_ROOM_MAP = mapOf(
