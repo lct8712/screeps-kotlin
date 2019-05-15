@@ -3,7 +3,6 @@ package chentian.extensions
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.OK
-import screeps.api.RESOURCE_GHODIUM_OXIDE
 import screeps.api.RoomPosition
 import screeps.api.keys
 import screeps.api.structures.Structure
@@ -43,11 +42,11 @@ fun Creep.moveToTargetRoom(roomName: String) {
 }
 
 fun Creep.moveToTargetPos(pos: RoomPosition) {
-    if (room.name == pos.roomName) {
-        moveTo(pos)
-    } else {
-        moveToTargetRoom(pos.roomName)
-    }
+    moveTo(pos)
+//    if (room.name == pos.roomName) {
+//    } else {
+//        moveToTargetRoom(pos.roomName)
+//    }
 }
 
 fun Creep.totalCarry(): Int {

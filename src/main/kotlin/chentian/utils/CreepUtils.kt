@@ -88,6 +88,7 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "") {
         return
     }
 
+    println("partCount: $partCount, max: $MAX_BODY_PART_COUNT_FOR_NORMAL_CREEP")
     // https://screeps.fandom.com/wiki/Creep#Fatigue
     val bodyList = mutableListOf<ActiveBodyPartConstant>().apply {
         for (i in 0 until partCount) {
@@ -131,7 +132,7 @@ private fun doCreateCreep(
     })
     println("create new creep $role. code: $result, $bodyList")
     if (result != OK && result != ERR_BUSY && result != ERR_NAME_EXISTS) {
-        Game.notify("create creep $role error at ${spawn.room.name}. body: $bodyList code: ${result.value}")
+        Game.notify("create creep $role error at ${spawn.room.name} code: ${result.value}. $bodyList")
     }
     return result == OK
 }
