@@ -21,7 +21,6 @@ import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_EXTENSION
 import screeps.api.STRUCTURE_SPAWN
 import screeps.api.STRUCTURE_TOWER
-import screeps.api.keys
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureController
@@ -53,11 +52,11 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
     private fun shouldCreate(): Boolean {
         val sourceSize = room.find(FIND_SOURCES).size
         // 最少 2 倍
-        if (creeps.size < sourceSize * 2) {
+        if (creeps.size < sourceSize * 1.5) {
             return true
         }
         // 最多 4 倍
-        if (creeps.size > sourceSize * 4) {
+        if (creeps.size > sourceSize * 3) {
             return false
         }
 

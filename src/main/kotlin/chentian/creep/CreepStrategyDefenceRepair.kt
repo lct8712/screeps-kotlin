@@ -22,7 +22,7 @@ import screeps.api.structures.StructureSpawn
  *
  * @author chentian
  */
-class CreepStrategyDefenceRepair(val room: Room): CreepStrategy {
+class CreepStrategyDefenceRepair(val room: Room) : CreepStrategy {
 
     private val structureList by lazy {
         room.find(FIND_STRUCTURES).filter {

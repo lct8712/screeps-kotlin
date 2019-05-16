@@ -32,10 +32,10 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
         }
 
         targetRoomIno?.let { targetRoomIno ->
-            val creeps by lazy { resourceCarriers.filter {
+            val creeps = resourceCarriers.filter {
                 val creepRoom = it.room.name
                 creepRoom == room.name || creepRoom == targetRoomIno.targetRoom
-            } }
+            }
 
             if (creeps.size >= targetRoomIno.creepCount) {
                 return
