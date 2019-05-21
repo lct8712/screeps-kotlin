@@ -23,9 +23,9 @@ import screeps.api.structures.StructureTower
  */
 
 private val STRUCTURE_PRIORITY = listOf(
-    STRUCTURE_RAMPART,
     STRUCTURE_CONTAINER,
     STRUCTURE_ROAD,
+    STRUCTURE_RAMPART,
     STRUCTURE_WALL
 )
 
@@ -95,7 +95,7 @@ private fun findStructureToRepair(tower: StructureTower) {
 
 private fun needRepair(target: Structure): Boolean {
     val maxHits = if (target.room.controlLevel() < 6) 1_000_000L else CreepStrategyDefenceRepair.MAX_HITS_TO_REPAIR
-    return when(target.structureType) {
+    return when (target.structureType) {
         STRUCTURE_RAMPART -> target.hits < target.hitsMax && target.hits < maxHits
         STRUCTURE_WALL -> target.hits < maxHits
         else -> target.hits < target.hitsMax - 1000
