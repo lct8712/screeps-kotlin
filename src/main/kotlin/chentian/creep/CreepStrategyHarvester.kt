@@ -68,7 +68,8 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
     }
 
     private fun create(spawn: StructureSpawn) {
-        createNormalCreep(spawn, CREEP_ROLE_HARVESTER)
+        val forceCreate = creeps.isEmpty()
+        createNormalCreep(spawn, CREEP_ROLE_HARVESTER, forceCreate)
     }
 
     private fun fillEnergy(creep: Creep) {
