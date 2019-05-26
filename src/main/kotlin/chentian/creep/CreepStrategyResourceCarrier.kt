@@ -27,7 +27,7 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
     private val targetRoomIno by lazy { TARGET_ROOM_MAP[room.name] }
 
     override fun tryToCreate(spawn: StructureSpawn) {
-        if (GameContext.timeMod16Result != -1) {
+        if (GameContext.timeMod16Result != 6) {
             return
         }
 
@@ -80,7 +80,7 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
         private const val EXTRA_RESOURCE_PER_ROOM = 750
 
         private val TARGET_ROOM_MAP = mapOf(
-//            "E18S19" to TargetRoomInfo("E18S19", MAX_COUNT_PER_ROOM, EXTRA_RESOURCE_PER_ROOM),
+            "E18S19" to TargetRoomInfo("E18S19", MAX_COUNT_PER_ROOM, EXTRA_RESOURCE_PER_ROOM),
             "E18S18" to TargetRoomInfo("E18S18", MAX_COUNT_PER_ROOM, EXTRA_RESOURCE_PER_ROOM)
         )
     }
