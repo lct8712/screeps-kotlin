@@ -84,7 +84,7 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "", forceCreate: Boo
 
     // 储备不够，等待
     if (spawn.room.energyAvailable < spawn.room.energyCapacityAvailable / 2 && !spawn.isFullCarry()) {
-        println("spawn: not enough energy")
+        println("spawn $role: not enough energy")
         return
     }
 
@@ -186,7 +186,6 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         val maxContainer = containers.maxBy { it.store.energy }
         if (minContainer != null && maxContainer != null && minContainer.store.energy * 6 < maxContainer.store.energy) {
             tryToWithdraw(creep, maxContainer)
-            creep.memory.withdrawTargetId = maxContainer.id
             println("$creep to full container $maxContainer")
             return
         }
@@ -195,11 +194,6 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         val containerList = creep.room.find(FIND_STRUCTURES).filter { it.structureType == STRUCTURE_CONTAINER }
         (creep.findClosest(containerList) as StructureContainer?)?.let { container ->
             tryToWithdraw(creep, container)
-            creep.memory.withdrawTargetId = container.id
-            // 让开采矿的位置
-            if (creep.pos == container.pos) {
-                creep.move(TOP)
-            }
             println("$creep is withdraw container")
             return
         }
@@ -219,9 +213,13 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
     return
 }
 
-private fun tryToWithdraw(creep: Creep, maxContainer: StructureContainer) {
-    if (creep.withdraw(maxContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(maxContainer.pos, moveToOptions)
+private fun tryToWithdraw(creep: Creep, container: StructureContainer) {
+    creep.memory.withdrawTargetId = container.id
+    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+        creep.moveTo(container.pos, moveToOptions)
+    } else if (creep.pos.isEqualTo(container.pos)) {
+        // 让开采矿的位置
+        creep.move(TOP)
     }
 }
 

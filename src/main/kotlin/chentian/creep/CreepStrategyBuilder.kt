@@ -60,6 +60,7 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
         harvestEnergyAndDoJob(creep) {
             if (constructionSites.isEmpty()) {
                 // 转换为 Harvester
+                println("$creep transfer to harvester")
                 creep.memory.role = CreepStrategyHarvester.CREEP_ROLE_HARVESTER
                 return@harvestEnergyAndDoJob
             }
@@ -71,6 +72,7 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
                 } else if (tryToBuild(creep, target)) {
                     return@harvestEnergyAndDoJob
                 }
+                println("$creep build current target failed")
             }
 
             // 重新选择
@@ -78,11 +80,14 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
                 val constructionList = room.findConstructionsToBuild(structureType)
                 creep.findClosest(constructionList)?.let { target ->
                     creep.memory.buildTargetId = target.id
+                    println("$creep change build target to ${target.id}")
                     if (tryToBuild(creep, target)) {
                         return@harvestEnergyAndDoJob
                     }
                 }
             }
+
+            println("$creep build failed: no target")
         }
     }
 

@@ -7,6 +7,7 @@ import chentian.extensions.role
 import chentian.extensions.targetLinkId
 import chentian.utils.RoomLinkInfo
 import chentian.utils.createCreepName
+import screeps.api.CARRY
 import screeps.api.CreepMemory
 import screeps.api.FIND_SOURCES
 import screeps.api.Game

@@ -45,7 +45,7 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
             if (targetRoomIno.targetRoom != room.name) {
                 extraResourceAmount += (Game.rooms[targetRoomIno.targetRoom]?.extraResourceAmount() ?: 0)
             }
-            println("extraResourceAmount: $extraResourceAmount")
+//            println("extraResourceAmount: $extraResourceAmount")
             if (creeps.size < extraResourceAmount / targetRoomIno.extraResourceAmount) {
                 create(spawn, targetRoomIno.targetRoom)
             }

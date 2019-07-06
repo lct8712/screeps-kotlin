@@ -1,13 +1,14 @@
 package chentian.creep
 
 import chentian.extensions.findCreepByRole
-import chentian.extensions.isFullCarry
+import chentian.extensions.isEmptyCarry
 import chentian.extensions.isWorking
 import chentian.extensions.role
 import chentian.extensions.setWorking
 import chentian.extensions.targetLinkId
 import chentian.utils.TARGET_ROOM_LINK
 import chentian.utils.createCreepName
+import screeps.api.CARRY
 import screeps.api.Creep
 import screeps.api.CreepMemory
 import screeps.api.Game
@@ -60,7 +61,7 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
             return
         }
 
-        val bodyList = mutableListOf(MOVE, MOVE).apply {
+        val bodyList = mutableListOf(CARRY, MOVE, MOVE).apply {
             for (i in 0 until WORKER_BODY_COUNT) {
                 add(WORK)
             }
@@ -86,17 +87,17 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
             creep.setWorking(true)
         }
 
-        // 升级 controller
-        if (creep.isFullCarry()) {
-            val controller = creep.room.controller ?: return
-            creep.upgradeController(controller)
-            println("$creep is upgrading controller")
-            return
+        // 从 Link 中充能
+        if (creep.isEmptyCarry()) {
+            creep.withdraw(targetLink, RESOURCE_ENERGY)
+            println("$creep is withdraw from link")
         }
 
-        // 从 Link 中充能
-        creep.withdraw(targetLink, RESOURCE_ENERGY)
-        println("$creep is withdraw from link")
+        // 升级 controller
+        val controller = creep.room.controller ?: return
+        creep.upgradeController(controller)
+        println("$creep is upgrading controller")
+        return
     }
 
     companion object {
