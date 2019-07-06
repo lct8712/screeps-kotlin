@@ -1,7 +1,7 @@
 package chentian.creep
 
+import chentian.GameContext
 import chentian.extensions.containerId
-import chentian.extensions.findCreepByRole
 import chentian.extensions.findStructureMapByType
 import chentian.extensions.role
 import chentian.utils.createCreepName
@@ -17,6 +17,7 @@ import screeps.api.STRUCTURE_LINK
 import screeps.api.Source
 import screeps.api.WORK
 import screeps.api.options
+import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureLink
 import screeps.api.structures.StructureSpawn
 import screeps.utils.unsafe.jsObject
@@ -29,7 +30,7 @@ import screeps.utils.unsafe.jsObject
 class CreepStrategyMiner(room: Room): CreepStrategy {
 
     private val containerMap = room.findStructureMapByType(STRUCTURE_CONTAINER)
-    private val creeps = room.findCreepByRole(CREEP_ROLE_MINER)
+    private val creeps = GameContext.creepsMiner[room.name].orEmpty()
 
     override fun tryToCreate(spawn: StructureSpawn) {
         if (shouldCreate()) {
@@ -39,7 +40,7 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
 
     override fun runLoop() {
         creeps.forEach { creep ->
-            val container = containerMap[creep.memory.containerId]
+            val container = containerMap[creep.memory.containerId] as? StructureContainer
             val source: Source? = container?.pos?.findInRange(FIND_SOURCES, 1)?.getOrNull(0)
             if (source == null) {
                 creep.say("error")
@@ -55,12 +56,12 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
             }
 
             // 传输到 link
-            if (creep.carry.energy >= ENERGY_AMOUNT_TO_LINK) {
+            if (container.store.energy >= MIN_CONTAINER_ENERGY && creep.carry.energy >= ENERGY_AMOUNT_TO_LINK) {
                 container.pos.findInRange(FIND_STRUCTURES, 1).firstOrNull {
                     it.structureType == STRUCTURE_LINK
                 }?.let {
                     val link = it as StructureLink
-                    if (link.energyCapacity >= link.energy - ENERGY_AMOUNT_TO_LINK) {
+                    if (link.energyCapacity >= link.energy + ENERGY_AMOUNT_TO_LINK) {
                         creep.transfer(link, RESOURCE_ENERGY)
                         return
                     }
@@ -103,8 +104,9 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
 
     companion object {
 
-        private const val CREEP_ROLE_MINER = "miner"
+        const val CREEP_ROLE_MINER = "miner"
         private const val MAX_WORKER_BODY_COUNT = 5
         private const val ENERGY_AMOUNT_TO_LINK = 50
+        private const val MIN_CONTAINER_ENERGY = 500
     }
 }

@@ -1,5 +1,6 @@
 package chentian.utils
 
+import chentian.GameContext
 import chentian.extensions.containerTargetId
 import chentian.extensions.homeRoomName
 import chentian.extensions.isEmptyCarry
@@ -10,6 +11,7 @@ import chentian.extensions.isWorking
 import chentian.extensions.moveToTargetRoom
 import chentian.extensions.role
 import chentian.extensions.setWorking
+import chentian.extensions.sourceTargetId
 import chentian.extensions.targetRoomName
 import chentian.extensions.transferTargetId
 import chentian.extensions.withdrawTargetId
@@ -33,6 +35,7 @@ import screeps.api.OK
 import screeps.api.RESOURCE_ENERGY
 import screeps.api.RoomVisual
 import screeps.api.STRUCTURE_CONTAINER
+import screeps.api.Source
 import screeps.api.TOP
 import screeps.api.WORK
 import screeps.api.get
@@ -164,12 +167,20 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
             println("$creep is withdrawing tombstone at $tombstone")
             return
         }
+
         // 捡地上掉的
         creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.let { resource ->
             if (creep.pickup(resource) == OK) {
                 println("$creep is picking up resource at $resource")
                 return
             }
+        }
+
+        // 特殊情况，没有 miner
+        val minerCreepCount = GameContext.creepsMiner[creep.room.name].orEmpty().size
+        if (minerCreepCount == 0) {
+            tryToMineFromSource(creep)
+            return
         }
 
         // 已经有目标
@@ -199,13 +210,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         }
 
         // 找最近的 source
-        creep.pos.findClosestByPath(FIND_SOURCES)?.let { source ->
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source.pos, moveToOptions)
-            }
-            println("$creep is harvesting")
-            return
-        }
+        tryToMineFromSource(creep)
     }
 
     creep.say("action")
@@ -213,11 +218,38 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
     return
 }
 
+private fun tryToMineFromSource(creep: Creep) {
+    fun harvestOrMove(creep: Creep, source: Source) {
+        if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(source.pos, moveToOptions)
+        }
+        println("$creep is harvesting from source")
+    }
+
+    Game.getObjectById<Source>(creep.memory.sourceTargetId)?.let { source ->
+        harvestOrMove(creep, source)
+        return
+    }
+
+    creep.pos.findClosestByPath(FIND_SOURCES)?.let { source ->
+        creep.memory.sourceTargetId = source.id
+        harvestOrMove(creep, source)
+        return
+    }
+}
+
 private fun tryToWithdraw(creep: Creep, container: StructureContainer) {
-    creep.memory.withdrawTargetId = container.id
+    fun shouldMove(): Boolean {
+        val miners = GameContext.creepsMiner[creep.room.name].orEmpty()
+        return creep.pos.isEqualTo(container.pos) && miners.any { it.pos.isNearTo(creep.pos) }
+    }
+
+    creep.memory.sourceTargetId = ""
+    creep.memory.withdrawTargetId = if (container.store.energy == 0) "" else container.id
+
     if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
         creep.moveTo(container.pos, moveToOptions)
-    } else if (creep.pos.isEqualTo(container.pos)) {
+    } else if (shouldMove()) {
         // 让开采矿的位置
         creep.move(TOP)
     }

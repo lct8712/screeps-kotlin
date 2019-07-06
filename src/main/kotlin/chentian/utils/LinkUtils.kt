@@ -26,7 +26,6 @@ fun linkTransfer() {
         val linkTo = Game.getObjectById<StructureLink>(roomLinkInfo.toLinkId) ?: return
 
         val energy = linkFrom.energy
-        println("####3 ${linkFrom.cooldown} $energy ${linkTo.energyCapacity} ${linkTo.energy}")
         if (linkFrom.cooldown == 0 && energy > 0 && linkTo.energyCapacity >= linkTo.energy + energy) {
             linkFrom.transferEnergy(linkTo, energy)
             println("$linkFrom transfer energy to $linkTo, $energy")

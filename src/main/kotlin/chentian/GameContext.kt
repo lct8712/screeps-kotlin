@@ -1,5 +1,7 @@
 package chentian
 
+import chentian.creep.CreepStrategyMiner
+import chentian.extensions.findCreepByRole
 import screeps.api.ConstructionSite
 import screeps.api.Creep
 import screeps.api.Game
@@ -33,5 +35,9 @@ object GameContext {
     @Suppress("UNCHECKED_CAST")
     val towers: List<StructureTower> by lazyPerTick {
         myStuctures.values.filter { it.structureType == STRUCTURE_TOWER } as List<StructureTower>
+    }
+
+    val creepsMiner: Map<String, List<Creep>> by lazyPerTick {
+        rooms.values.map { it.name to it.findCreepByRole(CreepStrategyMiner.CREEP_ROLE_MINER) }.toMap()
     }
 }
