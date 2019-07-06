@@ -10,6 +10,7 @@ import screeps.api.CreepMemory
 import screeps.api.FIND_SOURCES
 import screeps.api.Game
 import screeps.api.MOVE
+import screeps.api.OK
 import screeps.api.Room
 import screeps.api.Source
 import screeps.api.WORK
@@ -44,8 +45,11 @@ class CreepStrategyMinerLink(private val room: Room): CreepStrategy {
 
             if (!creep.pos.isEqualTo(link.pos)) {
                 // 移动到 link 的位置
-                creep.moveTo(link.pos)
-                creep.say("move")
+                val result = creep.moveTo(link.pos)
+                if (result != OK) {
+                    creep.say("error")
+                    println("move failed: result, ${creep.name}")
+                }
                 return@forEach
             }
 
@@ -98,7 +102,7 @@ class CreepStrategyMinerLink(private val room: Room): CreepStrategy {
         println("create new creep $CREEP_ROLE_MINER_LINK. code: $result, $bodyList")
     }
 
-    private class RoomLinkInfo(
+    class RoomLinkInfo(
         val targetRoom: String,
         val fromLinkId: String,
         val toLinkId: String

@@ -1,8 +1,6 @@
 package chentian.utils
 
-import chentian.GameContext
-import chentian.extensions.linkFromAId
-import chentian.extensions.linkToAId
+import chentian.creep.CreepStrategyMinerLink
 import screeps.api.Game
 import screeps.api.structures.StructureLink
 
@@ -12,10 +10,15 @@ import screeps.api.structures.StructureLink
  * @author chentian
  */
 
+
+private val TARGET_ROOM_LINK = listOf(
+    CreepStrategyMinerLink.RoomLinkInfo("E18S18", "5cdad0cdf9cba63e6c385dfd", "5cdacbb4e470435ac71db0cf")
+)
+
 fun linkTransfer() {
-    GameContext.rooms.values.forEach { room ->
-        val linkFrom = Game.getObjectById<StructureLink>(room.memory.linkFromAId) ?: return
-        val linkTo = Game.getObjectById<StructureLink>(room.memory.linkToAId) ?: return
+    TARGET_ROOM_LINK.forEach { roomLinkInfo ->
+        val linkFrom = Game.getObjectById<StructureLink>(roomLinkInfo.fromLinkId) ?: return
+        val linkTo = Game.getObjectById<StructureLink>(roomLinkInfo.toLinkId) ?: return
 
         val energy = linkFrom.energy
         if (linkFrom.cooldown == 0 && energy > 0 && linkTo.energyCapacity > linkTo.energy + energy) {

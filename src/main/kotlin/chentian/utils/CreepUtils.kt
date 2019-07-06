@@ -159,7 +159,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         // 捡坟墓上的
         creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy > 0 }?.let { tombstone ->
             if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(tombstone.pos)
+                creep.moveTo(tombstone.pos, moveToOptions)
             }
             println("$creep is withdrawing tombstone at $tombstone")
             return
@@ -249,7 +249,7 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         // 捡坟墓上的
         creep.pos.findInRange(FIND_TOMBSTONES, 3).firstOrNull { it.store.energy > 0 }?.let { tombstone ->
             if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(tombstone.pos)
+                creep.moveTo(tombstone.pos, moveToOptions)
             }
             println("$creep is withdrawing tombstone at $tombstone")
             return

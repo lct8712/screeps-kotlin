@@ -5,14 +5,19 @@ import chentian.extensions.findCreepByRole
 import chentian.extensions.findStructureMapByType
 import chentian.extensions.role
 import chentian.utils.createCreepName
+import screeps.api.CARRY
 import screeps.api.CreepMemory
 import screeps.api.FIND_SOURCES
+import screeps.api.FIND_STRUCTURES
 import screeps.api.MOVE
+import screeps.api.RESOURCE_ENERGY
 import screeps.api.Room
 import screeps.api.STRUCTURE_CONTAINER
+import screeps.api.STRUCTURE_LINK
 import screeps.api.Source
 import screeps.api.WORK
 import screeps.api.options
+import screeps.api.structures.StructureLink
 import screeps.api.structures.StructureSpawn
 import screeps.utils.unsafe.jsObject
 
@@ -42,15 +47,29 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
                 return@forEach
             }
 
+            // 移动到 container 的位置
             if (!creep.pos.isEqualTo(container.pos)) {
-                // 移动到 container 的位置
                 creep.moveTo(container.pos)
                 creep.say("move")
-            } else {
-                // 正常采集
-                creep.harvest(source)
-                creep.say("mine")
+                return
             }
+
+            // 传输到 link
+            if (creep.carry.energy >= ENERGY_AMOUNT_TO_LINK) {
+                container.pos.findInRange(FIND_STRUCTURES, 1).firstOrNull {
+                    it.structureType == STRUCTURE_LINK
+                }?.let {
+                    val link = it as StructureLink
+                    if (link.energyCapacity >= link.energy - ENERGY_AMOUNT_TO_LINK) {
+                        creep.transfer(link, RESOURCE_ENERGY)
+                        return
+                    }
+                }
+            }
+
+            // 正常采集
+            creep.harvest(source)
+            creep.say("mine")
         }
     }
 
@@ -68,7 +87,7 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
         creeps.forEach { containerIds.remove(it.memory.containerId) }
         val targetId = containerIds.firstOrNull() ?: return
 
-        val bodyList = mutableListOf(MOVE).apply {
+        val bodyList = mutableListOf(MOVE, CARRY).apply {
             for (i in 0 until MAX_WORKER_BODY_COUNT) {
                 add(WORK)
             }
@@ -86,5 +105,6 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
 
         private const val CREEP_ROLE_MINER = "miner"
         private const val MAX_WORKER_BODY_COUNT = 5
+        private const val ENERGY_AMOUNT_TO_LINK = 50
     }
 }
