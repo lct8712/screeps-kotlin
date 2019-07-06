@@ -5,6 +5,7 @@ import chentian.extensions.linkFromAId
 import chentian.extensions.linkToAId
 import chentian.extensions.role
 import chentian.extensions.targetLinkId
+import chentian.utils.RoomLinkInfo
 import chentian.utils.createCreepName
 import screeps.api.CreepMemory
 import screeps.api.FIND_SOURCES
@@ -101,12 +102,6 @@ class CreepStrategyMinerLink(private val room: Room): CreepStrategy {
         })
         println("create new creep $CREEP_ROLE_MINER_LINK. code: $result, $bodyList")
     }
-
-    class RoomLinkInfo(
-        val targetRoom: String,
-        val fromLinkId: String,
-        val toLinkId: String
-    )
 
     companion object {
 

@@ -4,9 +4,9 @@ import chentian.creep.CreepStrategyBuilder
 import chentian.creep.CreepStrategyBuilderRemote
 import chentian.creep.CreepStrategyClaimer
 import chentian.creep.CreepStrategyHarvester
+import chentian.creep.CreepStrategyHarvesterLink
 import chentian.creep.CreepStrategyHarvesterRemote
 import chentian.creep.CreepStrategyMiner
-import chentian.creep.CreepStrategyMinerLink
 import chentian.creep.CreepStrategyResourceCarrier
 import chentian.utils.linkTransfer
 import chentian.utils.runRemoteHarvesters
@@ -45,7 +45,8 @@ object CreepStrategyController {
                 CreepStrategyHarvesterRemote(room),
                 CreepStrategyClaimer(room),
                 CreepStrategyBuilderRemote(room),
-                CreepStrategyResourceCarrier(room)
+                CreepStrategyResourceCarrier(room),
+                CreepStrategyHarvesterLink(room)
 //                CreepStrategyMinerLink(room)
             ).forEach { strategy ->
                 strategy.tryToCreate(spawn)
