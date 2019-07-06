@@ -1,21 +1,20 @@
 package chentian.creep
 
-import chentian.GameContext
-import chentian.extensions.containerId
 import chentian.extensions.findCreepByRole
-import chentian.extensions.findStructureMapByType
 import chentian.extensions.linkFromAId
 import chentian.extensions.linkToAId
 import chentian.extensions.role
+import chentian.extensions.targetLinkId
 import chentian.utils.createCreepName
 import screeps.api.CreepMemory
 import screeps.api.FIND_SOURCES
+import screeps.api.Game
 import screeps.api.MOVE
 import screeps.api.Room
-import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.Source
 import screeps.api.WORK
 import screeps.api.options
+import screeps.api.structures.StructureLink
 import screeps.api.structures.StructureSpawn
 import screeps.utils.unsafe.jsObject
 
@@ -26,41 +25,44 @@ import screeps.utils.unsafe.jsObject
  */
 class CreepStrategyMinerLink(private val room: Room): CreepStrategy {
 
-    private lateinit var creeps lazy by { room.findCreepByRole(CREEP_ROLE_MINER_LINK) }
+    private val creeps by lazy { room.findCreepByRole(CREEP_ROLE_MINER_LINK) }
 
     override fun tryToCreate(spawn: StructureSpawn) {
-        if (GameContext.timeMod16Result != 5) {
-            return
-        }
-
-        if (shouldCreate()) {
-            create(spawn)
+        getFromLinkId()?.let { linkId ->
+            create(spawn, linkId)
         }
     }
 
     override fun runLoop() {
         creeps.forEach { creep ->
-            val container = containerMap[creep.memory.containerId]
-            val source: Source? = container?.pos?.findInRange(FIND_SOURCES, 1)?.getOrNull(0)
+            val link = Game.getObjectById<StructureLink>(creep.memory.targetLinkId)
+            if (link == null) {
+                creep.say("error")
+                println("link not found: ${creep.name} ${creep.memory.targetLinkId}")
+                return@forEach
+            }
+
+            if (!creep.pos.isEqualTo(link.pos)) {
+                // 移动到 link 的位置
+                creep.moveTo(link.pos)
+                creep.say("move")
+                return@forEach
+            }
+
+            val source: Source? = link.pos.findInRange(FIND_SOURCES, 1).getOrNull(0)
             if (source == null) {
                 creep.say("error")
                 println("source not found: ${creep.name}")
                 return@forEach
             }
 
-            if (!creep.pos.isEqualTo(container.pos)) {
-                // 移动到 container 的位置
-                creep.moveTo(container.pos)
-                creep.say("move")
-            } else {
-                // 正常采集
-                creep.harvest(source)
-                creep.say("mine")
-            }
+            // 正常采集
+            creep.harvest(source)
+            creep.say("mine")
         }
     }
 
-    private fun shouldCreate(): Boolean {
+    private fun getFromLinkId(): String? {
         TARGET_ROOM_LINK.forEach { roomLinkInfo ->
             if (roomLinkInfo.targetRoom != room.name) {
                 return@forEach
@@ -68,22 +70,21 @@ class CreepStrategyMinerLink(private val room: Room): CreepStrategy {
 
             room.memory.linkFromAId = roomLinkInfo.fromLinkId
             room.memory.linkToAId = roomLinkInfo.toLinkId
-            return creeps.isEmpty()
+            if (creeps.isEmpty()) {
+                return roomLinkInfo.fromLinkId
+            }
+            return null
         }
-        return false
+        return null
     }
 
-    private fun create(spawn: StructureSpawn) {
+    private fun create(spawn: StructureSpawn, linkId: String) {
         val workerCount = (spawn.room.energyAvailable - 50) / 100
         if (workerCount < MAX_WORKER_BODY_COUNT) {
             return
         }
 
-        val containerIds = containerMap.keys.toMutableSet()
-        creeps.forEach { containerIds.remove(it.memory.containerId) }
-        val targetId = containerIds.firstOrNull() ?: return
-
-        val bodyList = mutableListOf(MOVE).apply {
+        val bodyList = mutableListOf(MOVE, MOVE).apply {
             for (i in 0 until MAX_WORKER_BODY_COUNT) {
                 add(WORK)
             }
@@ -91,12 +92,11 @@ class CreepStrategyMinerLink(private val room: Room): CreepStrategy {
         val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(CREEP_ROLE_MINER_LINK), options {
             memory = jsObject<CreepMemory> {
                 this.role = CREEP_ROLE_MINER_LINK
-                this.containerId = targetId
+                this.targetLinkId = linkId
             }
         })
         println("create new creep $CREEP_ROLE_MINER_LINK. code: $result, $bodyList")
     }
-
 
     private class RoomLinkInfo(
         val targetRoom: String,
@@ -110,7 +110,7 @@ class CreepStrategyMinerLink(private val room: Room): CreepStrategy {
         private const val MAX_WORKER_BODY_COUNT = 5
 
         private val TARGET_ROOM_LINK = listOf(
-            RoomLinkInfo("E18S18", "5cdac520a6a54c60f25c8358", "5cdac54a058ace60ea047ae3")
+            RoomLinkInfo("E18S18", "5cdad0cdf9cba63e6c385dfd", "5cdacbb4e470435ac71db0cf")
         )
     }
 }
