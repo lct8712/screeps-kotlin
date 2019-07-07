@@ -103,7 +103,7 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
     companion object {
 
         const val CREEP_ROLE_HARVESTER_LINK = "harvester-link"
-        private const val MAX_CREEP_COUNT_PER_ROOM = 1
+        private const val MAX_CREEP_COUNT_PER_ROOM = 2
         private const val WORKER_BODY_COUNT = 5
     }
 }

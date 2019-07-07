@@ -1,5 +1,6 @@
 package chentian.utils
 
+import chentian.extensions.isFull
 import screeps.api.Game
 import screeps.api.structures.StructureLink
 
@@ -17,7 +18,7 @@ class RoomLinkInfo(
 
 val TARGET_ROOM_LINK = listOf(
     RoomLinkInfo("E18S18", "5cdad0cdf9cba63e6c385dfd", "5cdacbb4e470435ac71db0cf"),
-    RoomLinkInfo("E18S18", "5d204ee4213aac3b59daac53", "5cdacbb4e470435ac71db0cf")
+    RoomLinkInfo("E18S18", "5d2071da14a08a72e00d134c", "5cdacbb4e470435ac71db0cf")
 )
 
 fun linkTransfer() {
@@ -25,8 +26,8 @@ fun linkTransfer() {
         val linkFrom = Game.getObjectById<StructureLink>(roomLinkInfo.fromLinkId) ?: return
         val linkTo = Game.getObjectById<StructureLink>(roomLinkInfo.toLinkId) ?: return
 
-        val energy = linkFrom.energy
-        if (linkFrom.cooldown == 0 && energy > 0 && linkTo.energyCapacity >= linkTo.energy + energy) {
+        val energy = transferAmount(linkFrom, linkTo)
+        if (energy > 0) {
             linkFrom.transferEnergy(linkTo, energy)
             println("$linkFrom transfer energy to $linkTo, $energy")
 
@@ -34,4 +35,22 @@ fun linkTransfer() {
             return
         }
     }
+}
+
+/**
+ * 应该传输多少能量
+ */
+private fun transferAmount(linkFrom: StructureLink, linkTo: StructureLink): Int {
+    if (linkFrom.cooldown != 0) {
+        return 0
+    }
+
+    val energy = linkFrom.energy
+    if (energy > 0 && linkTo.energyCapacity >= linkTo.energy + energy) {
+        return energy
+    }
+    if (linkFrom.isFull() && linkTo.energyCapacity >= linkTo.energy + energy / 2) {
+        return energy / 2
+    }
+    return 0
 }
