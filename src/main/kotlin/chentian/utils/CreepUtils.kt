@@ -76,7 +76,9 @@ val MAX_BODY_PART_COUNT_FOR_NORMAL_CREEP = MAX_BODY_PART / BODY_PART_FOR_NORMAL_
 fun createNormalCreep(spawn: StructureSpawn, role: String = "", forceCreate: Boolean = false) {
     // 一个小房间，创建最基本的 creep
     if (forceCreate || spawn.room.energyCapacityAvailable < BODY_COST_FOR_NORMAL_CREEP) {
-        doCreateCreep(role, "", spawn, mutableListOf(MOVE, CARRY, WORK))
+        if (spawn.room.energyAvailable >= BODY_COST_FOR_NORMAL_CREEP) {
+            doCreateCreep(role, "", spawn, mutableListOf(MOVE, CARRY, WORK))
+        }
         return
     }
 
