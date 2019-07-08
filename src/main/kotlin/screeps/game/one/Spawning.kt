@@ -1,8 +1,13 @@
 package screeps.game.one
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JSON
-import screeps.api.*
+import screeps.api.CreepMemory
+import screeps.api.DirectionConstant
+import screeps.api.ERR_NOT_ENOUGH_ENERGY
+import screeps.api.Game
+import screeps.api.Memory
+import screeps.api.OK
+import screeps.api.ScreepsReturnCode
 import screeps.api.structures.SpawnOptions
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureSpawn
@@ -94,11 +99,12 @@ object GlobalSpawnQueue {
     private var Memory.globalSpawnQueue: CreepSpawnList?
         get() {
             val internal = this.asDynamic().globalSpawnQueue
-            return if (internal == null) null else JSON.parse(internal)
+            return null
+//            return if (internal == null) null else JSON.parse(internal)
         }
         set(value) {
-            val stringyfied = if (value == null) null else JSON.stringify(value)
-            this.asDynamic().globalSpawnQueue = stringyfied
+//            val stringyfied = if (value == null) null else JSON.stringify(value)
+//            this.asDynamic().globalSpawnQueue = stringyfied
         }
 }
 

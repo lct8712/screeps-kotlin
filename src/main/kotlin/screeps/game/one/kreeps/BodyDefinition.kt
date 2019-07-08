@@ -1,6 +1,5 @@
 package screeps.game.one.kreeps
 
-import kotlinx.serialization.Serializable
 import screeps.api.BODYPART_COST
 import screeps.api.BodyPartConstant
 import screeps.api.CARRY
@@ -10,7 +9,7 @@ import screeps.api.WORK
 import screeps.api.get
 import screeps.api.value
 
-@Serializable
+//@Serializable
 enum class BodyDefinition(val body: Array<BodyPartConstant>, val maxSize: Int = 0) {
     BASIC_WORKER(arrayOf(WORK, CARRY, MOVE), maxSize = 5),
     MINER(arrayOf(WORK, WORK, MOVE), maxSize = 2),
