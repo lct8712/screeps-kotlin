@@ -83,7 +83,7 @@ class CreepStrategyDefenceRepair(val room: Room) : CreepStrategy {
 
     companion object {
 
-        const val MAX_HITS_TO_REPAIR = 3_000_000L
+        private const val MAX_HITS_TO_REPAIR = 3_000_000L
         private const val CREEP_ROLE_DEFENCE_BUILDER = "defence-builder"
         private val MOVE_OPTION = createMoveOptions("#ffaa00")
     }
