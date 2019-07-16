@@ -73,15 +73,19 @@ val BODY_PART_FOR_NORMAL_CREEP = listOf(MOVE, CARRY, CARRY, WORK, WORK)
 val BODY_COST_FOR_NORMAL_CREEP = BODY_PART_FOR_NORMAL_CREEP.sumBy { (BODYPART_COST[it])!! }
 val MAX_BODY_PART_COUNT_FOR_NORMAL_CREEP = MAX_BODY_PART / BODY_PART_FOR_NORMAL_CREEP.size
 
+val BODY_PART_FOR_MIN_CREEP = listOf(MOVE, CARRY, WORK)
+val BODY_COST_FOR_MIN_CREEP = BODY_PART_FOR_MIN_CREEP.sumBy { (BODYPART_COST[it])!! }
+
 fun createNormalCreep(spawn: StructureSpawn, role: String = "", forceCreate: Boolean = false) {
     // 一个小房间，创建最基本的 creep
-    if (forceCreate || spawn.room.energyCapacityAvailable < BODY_COST_FOR_NORMAL_CREEP) {
-        if (spawn.room.energyAvailable >= BODY_COST_FOR_NORMAL_CREEP) {
-            doCreateCreep(role, "", spawn, mutableListOf(MOVE, CARRY, WORK))
+    if (forceCreate || spawn.room.energyCapacityAvailable < BODY_COST_FOR_MIN_CREEP) {
+        if (spawn.room.energyAvailable >= BODY_COST_FOR_MIN_CREEP) {
+            doCreateCreep(role, "", spawn, BODY_PART_FOR_MIN_CREEP.toMutableList())
         }
         return
     }
 
+    println("####4")
     val partCount = min(spawn.room.energyAvailable / BODY_COST_FOR_NORMAL_CREEP, MAX_BODY_PART_COUNT_FOR_NORMAL_CREEP)
     if (partCount < 1) {
         return
