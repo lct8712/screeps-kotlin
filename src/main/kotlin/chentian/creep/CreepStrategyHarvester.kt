@@ -54,11 +54,11 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
     private fun shouldCreate(): Boolean {
         val sourceSize = room.find(FIND_SOURCES).size
-        // 最少 2 倍
+        // 最少个数
         if (creeps.size < sourceSize * 1.5) {
             return true
         }
-        // 最多 4 倍
+        // 最多个数
         if (creeps.size > sourceSize * 3) {
             return false
         }
@@ -67,7 +67,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         val containers = room.find(FIND_STRUCTURES).filter { it.structureType == STRUCTURE_CONTAINER }
         val totalStore = containers.sumBy { (it as StructureContainer).store.energy }
         val totalCapacity = containers.sumBy { (it as StructureContainer).storeCapacity }
-        return totalStore.toFloat() / totalCapacity.toFloat() >= 0.75f
+        return totalStore.toFloat() / totalCapacity.toFloat() >= 0.8f
     }
 
     private fun create(spawn: StructureSpawn) {
