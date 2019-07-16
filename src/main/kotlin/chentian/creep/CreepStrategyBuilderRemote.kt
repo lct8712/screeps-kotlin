@@ -51,16 +51,26 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
 
     private fun buildStructure(creep: Creep) {
         harvestEnergyAndDoJobRemote(creep) {
-            val structure = creep.room.findFirstConstructionToBuild(STRUCTURE_SPAWN)
-            if (structure == null) {
+            creep.room.controller?.let { controller ->
+                // RCL 快要降级了
+                if (controller.ticksToDowngrade <= 4000) {
+                    if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(controller.pos)
+                    }
+                    return@harvestEnergyAndDoJobRemote
+                }
+            }
+
+            val spawnToBuild = creep.room.findFirstConstructionToBuild(STRUCTURE_SPAWN)
+            if (spawnToBuild == null) {
                 // 转换为 Harvester
                 creep.memory.role = CreepStrategyHarvester.CREEP_ROLE_HARVESTER
                 return@harvestEnergyAndDoJobRemote
             }
 
-            if (creep.build(structure) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(structure.pos)
-                println("$creep is building remote $structure")
+            if (creep.build(spawnToBuild) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(spawnToBuild.pos)
+                println("$creep is building remote $spawnToBuild")
                 return@harvestEnergyAndDoJobRemote
             }
         }
@@ -69,6 +79,6 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
     companion object {
 
         private const val CREEP_ROLE_BUILDER_REMOTE = "builder-remote"
-        private const val MAX_REMOTE_BUILDER_COUNT = 8
+        private const val MAX_REMOTE_BUILDER_COUNT = 3
     }
 }

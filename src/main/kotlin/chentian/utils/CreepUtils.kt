@@ -1,5 +1,6 @@
 package chentian.utils
 
+import chentian.GameContext
 import chentian.extensions.containerTargetId
 import chentian.extensions.homeRoomName
 import chentian.extensions.isEmptyCarry
@@ -10,6 +11,7 @@ import chentian.extensions.isWorking
 import chentian.extensions.moveToTargetRoom
 import chentian.extensions.role
 import chentian.extensions.setWorking
+import chentian.extensions.sourceTargetId
 import chentian.extensions.targetRoomName
 import chentian.extensions.transferTargetId
 import chentian.extensions.withdrawTargetId
@@ -33,6 +35,7 @@ import screeps.api.OK
 import screeps.api.RESOURCE_ENERGY
 import screeps.api.RoomVisual
 import screeps.api.STRUCTURE_CONTAINER
+import screeps.api.Source
 import screeps.api.TOP
 import screeps.api.WORK
 import screeps.api.get
@@ -70,13 +73,19 @@ val BODY_PART_FOR_NORMAL_CREEP = listOf(MOVE, CARRY, CARRY, WORK, WORK)
 val BODY_COST_FOR_NORMAL_CREEP = BODY_PART_FOR_NORMAL_CREEP.sumBy { (BODYPART_COST[it])!! }
 val MAX_BODY_PART_COUNT_FOR_NORMAL_CREEP = MAX_BODY_PART / BODY_PART_FOR_NORMAL_CREEP.size
 
+val BODY_PART_FOR_MIN_CREEP = listOf(MOVE, CARRY, WORK)
+val BODY_COST_FOR_MIN_CREEP = BODY_PART_FOR_MIN_CREEP.sumBy { (BODYPART_COST[it])!! }
+
 fun createNormalCreep(spawn: StructureSpawn, role: String = "", forceCreate: Boolean = false) {
     // 一个小房间，创建最基本的 creep
-    if (forceCreate || spawn.room.energyCapacityAvailable < BODY_COST_FOR_NORMAL_CREEP) {
-        doCreateCreep(role, "", spawn, mutableListOf(MOVE, CARRY, WORK))
+    if (forceCreate || spawn.room.energyCapacityAvailable < BODY_COST_FOR_MIN_CREEP) {
+        if (spawn.room.energyAvailable >= BODY_COST_FOR_MIN_CREEP) {
+            doCreateCreep(role, "", spawn, BODY_PART_FOR_MIN_CREEP.toMutableList())
+        }
         return
     }
 
+    println("####4")
     val partCount = min(spawn.room.energyAvailable / BODY_COST_FOR_NORMAL_CREEP, MAX_BODY_PART_COUNT_FOR_NORMAL_CREEP)
     if (partCount < 1) {
         return
@@ -84,7 +93,7 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "", forceCreate: Boo
 
     // 储备不够，等待
     if (spawn.room.energyAvailable < spawn.room.energyCapacityAvailable / 2 && !spawn.isFullCarry()) {
-        println("spawn: not enough energy")
+        println("spawn $role: not enough energy")
         return
     }
 
@@ -159,17 +168,25 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         // 捡坟墓上的
         creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy > 0 }?.let { tombstone ->
             if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(tombstone.pos)
+                creep.moveTo(tombstone.pos, moveToOptions)
             }
             println("$creep is withdrawing tombstone at $tombstone")
             return
         }
+
         // 捡地上掉的
         creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.let { resource ->
             if (creep.pickup(resource) == OK) {
                 println("$creep is picking up resource at $resource")
                 return
             }
+        }
+
+        // 特殊情况，没有 miner
+        val minerCreepCount = GameContext.creepsMiner[creep.room.name].orEmpty().size
+        if (minerCreepCount == 0) {
+            tryToMineFromSource(creep)
+            return
         }
 
         // 已经有目标
@@ -186,7 +203,6 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         val maxContainer = containers.maxBy { it.store.energy }
         if (minContainer != null && maxContainer != null && minContainer.store.energy * 6 < maxContainer.store.energy) {
             tryToWithdraw(creep, maxContainer)
-            creep.memory.withdrawTargetId = maxContainer.id
             println("$creep to full container $maxContainer")
             return
         }
@@ -195,23 +211,12 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         val containerList = creep.room.find(FIND_STRUCTURES).filter { it.structureType == STRUCTURE_CONTAINER }
         (creep.findClosest(containerList) as StructureContainer?)?.let { container ->
             tryToWithdraw(creep, container)
-            creep.memory.withdrawTargetId = container.id
-            // 让开采矿的位置
-            if (creep.pos == container.pos) {
-                creep.move(TOP)
-            }
             println("$creep is withdraw container")
             return
         }
 
         // 找最近的 source
-        creep.pos.findClosestByPath(FIND_SOURCES)?.let { source ->
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source.pos, moveToOptions)
-            }
-            println("$creep is harvesting")
-            return
-        }
+        tryToMineFromSource(creep)
     }
 
     creep.say("action")
@@ -219,9 +224,40 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
     return
 }
 
-private fun tryToWithdraw(creep: Creep, maxContainer: StructureContainer) {
-    if (creep.withdraw(maxContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(maxContainer.pos, moveToOptions)
+private fun tryToMineFromSource(creep: Creep) {
+    fun harvestOrMove(creep: Creep, source: Source) {
+        if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(source.pos, moveToOptions)
+        }
+        println("$creep is harvesting from source")
+    }
+
+    Game.getObjectById<Source>(creep.memory.sourceTargetId)?.let { source ->
+        harvestOrMove(creep, source)
+        return
+    }
+
+    creep.pos.findClosestByPath(FIND_SOURCES)?.let { source ->
+        creep.memory.sourceTargetId = source.id
+        harvestOrMove(creep, source)
+        return
+    }
+}
+
+private fun tryToWithdraw(creep: Creep, container: StructureContainer) {
+    fun shouldMove(): Boolean {
+        val miners = GameContext.creepsMiner[creep.room.name].orEmpty()
+        return creep.pos.isEqualTo(container.pos) && miners.any { it.pos.isNearTo(creep.pos) }
+    }
+
+    creep.memory.sourceTargetId = ""
+    creep.memory.withdrawTargetId = if (container.store.energy == 0) "" else container.id
+
+    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+        creep.moveTo(container.pos, moveToOptions)
+    } else if (shouldMove()) {
+        // 让开采矿的位置
+        creep.move(TOP)
     }
 }
 
@@ -249,7 +285,7 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         // 捡坟墓上的
         creep.pos.findInRange(FIND_TOMBSTONES, 3).firstOrNull { it.store.energy > 0 }?.let { tombstone ->
             if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(tombstone.pos)
+                creep.moveTo(tombstone.pos, moveToOptions)
             }
             println("$creep is withdrawing tombstone at $tombstone")
             return

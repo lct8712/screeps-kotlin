@@ -19,7 +19,8 @@ import screeps.utils.toMap
 import screeps.utils.unsafe.jsObject
 
 /**
- *
+ * 开分基地时用一次
+ * 手动在原房间设置 room.memory.claimerRoomName
  *
  * @author chentian
  */

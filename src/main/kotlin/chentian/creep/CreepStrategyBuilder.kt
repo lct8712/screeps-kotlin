@@ -18,9 +18,11 @@ import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_EXTENSION
 import screeps.api.STRUCTURE_EXTRACTOR
 import screeps.api.STRUCTURE_LINK
+import screeps.api.STRUCTURE_NUKER
 import screeps.api.STRUCTURE_RAMPART
 import screeps.api.STRUCTURE_ROAD
 import screeps.api.STRUCTURE_STORAGE
+import screeps.api.STRUCTURE_TERMINAL
 import screeps.api.STRUCTURE_TOWER
 import screeps.api.STRUCTURE_WALL
 import screeps.api.structures.StructureSpawn
@@ -60,6 +62,7 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
         harvestEnergyAndDoJob(creep) {
             if (constructionSites.isEmpty()) {
                 // 转换为 Harvester
+                println("$creep transfer to harvester")
                 creep.memory.role = CreepStrategyHarvester.CREEP_ROLE_HARVESTER
                 return@harvestEnergyAndDoJob
             }
@@ -71,6 +74,7 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
                 } else if (tryToBuild(creep, target)) {
                     return@harvestEnergyAndDoJob
                 }
+                println("$creep build current target failed")
             }
 
             // 重新选择
@@ -78,11 +82,14 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
                 val constructionList = room.findConstructionsToBuild(structureType)
                 creep.findClosest(constructionList)?.let { target ->
                     creep.memory.buildTargetId = target.id
+                    println("$creep change build target to ${target.id}")
                     if (tryToBuild(creep, target)) {
                         return@harvestEnergyAndDoJob
                     }
                 }
             }
+
+            println("$creep build failed: no target")
         }
     }
 
@@ -111,6 +118,8 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
             STRUCTURE_RAMPART,
             STRUCTURE_STORAGE,
             STRUCTURE_LINK,
+            STRUCTURE_TERMINAL,
+            STRUCTURE_NUKER,
             STRUCTURE_WALL,
             STRUCTURE_ROAD
         )
