@@ -3,6 +3,7 @@ package chentian.creep
 import chentian.extensions.containerTargetId
 import chentian.extensions.findCreepByRole
 import chentian.extensions.isFullCarry
+import chentian.extensions.needUpgrade
 import chentian.extensions.transferAllTypeOrMove
 import chentian.extensions.transferTargetId
 import chentian.utils.createMoveOptions
@@ -20,11 +21,13 @@ import screeps.api.Room
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_EXTENSION
 import screeps.api.STRUCTURE_SPAWN
+import screeps.api.STRUCTURE_TERMINAL
 import screeps.api.STRUCTURE_TOWER
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureController
 import screeps.api.structures.StructureSpawn
+import screeps.api.structures.StructureTerminal
 import screeps.game.one.findClosest
 
 /**
@@ -78,25 +81,45 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         }
     }
 
+    private fun transferEnergy(creep: Creep): Boolean {
+        return transferToExtension(creep) ||
+            transferToContainer(creep) ||
+            updateController(creep) ||
+            transferToTerminal(creep)
+    }
+
+    /**
+     * 附近有扩展
+     */
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-    private fun transferEnergy(creep: Creep) {
-        // 附近有扩展
-        if (!isFullEnergy) {
-            creep.pos.findInRange(FIND_STRUCTURES, 1)
-                .filter { it.structureType == STRUCTURE_EXTENSION }
-                .map { it as EnergyContainer }
-                .firstOrNull { it.energy < it.energyCapacity }?.let {
-                    if (creep.transfer(it as Structure, RESOURCE_ENERGY) == OK) {
-                        println("$creep transfer to a near extension")
-                        return
-                    }
-                }
+    private fun transferToExtension(creep: Creep): Boolean {
+        if (isFullEnergy) {
+            return false
         }
 
-        // 已有 transfer 目标
+        creep.pos.findInRange(FIND_STRUCTURES, 1).filter {
+            it.structureType == STRUCTURE_EXTENSION
+        }.mapNotNull {
+            it as? EnergyContainer
+        }.firstOrNull {
+            it.energy < it.energyCapacity
+        }?.let {
+            if (creep.transfer(it as Structure, RESOURCE_ENERGY) == OK) {
+                println("$creep transfer to a near extension")
+                return true
+            }
+        }
+        return false
+    }
+
+    /**
+     * 给建筑充能
+     */
+    @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+    private fun transferToContainer(creep: Creep): Boolean {
         Game.getObjectById<Structure>(creep.memory.transferTargetId)?.let { target ->
             if (transferOrMove(creep, target)) {
-                return
+                return true
             }
         }
 
@@ -112,23 +135,46 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
             creep.findClosest(energyStructures)?.let { target ->
                 creep.memory.transferTargetId = target.id
                 if (transferOrMove(creep, target)) {
-                    return
+                    return true
                 }
             }
         }
+        return false
+    }
 
-        // 已有 controller 目标
+    /**
+     * 升级 Controller
+     */
+    private fun updateController(creep: Creep): Boolean {
+        // 已有目标
         Game.getObjectById<StructureController>(creep.memory.containerTargetId)?.let { target ->
             upgradeOrMove(creep, target)
-            return
+            return true
         }
 
         // 去升级 controller
         val controller = creep.room.controller
-        if (controller != null) {
+        if (controller?.needUpgrade() == true) {
             creep.memory.containerTargetId = controller.id
             upgradeOrMove(creep, controller)
+            return true
         }
+        return false
+    }
+
+    /**
+     * 传输到 terminal
+     */
+    private fun transferToTerminal(creep: Creep): Boolean {
+        val terminal = room.find(FIND_STRUCTURES)
+            .firstOrNull { it.structureType == STRUCTURE_TERMINAL }
+            as? StructureTerminal
+            ?: return false
+
+        if (transferOrMove(creep, terminal)) {
+            return true
+        }
+        return false
     }
 
     private fun upgradeOrMove(creep: Creep, controller: StructureController) {
@@ -142,7 +188,6 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         if (target.structureType == STRUCTURE_TOWER) {
             towerTargetIdSet.add(target.id)
         }
-
 
         return creep.transferAllTypeOrMove(target)
     }

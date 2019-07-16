@@ -11,6 +11,7 @@ import chentian.creep.CreepStrategyResourceCarrier
 import chentian.utils.linkTransfer
 import chentian.utils.runRemoteHarvesters
 import chentian.utils.runResourceCarriers
+import chentian.utils.sellEnergy
 import chentian.utils.towerAttack
 import screeps.api.Game
 import screeps.api.values
@@ -30,6 +31,7 @@ object CreepStrategyController {
         houseKeeping()
         towerAttack()
         linkTransfer()
+        sellEnergy()
 
         println("Game Loop Start")
         Game.spawns.values.forEach { spawn ->
