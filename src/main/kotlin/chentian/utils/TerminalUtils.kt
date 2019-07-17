@@ -6,6 +6,7 @@ import screeps.api.Market
 import screeps.api.ORDER_BUY
 import screeps.api.RESOURCE_ENERGY
 import screeps.api.structures.StructureTerminal
+import kotlin.math.min
 
 /**
  *
@@ -13,15 +14,15 @@ import screeps.api.structures.StructureTerminal
  * @author chentian
  */
 
-private const val MIN_ENERGY_TO_SELL = 1000
+private const val MIN_ENERGY_TO_SELL = 50_000
 
 private class RoomTerminalInfo(
-    val targetRoom: String,
+    val roomName: String,
     val terminalId: String
 )
 
 private val TARGET_ROOM_TERMINAL = listOf(
-    RoomTerminalInfo("E18S19", "5d2d768f24bc272472a28c8a")
+    RoomTerminalInfo("E18S19", "5d2e18efae29775e0162b5eb")
 )
 
 fun sellEnergy() {
@@ -40,7 +41,9 @@ fun sellEnergy() {
             this.type = ORDER_BUY
         }
         Game.market.getAllOrders(filter).maxBy { it.price }?.let { order ->
-            Game.market.deal(order.id, terminal.store.energy)
+            val amount = min(terminal.store.energy, order.remainingAmount) / 2
+            val result = Game.market.deal(order.id, amount, info.roomName)
+            println("terminal: result: $result. $amount")
             // 每次成交一单即可
             return
         }

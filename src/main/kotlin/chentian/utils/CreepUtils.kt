@@ -85,7 +85,6 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "", forceCreate: Boo
         return
     }
 
-    println("####4")
     val partCount = min(spawn.room.energyAvailable / BODY_COST_FOR_NORMAL_CREEP, MAX_BODY_PART_COUNT_FOR_NORMAL_CREEP)
     if (partCount < 1) {
         return
