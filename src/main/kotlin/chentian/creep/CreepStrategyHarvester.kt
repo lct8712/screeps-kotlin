@@ -1,6 +1,9 @@
 package chentian.creep
 
 import chentian.extensions.containerTargetId
+import chentian.extensions.energy
+import chentian.extensions.energyCapacity
+import chentian.extensions.findClosest
 import chentian.extensions.findCreepByRole
 import chentian.extensions.isFullCarry
 import chentian.extensions.needUpgrade
@@ -11,7 +14,6 @@ import chentian.utils.createNormalCreep
 import chentian.utils.harvestEnergyAndDoJob
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
-import screeps.api.EnergyContainer
 import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES
 import screeps.api.Game
@@ -23,12 +25,12 @@ import screeps.api.STRUCTURE_EXTENSION
 import screeps.api.STRUCTURE_SPAWN
 import screeps.api.STRUCTURE_TERMINAL
 import screeps.api.STRUCTURE_TOWER
+import screeps.api.StoreOwner
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureController
 import screeps.api.structures.StructureSpawn
 import screeps.api.structures.StructureTerminal
-import screeps.game.one.findClosest
 
 /**
  *
@@ -65,8 +67,8 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
         // 看 Container 容量
         val containers = room.find(FIND_STRUCTURES).filter { it.structureType == STRUCTURE_CONTAINER }
-        val totalStore = containers.sumBy { (it as StructureContainer).store.energy }
-        val totalCapacity = containers.sumBy { (it as StructureContainer).storeCapacity }
+        val totalStore = containers.sumBy { (it as StructureContainer).store.getUsedCapacity() }
+        val totalCapacity = containers.sumBy { (it as StructureContainer).store.getCapacity() }
         return totalStore.toFloat() / totalCapacity.toFloat() >= 0.8f
     }
 
@@ -100,9 +102,9 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         creep.pos.findInRange(FIND_STRUCTURES, 1).filter {
             it.structureType == STRUCTURE_EXTENSION
         }.mapNotNull {
-            it as? EnergyContainer
+            it as? StoreOwner
         }.firstOrNull {
-            it.energy < it.energyCapacity
+            it.store.energy() < it.store.energyCapacity()
         }?.let {
             if (creep.transfer(it as Structure, RESOURCE_ENERGY) == OK) {
                 println("$creep transfer to a near extension")
@@ -127,8 +129,8 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
             // 所有可以充能的建筑列表
             val energyStructures = room.find(FIND_STRUCTURES)
                 .filter { it.structureType == structureType && !towerTargetIdSet.contains(it.id) }
-                .map { it as EnergyContainer }
-                .filter { it.energy < it.energyCapacity }
+                .map { it as StoreOwner }
+                .filter { it.store.energy() < it.store.energyCapacity() }
                 .map { it as Structure }
 
             // 找最近的一个建筑去充能

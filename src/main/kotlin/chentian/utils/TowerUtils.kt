@@ -2,6 +2,8 @@ package chentian.utils
 
 import chentian.GameContext
 import chentian.extensions.controlLevel
+import chentian.extensions.energy
+import chentian.extensions.energyCapacity
 import chentian.extensions.repairTargetCountDown
 import chentian.extensions.repairTargetId
 import screeps.api.FIND_CREEPS
@@ -51,7 +53,7 @@ fun towerAttack() {
             return@forEach
         }
 
-        if (tower.energy <= tower.energyCapacity / 3) {
+        if (tower.store.energy() <= tower.store.energyCapacity() / 3) {
             return@forEach
         }
 

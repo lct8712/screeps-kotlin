@@ -1,5 +1,7 @@
-package screeps.game.one
+package chentian.utils
 
+import chentian.extensions.energy
+import chentian.utils.Stats.stats
 import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES
 import screeps.api.Game
@@ -8,7 +10,6 @@ import screeps.api.Room
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureController
-import screeps.game.one.Stats.stats
 
 object Stats {
 
@@ -52,7 +53,7 @@ object Stats {
                 structure as StructureContainer
             }.forEachIndexed { index, structureContainer ->
                 val containerName = "$roomName.container$index"
-                Memory.stats["$containerName.energy"] = structureContainer.store.energy
+                Memory.stats["$containerName.energy"] = structureContainer.store.energy()
             }
         }
     }

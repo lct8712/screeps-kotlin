@@ -9,5 +9,5 @@ import screeps.api.structures.StructureLink
  */
 
 fun StructureLink.isFull(): Boolean {
-    return energy == energyCapacity
+    return store.getFreeCapacity() == 0
 }

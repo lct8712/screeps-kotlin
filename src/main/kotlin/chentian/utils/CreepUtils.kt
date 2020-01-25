@@ -2,6 +2,8 @@ package chentian.utils
 
 import chentian.GameContext
 import chentian.extensions.containerTargetId
+import chentian.extensions.energy
+import chentian.extensions.findClosest
 import chentian.extensions.homeRoomName
 import chentian.extensions.isEmptyCarry
 import chentian.extensions.isFullCarry
@@ -43,7 +45,6 @@ import screeps.api.options
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureSpawn
 import screeps.api.value
-import screeps.game.one.findClosest
 import screeps.utils.unsafe.jsObject
 import kotlin.math.min
 
@@ -115,8 +116,10 @@ fun createMoveOptions(color: String): MoveToOptions {
         this.lineStyle = LINE_STYLE_DOTTED
     }
     return object : MoveToOptions {
-        override val visualizePathStyle: RoomVisual.LineStyle?
+        @Suppress("UNUSED_PARAMETER")
+        override var visualizePathStyle: RoomVisual.Style?
             get() = pathStyle
+            set(value) {}
     }
 }
 
@@ -165,7 +168,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         creep.say(message)
 
         // 捡坟墓上的
-        creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy > 0 }?.let { tombstone ->
+        creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.getUsedCapacity() > 0 }?.let { tombstone ->
             if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(tombstone.pos, moveToOptions)
             }
@@ -198,17 +201,20 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         val containers = creep.room.find(FIND_STRUCTURES).filter {
             it.structureType == STRUCTURE_CONTAINER
         }.map { it as StructureContainer }
-        val minContainer = containers.minBy { it.store.energy }
-        val maxContainer = containers.maxBy { it.store.energy }
-        if (minContainer != null && maxContainer != null && minContainer.store.energy * 6 < maxContainer.store.energy) {
+        val minContainer = containers.minBy { it.store.energy() }
+        val maxContainer = containers.maxBy { it.store.energy() }
+        if (minContainer != null && maxContainer != null && minContainer.store.energy() * 6 < maxContainer.store.energy()) {
             tryToWithdraw(creep, maxContainer)
             println("$creep to full container $maxContainer")
             return
         }
 
         // 找最近的 container
-        val containerList = creep.room.find(FIND_STRUCTURES).filter { it.structureType == STRUCTURE_CONTAINER }
-        (creep.findClosest(containerList) as StructureContainer?)?.let { container ->
+        val containerList = creep.room
+            .find(FIND_STRUCTURES)
+            .filter { it.structureType == STRUCTURE_CONTAINER }
+            .map { it as StructureContainer }
+        creep.findClosest(containerList)?.let { container ->
             tryToWithdraw(creep, container)
             println("$creep is withdraw container")
             return
@@ -250,7 +256,7 @@ private fun tryToWithdraw(creep: Creep, container: StructureContainer) {
     }
 
     creep.memory.sourceTargetId = ""
-    creep.memory.withdrawTargetId = if (container.store.energy == 0) "" else container.id
+    creep.memory.withdrawTargetId = if (container.store.energy() == 0) "" else container.id
 
     if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
         creep.moveTo(container.pos, moveToOptions)
@@ -282,7 +288,7 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         creep.say(message)
 
         // 捡坟墓上的
-        creep.pos.findInRange(FIND_TOMBSTONES, 3).firstOrNull { it.store.energy > 0 }?.let { tombstone ->
+        creep.pos.findInRange(FIND_TOMBSTONES, 3).firstOrNull { it.store.energy() > 0 }?.let { tombstone ->
             if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(tombstone.pos, moveToOptions)
             }

@@ -2,6 +2,8 @@ package chentian.creep
 
 import chentian.GameContext
 import chentian.extensions.containerId
+import chentian.extensions.energy
+import chentian.extensions.energyCapacity
 import chentian.extensions.findStructureMapByType
 import chentian.extensions.role
 import chentian.utils.createCreepName
@@ -56,12 +58,12 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
             }
 
             // 传输到 link
-            if (container.store.energy >= MIN_CONTAINER_ENERGY && creep.carry.energy >= ENERGY_AMOUNT_TO_LINK) {
+            if (container.store.energy() >= MIN_CONTAINER_ENERGY && creep.store.energy() >= ENERGY_AMOUNT_TO_LINK) {
                 container.pos.findInRange(FIND_STRUCTURES, 1).firstOrNull {
                     it.structureType == STRUCTURE_LINK
                 }?.let {
                     val link = it as StructureLink
-                    if (link.energyCapacity >= link.energy + ENERGY_AMOUNT_TO_LINK) {
+                    if (link.store.energyCapacity() >= link.store.energy() + ENERGY_AMOUNT_TO_LINK) {
                         creep.transfer(link, RESOURCE_ENERGY)
                         return
                     }

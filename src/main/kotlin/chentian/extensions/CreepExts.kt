@@ -3,10 +3,10 @@ package chentian.extensions
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.OK
+import screeps.api.RoomObject
 import screeps.api.RoomPosition
 import screeps.api.keys
 import screeps.api.structures.Structure
-import screeps.api.values
 
 /**
  *
@@ -15,7 +15,7 @@ import screeps.api.values
  */
 
 fun Creep.isFullCarry(): Boolean {
-    return totalCarry() == carryCapacity
+    return store.getFreeCapacity() == 0
 }
 
 fun Creep.isEmptyCarry(): Boolean {
@@ -49,12 +49,8 @@ fun Creep.moveToTargetPos(pos: RoomPosition) {
 //    }
 }
 
-fun Creep.totalCarry(): Int {
-    return carry.values.sum()
-}
-
 fun Creep.transferAllTypeOrMove(target: Structure): Boolean {
-    carry.keys.forEach { resourceType ->
+    store.keys.forEach { resourceType ->
         val transferResult = transfer(target, resourceType)
         when (transferResult) {
             ERR_NOT_IN_RANGE -> {
@@ -71,4 +67,43 @@ fun Creep.transferAllTypeOrMove(target: Structure): Boolean {
         }
     }
     return false
+}
+
+fun <T : RoomObject> Creep.findClosest(roomObjects: Collection<T>): T? {
+    var closest: T? = null
+    var minDistance = Int.MAX_VALUE
+    for (roomObject in roomObjects) {
+        val dist = (roomObject.pos.x - this.pos.x) * (roomObject.pos.x - this.pos.x) +
+            (roomObject.pos.y - this.pos.y) * (roomObject.pos.y - this.pos.y)
+
+        if (dist < minDistance) {
+            minDistance = dist
+            closest = roomObject
+        }
+    }
+    return closest
+}
+
+fun <T : RoomObject> Creep.findClosest(roomObjects: Array<out T>): T? {
+    var closest: T? = null
+    var minDistance = Int.MAX_VALUE
+    for (roomObject in roomObjects) {
+        val dist = (roomObject.pos.x - this.pos.x) * (roomObject.pos.x - this.pos.x) +
+            (roomObject.pos.y - this.pos.y) * (roomObject.pos.y - this.pos.y)
+
+        if (dist < minDistance) {
+            minDistance = dist
+            closest = roomObject
+        }
+    }
+    return closest
+}
+
+fun <T : RoomObject> Creep.findClosestNotEmpty(roomObjects: Array<out T>): T {
+    require(roomObjects.isNotEmpty())
+    return findClosest(roomObjects)!!
+}
+
+private fun Creep.totalCarry(): Int {
+    return store.getUsedCapacity()
 }

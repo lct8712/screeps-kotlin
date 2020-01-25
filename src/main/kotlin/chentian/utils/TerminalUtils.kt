@@ -1,6 +1,7 @@
 package chentian.utils
 
 import chentian.GameContext
+import chentian.extensions.energy
 import screeps.api.Game
 import screeps.api.Market
 import screeps.api.ORDER_BUY
@@ -32,7 +33,7 @@ fun sellEnergy() {
 
     TARGET_ROOM_TERMINAL.forEach { info ->
         val terminal = Game.getObjectById<StructureTerminal>(info.terminalId) ?: return@forEach
-        if (terminal.cooldown > 0 || terminal.store.energy < MIN_ENERGY_TO_SELL) {
+        if (terminal.cooldown > 0 || terminal.store.energy() < MIN_ENERGY_TO_SELL) {
             return@forEach
         }
 
@@ -41,11 +42,11 @@ fun sellEnergy() {
             this.type = ORDER_BUY
         }
         Game.market.getAllOrders(filter).maxBy { it.price }?.let { order ->
-            val amount = min(terminal.store.energy, order.remainingAmount) / 2
+            val amount = min(terminal.store.energy(), order.remainingAmount) / 2
             val result = Game.market.deal(order.id, amount, info.roomName)
             println("terminal: result: $result. $amount")
             // 每次成交一单即可
-            return
+            return@forEach
         }
     }
 }

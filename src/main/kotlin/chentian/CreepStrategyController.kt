@@ -15,8 +15,8 @@ import chentian.utils.sellEnergy
 import chentian.utils.towerAttack
 import screeps.api.Game
 import screeps.api.values
-import screeps.game.one.Stats
-import screeps.game.one.houseKeeping
+import chentian.utils.Stats
+import chentian.utils.houseKeeping
 
 /**
  *

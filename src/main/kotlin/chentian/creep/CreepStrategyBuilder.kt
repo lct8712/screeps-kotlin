@@ -1,6 +1,7 @@
 package chentian.creep
 
 import chentian.extensions.buildTargetId
+import chentian.extensions.findClosest
 import chentian.extensions.findConstructionsToBuild
 import chentian.extensions.findCreepByRole
 import chentian.extensions.isBuildFinished
@@ -26,7 +27,6 @@ import screeps.api.STRUCTURE_TERMINAL
 import screeps.api.STRUCTURE_TOWER
 import screeps.api.STRUCTURE_WALL
 import screeps.api.structures.StructureSpawn
-import screeps.game.one.findClosest
 import kotlin.math.max
 
 /**

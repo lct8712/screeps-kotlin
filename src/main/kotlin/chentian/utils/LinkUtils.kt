@@ -1,5 +1,7 @@
 package chentian.utils
 
+import chentian.extensions.energy
+import chentian.extensions.energyCapacity
 import chentian.extensions.isFull
 import screeps.api.Game
 import screeps.api.structures.StructureLink
@@ -45,11 +47,11 @@ private fun transferAmount(linkFrom: StructureLink, linkTo: StructureLink): Int 
         return 0
     }
 
-    val energy = linkFrom.energy
-    if (energy > 0 && linkTo.energyCapacity >= linkTo.energy + energy) {
+    val energy = linkFrom.store.energy()
+    if (energy > 0 && linkTo.store.energyCapacity() >= linkTo.store.energy() + energy) {
         return energy
     }
-    if (linkFrom.isFull() && linkTo.energyCapacity >= linkTo.energy + energy / 2) {
+    if (linkFrom.isFull() && linkTo.store.energyCapacity() >= linkTo.store.energy() + energy / 2) {
         return energy / 2
     }
     return 0
