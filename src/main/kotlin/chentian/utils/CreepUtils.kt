@@ -14,6 +14,7 @@ import chentian.extensions.moveToTargetRoom
 import chentian.extensions.role
 import chentian.extensions.setWorking
 import chentian.extensions.sourceTargetId
+import chentian.extensions.targetLinkId
 import chentian.extensions.targetRoomName
 import chentian.extensions.transferTargetId
 import chentian.extensions.withdrawTargetId
@@ -30,6 +31,7 @@ import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES
 import screeps.api.FIND_TOMBSTONES
 import screeps.api.Game
+import screeps.api.IStructure
 import screeps.api.LINE_STYLE_DOTTED
 import screeps.api.MOVE
 import screeps.api.MoveToOptions
@@ -38,11 +40,13 @@ import screeps.api.RESOURCE_ENERGY
 import screeps.api.RoomVisual
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.Source
+import screeps.api.StoreOwner
 import screeps.api.TOP
 import screeps.api.WORK
 import screeps.api.get
 import screeps.api.options
 import screeps.api.structures.StructureContainer
+import screeps.api.structures.StructureLink
 import screeps.api.structures.StructureSpawn
 import screeps.api.value
 import screeps.utils.unsafe.jsObject
@@ -197,6 +201,12 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
             return
         }
 
+        // 找 Link
+        Game.getObjectById<StructureLink>(creep.memory.targetLinkId)?.let { targetLink ->
+            tryToWithdraw(creep, targetLink)
+            return
+        }
+
         // Container 存量不平衡
         val containers = creep.room.find(FIND_STRUCTURES).filter {
             it.structureType == STRUCTURE_CONTAINER
@@ -229,6 +239,25 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
     return
 }
 
+fun tryToMineFromLink(creep: Creep, targetLink: StructureLink) {
+
+    if (!creep.isWorking()) {
+        if (!targetLink.pos.inRangeTo(creep.pos, 1)) {
+            creep.moveTo(targetLink.pos)
+            println("$creep is moving to link")
+            return
+        }
+
+        creep.setWorking(true)
+    }
+
+    // 从 Link 中充能
+    if (creep.isEmptyCarry()) {
+        creep.withdraw(targetLink, RESOURCE_ENERGY)
+        println("$creep is withdraw from link")
+    }
+}
+
 private fun tryToMineFromSource(creep: Creep) {
     fun harvestOrMove(creep: Creep, source: Source) {
         if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
@@ -249,14 +278,15 @@ private fun tryToMineFromSource(creep: Creep) {
     }
 }
 
-private fun tryToWithdraw(creep: Creep, container: StructureContainer) {
+private fun tryToWithdraw(creep: Creep, container: IStructure) {
     fun shouldMove(): Boolean {
         val miners = GameContext.creepsMiner[creep.room.name].orEmpty()
         return creep.pos.isEqualTo(container.pos) && miners.any { it.pos.isNearTo(creep.pos) }
     }
 
     creep.memory.sourceTargetId = ""
-    creep.memory.withdrawTargetId = if (container.store.energy() == 0) "" else container.id
+    @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+    creep.memory.withdrawTargetId = if ((container as? StoreOwner)?.store?.energy() ?: 0 == 0) "" else container.id
 
     if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
         creep.moveTo(container.pos, moveToOptions)
