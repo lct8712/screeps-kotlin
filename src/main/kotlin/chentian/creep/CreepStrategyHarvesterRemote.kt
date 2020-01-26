@@ -60,7 +60,8 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
 
         private val TARGET_ROOM_MAP = mapOf(
 //            "E18S19" to listOf("E17S19"),
-            "E18S18" to listOf("E17S18")
+            "E18S18" to listOf("E17S18"),
+            "W8N3" to listOf("W8N2")
         )
     }
 }

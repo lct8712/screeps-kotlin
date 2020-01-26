@@ -170,8 +170,8 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         val message = if (creep.isEmptyCarry()) "empty" else "fill"
         creep.say(message)
 
-        // 捡坟墓上的
-        creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.getUsedCapacity() > 0 }?.let { tombstone ->
+        // 捡坟墓上的，只捡能量
+        creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy() > 0 }?.let { tombstone ->
             if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(tombstone.pos, moveToOptions)
             }
@@ -179,9 +179,9 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
             return
         }
 
-        // 捡地上掉的
+        // 捡地上掉的，只捡能量
         creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.let { resource ->
-            if (creep.pickup(resource) == OK) {
+            if (resource.resourceType == RESOURCE_ENERGY && creep.pickup(resource) == OK) {
                 println("$creep is picking up resource at $resource")
                 return
             }

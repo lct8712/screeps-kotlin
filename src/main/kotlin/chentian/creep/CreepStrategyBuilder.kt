@@ -94,15 +94,19 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
     }
 
     private fun tryToBuild(creep: Creep, target: ConstructionSite): Boolean {
-        val result = creep.build(target)
-        println("$creep is building ${target.structureType} at ${target.pos}, result: $result")
-        if (result == ERR_NOT_IN_RANGE) {
-            creep.moveTo(target.pos)
+        return when (creep.build(target)) {
+            OK -> {
+                true
+            }
+            ERR_NOT_IN_RANGE -> {
+                creep.moveTo(target.pos)
+                true
+            }
+            else -> {
+                println("$creep build ${target.structureType} failed at ${target.pos}, result: ${creep.build(target)}")
+                false
+            }
         }
-        if (result == OK || result == ERR_NOT_IN_RANGE) {
-            return true
-        }
-        return false
     }
 
     companion object {

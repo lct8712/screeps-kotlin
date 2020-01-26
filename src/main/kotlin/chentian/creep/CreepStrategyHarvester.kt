@@ -85,7 +85,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
 
     private fun transferEnergy(creep: Creep): Boolean {
         return transferToExtension(creep) ||
-            transferToContainer(creep) ||
+            transferToStoreOwner(creep) ||
             updateController(creep) ||
             transferToTerminal(creep)
     }
@@ -118,7 +118,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
      * 给建筑充能
      */
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-    private fun transferToContainer(creep: Creep): Boolean {
+    private fun transferToStoreOwner(creep: Creep): Boolean {
         Game.getObjectById<Structure>(creep.memory.transferTargetId)?.let { target ->
             if (transferOrMove(creep, target)) {
                 return true
