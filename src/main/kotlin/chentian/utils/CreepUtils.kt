@@ -62,6 +62,10 @@ fun createCreepName(role: String): String {
     return "creep_${role}_${Game.time}"
 }
 
+
+val BODY_PART_FOR_MINER_CREEP = listOf(MOVE, CARRY, WORK, WORK, WORK, WORK, WORK)
+val BODY_COST_FOR_MINER_CREEP = BODY_PART_FOR_MINER_CREEP.sumBy { (BODYPART_COST[it])!! }
+
 val BODY_PART_FOR_REMOTE_CREEP = mutableListOf(MOVE, MOVE, CARRY, CARRY, WORK, WORK)
 val BODY_COST_FOR_REMOTE_CREEP = BODY_PART_FOR_REMOTE_CREEP.sumBy { (BODYPART_COST[it])!! }
 
@@ -83,7 +87,7 @@ val BODY_COST_FOR_MIN_CREEP = BODY_PART_FOR_MIN_CREEP.sumBy { (BODYPART_COST[it]
 
 fun createNormalCreep(spawn: StructureSpawn, role: String = "", forceCreate: Boolean = false) {
     // 一个小房间，创建最基本的 creep
-    if (forceCreate || spawn.room.energyCapacityAvailable < BODY_COST_FOR_MIN_CREEP) {
+    if (forceCreate || spawn.room.energyCapacityAvailable < BODY_COST_FOR_NORMAL_CREEP) {
         if (spawn.room.energyAvailable >= BODY_COST_FOR_MIN_CREEP) {
             doCreateCreep(role, "", spawn, BODY_PART_FOR_MIN_CREEP.toMutableList())
         }

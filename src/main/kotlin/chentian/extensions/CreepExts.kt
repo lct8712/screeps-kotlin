@@ -1,6 +1,7 @@
 package chentian.extensions
 
 import screeps.api.Creep
+import screeps.api.ERR_FULL
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.OK
 import screeps.api.RoomObject
@@ -53,16 +54,20 @@ fun Creep.transferAllTypeOrMove(target: Structure): Boolean {
     store.keys.forEach { resourceType ->
         val transferResult = transfer(target, resourceType)
         when (transferResult) {
+            OK -> {
+                return true
+            }
             ERR_NOT_IN_RANGE -> {
                 moveTo(target.pos)
                 println("$this is filling energy $target")
                 return true
             }
-            OK -> {
-                return true
+            ERR_FULL -> {
+                memory.transferTargetId = ""
+                println("$this transfer failed: target full")
             }
             else -> {
-                println("$this transfer failed: $transferResult")
+                println("$this transfer resource $resourceType failed: $transferResult")
             }
         }
     }

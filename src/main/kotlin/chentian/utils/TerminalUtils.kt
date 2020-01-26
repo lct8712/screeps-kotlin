@@ -23,7 +23,8 @@ private class RoomTerminalInfo(
 )
 
 private val TARGET_ROOM_TERMINAL = listOf(
-    RoomTerminalInfo("E18S19", "5d2e18efae29775e0162b5eb")
+    RoomTerminalInfo("E18S19", "5d2e18efae29775e0162b5eb"),
+    RoomTerminalInfo("E18S18", "5e2cb4b927eb82e7987a89ac")
 )
 
 fun sellEnergy() {
