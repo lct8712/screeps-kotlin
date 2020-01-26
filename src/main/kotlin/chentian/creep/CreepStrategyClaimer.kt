@@ -1,6 +1,7 @@
 package chentian.creep
 
 import chentian.extensions.claimerRoomName
+import chentian.extensions.homeRoomName
 import chentian.extensions.isInTargetRoom
 import chentian.extensions.moveToTargetRoom
 import chentian.extensions.role
@@ -64,6 +65,7 @@ class CreepStrategyClaimer(val room: Room): CreepStrategy {
         val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(CREEP_ROLE_CLAIMER), options {
             memory = jsObject<CreepMemory> {
                 this.role = CREEP_ROLE_CLAIMER
+                this.homeRoomName = spawn.room.name
                 this.targetRoomName = room.memory.claimerRoomName
             }
         })

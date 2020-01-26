@@ -26,7 +26,7 @@ fun runSellEnergy() {
         return
     }
 
-    GameContext.myRooms.forEach { (_, room) ->
+    GameContext.myRooms.forEach { room ->
         if (room.memory.terminalId.isNotEmpty()) {
             Game.getObjectById<StructureTerminal>(room.memory.terminalId)?.let {
                 tryToSellEnergy(it)

@@ -140,6 +140,7 @@ private fun doCreateCreep(
     val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(role), options {
         memory = jsObject<CreepMemory> {
             this.role = role
+            this.homeRoomName = spawn.room.name
             this.targetRoomName = targetRoomName
             this.homeRoomName = spawn.room.name
         }
@@ -295,8 +296,6 @@ private fun tryToWithdraw(creep: Creep, container: IStructure) {
     }
 }
 
-const val ROOM_NAME_HOME = "E18S19"
-
 fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
     if (creep.isFullCarry()) {
         creep.setWorking(true)
@@ -304,8 +303,7 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         if (creep.room.isMine()) {
             jobAction()
         } else {
-            val homeRoomName = if (creep.memory.homeRoomName.isEmpty()) ROOM_NAME_HOME else creep.memory.homeRoomName
-            creep.moveToTargetRoom(homeRoomName)
+            creep.moveToTargetRoom(creep.memory.homeRoomName)
         }
         return
     }

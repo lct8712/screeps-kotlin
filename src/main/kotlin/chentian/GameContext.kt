@@ -22,8 +22,8 @@ object GameContext {
 
     val creeps: Map<String, Creep> by lazyPerTick { Game.creeps.toMap() }
     val rooms: Map<String, Room> = Game.rooms.toMap()
-    val myRooms: Map<String, Room> by lazyPerTick {
-        Game.rooms.values.filter { it.controller?.my == true }.map { it.name to it }.toMap()
+    val myRooms: List<Room> by lazyPerTick {
+        Game.rooms.values.filter { it.controller?.my == true }
     }
     val myStuctures: Map<String, Structure> by lazyPerTick { Game.structures.toMap() }
     val constructionSites: Map<String, ConstructionSite> by lazyPerTick { Game.constructionSites.toMap() }

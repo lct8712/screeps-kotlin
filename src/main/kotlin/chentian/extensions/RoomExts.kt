@@ -46,7 +46,7 @@ fun Room.findCreepByRole(role: String): List<Creep> {
 }
 
 fun Room.isMine(): Boolean {
-    return GameContext.myRooms.containsKey(name)
+    return controller?.my == true
 }
 
 fun Room.hasStructureStorage(): Boolean {

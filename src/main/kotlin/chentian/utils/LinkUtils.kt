@@ -1,9 +1,23 @@
 package chentian.utils
 
+import chentian.GameContext
+import chentian.extensions.controlLevel
 import chentian.extensions.energy
 import chentian.extensions.energyCapacity
 import chentian.extensions.isFull
+import chentian.extensions.linkIdFrom1
+import chentian.extensions.linkIdFrom2
+import chentian.extensions.linkIdTo
+import chentian.extensions.needUpgrade
+import screeps.api.FIND_SOURCES
+import screeps.api.FIND_STRUCTURES
+import screeps.api.FilterOption
 import screeps.api.Game
+import screeps.api.Room
+import screeps.api.STRUCTURE_LINK
+import screeps.api.STRUCTURE_STORAGE
+import screeps.api.options
+import screeps.api.structures.Structure
 import screeps.api.structures.StructureLink
 
 /**
@@ -12,47 +26,88 @@ import screeps.api.structures.StructureLink
  * @author chentian
  */
 
-class RoomLinkInfo(
-    val targetRoom: String,
-    val fromLinkId: String,
-    val toLinkId: String
-)
-
-val TARGET_ROOM_LINK = listOf(
-//    RoomLinkInfo("E18S18", "5cdad0cdf9cba63e6c385dfd", "5cdacbb4e470435ac71db0cf"),
-//    RoomLinkInfo("E18S18", "5d2071da14a08a72e00d134c", "5cdacbb4e470435ac71db0cf"),
-    RoomLinkInfo("E18S18", "5cdad0cdf9cba63e6c385dfd", "5e2d0b60ece8181d45d266b4"),
-    RoomLinkInfo("E18S18", "5d2071da14a08a72e00d134c", "5e2d0b60ece8181d45d266b4"),
-    RoomLinkInfo("E17S17", "5d43c038d16c4b73af5acfa0", "5d44004ccb3b537470a4633e"),
-    RoomLinkInfo("E17S17", "5e2c3ab6ece8182cd4d219eb", "5d44004ccb3b537470a4633e"),
-    RoomLinkInfo("W8N3", "1f0f0e7b012ae92", "d87f0e9465b0b50"),
-    RoomLinkInfo("W8N3", "a8942044504c0fc", "d87f0e9465b0b50")
-)
-
 fun runLinkTransfer() {
-    val roomSet = mutableSetOf<String>()
-    TARGET_ROOM_LINK.forEach { roomLinkInfo ->
-        // 每个房间每 tick 只传输一个 Link
-        if (roomSet.contains(roomLinkInfo.targetRoom)) {
+    GameContext.myRooms.forEach { room ->
+        // 低等级的房间没有 Link
+        if (room.controlLevel() < 5) {
             return@forEach
         }
 
-        val linkFrom = Game.getObjectById<StructureLink>(roomLinkInfo.fromLinkId) ?: return@forEach
-        val linkTo = Game.getObjectById<StructureLink>(roomLinkInfo.toLinkId) ?: return@forEach
+        // 每隔一段时间重建 memory
+        if (GameContext.timeMod16Result == MOD_16_REBUILD_LINK_IDS) {
+            rebuildRoomLinkId(room)
+        }
 
-        val energy = transferAmount(linkFrom, linkTo)
-        if (energy > 0) {
-            linkFrom.transferEnergy(linkTo, energy)
-            roomSet.add(roomLinkInfo.targetRoom)
-            println("$linkFrom transfer energy to $linkTo, $energy")
+        // 每个房间每 tick 只传输一个 Link
+        if (room.memory.linkIdFrom1.isNotEmpty() &&
+            tryToTransfer(room.memory.linkIdFrom1, room.memory.linkIdTo)) {
+            return@forEach
+        }
+
+        if (room.memory.linkIdFrom2.isNotEmpty()) {
+            tryToTransfer(room.memory.linkIdFrom2, room.memory.linkIdTo)
         }
     }
 }
 
 /**
+ * 查找 link，并将 id 写入存储
+ *   - 离 miner 近的是 from
+ *   - 离 controller 或 storage 近的是 to
+ *
+ * 如果两个 link 都找过，则不再寻找
+ */
+fun rebuildRoomLinkId(room: Room) {
+    if (room.memory.linkIdFrom2.isNotEmpty() && room.memory.linkIdTo.isNotEmpty()) {
+        return
+    }
+
+    // 在两个 source 附近找 from
+    val linkFromIds = room.find(FIND_SOURCES).flatMap { source ->
+        source.pos.findInRange(FIND_STRUCTURES, 2)
+            .filter { it.structureType == STRUCTURE_LINK }
+            .map { it as StructureLink }
+    }.distinctBy { link ->
+        link.id
+    }.map { link ->
+        link.id
+    }
+    room.memory.linkIdFrom1 = linkFromIds.getOrNull(0).orEmpty()
+    room.memory.linkIdFrom2 = linkFromIds.getOrNull(1).orEmpty()
+
+    // 找 to。需要升级就在 controller 附近找，否则就在 storage 附近找
+    val pos = if (room.controller?.needUpgrade() == true) {
+        room.controller?.pos
+    } else {
+        room.find(FIND_STRUCTURES).firstOrNull { it.structureType == STRUCTURE_STORAGE }?.pos
+    }
+    room.memory.linkIdTo = pos?.findClosestByRange(FIND_STRUCTURES, options<FilterOption<Structure>> {
+        filter = { it.structureType == STRUCTURE_LINK }
+    })?.id.orEmpty()
+}
+
+/**
+ * 传输一次能量
+ *
+ * @return 是否传输成功
+ */
+private fun tryToTransfer(fromLinkId: String, toLinkId: String): Boolean {
+    val linkFrom = Game.getObjectById<StructureLink>(fromLinkId) ?: return false
+    val linkTo = Game.getObjectById<StructureLink>(toLinkId) ?: return false
+
+    val energy = getTransferAmount(linkFrom, linkTo)
+    if (energy > 0) {
+        linkFrom.transferEnergy(linkTo, energy)
+        println("$linkFrom transfer energy to $linkTo, $energy")
+        return true
+    }
+    return false
+}
+
+/**
  * 应该传输多少能量
  */
-private fun transferAmount(linkFrom: StructureLink, linkTo: StructureLink): Int {
+private fun getTransferAmount(linkFrom: StructureLink, linkTo: StructureLink): Int {
     if (linkFrom.cooldown != 0) {
         return 0
     }

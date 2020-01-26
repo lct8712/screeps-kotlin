@@ -53,8 +53,7 @@ fun runSingleResourceCarriers(creep: Creep) {
         if (creep.room.name == creep.memory.homeRoomName) {
             transferResourceToStorage(creep)
         } else {
-            val homeRoomName = if (creep.memory.homeRoomName.isEmpty()) ROOM_NAME_HOME else creep.memory.homeRoomName
-            creep.moveToTargetRoom(homeRoomName)
+            creep.moveToTargetRoom(creep.memory.homeRoomName)
         }
         return
     }

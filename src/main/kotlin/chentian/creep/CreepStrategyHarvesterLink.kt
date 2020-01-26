@@ -3,12 +3,13 @@ package chentian.creep
 import chentian.GameContext
 import chentian.extensions.containerTargetId
 import chentian.extensions.findCreepByRole
+import chentian.extensions.homeRoomName
+import chentian.extensions.linkIdTo
 import chentian.extensions.needUpgrade
 import chentian.extensions.role
 import chentian.extensions.targetLinkId
 import chentian.extensions.transferAllTypeOrMove
 import chentian.utils.MOD_16_CREATE_HARVESTER_LINK
-import chentian.utils.TARGET_ROOM_LINK
 import chentian.utils.createCreepName
 import chentian.utils.createMoveOptions
 import chentian.utils.harvestEnergyAndDoJob
@@ -43,9 +44,11 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
             return
         }
 
-        getToLinkId()?.let { linkId ->
-            create(spawn, linkId)
+        if (room.memory.linkIdTo.isEmpty() || creeps.count() >= MAX_CREEP_COUNT_PER_ROOM) {
+            return
         }
+
+        create(spawn, room.memory.linkIdTo)
     }
 
     override fun runLoop() {
@@ -54,17 +57,6 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
                 upgradeController(creep) || transferToTerminal(creep)
             }
         }
-    }
-
-    private fun getToLinkId(): String? {
-        TARGET_ROOM_LINK.forEach { roomLinkInfo ->
-            if (roomLinkInfo.targetRoom != room.name) {
-                return@forEach
-            }
-
-            return if (creeps.count() < MAX_CREEP_COUNT_PER_ROOM) roomLinkInfo.toLinkId else null
-        }
-        return null
     }
 
     private fun create(spawn: StructureSpawn, linkId: String) {
@@ -81,6 +73,7 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
         val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(CREEP_ROLE_HARVESTER_LINK), options {
             memory = jsObject<CreepMemory> {
                 this.role = CREEP_ROLE_HARVESTER_LINK
+                this.homeRoomName = spawn.room.name
                 this.targetLinkId = linkId
             }
         })

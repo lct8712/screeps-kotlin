@@ -5,6 +5,7 @@ import chentian.extensions.containerId
 import chentian.extensions.energy
 import chentian.extensions.energyCapacity
 import chentian.extensions.findStructureMapByType
+import chentian.extensions.homeRoomName
 import chentian.extensions.role
 import chentian.utils.BODY_COST_FOR_MINER_CREEP
 import chentian.utils.BODY_PART_FOR_MINER_CREEP
@@ -92,6 +93,7 @@ class CreepStrategyMiner(room: Room) : CreepStrategy {
         val result = spawn.spawnCreep(BODY_PART_FOR_MINER_CREEP.toTypedArray(), createCreepName(CREEP_ROLE_MINER), options {
             memory = jsObject<CreepMemory> {
                 this.role = CREEP_ROLE_MINER
+                this.homeRoomName = spawn.room.name
                 this.containerId = targetId
             }
         })
