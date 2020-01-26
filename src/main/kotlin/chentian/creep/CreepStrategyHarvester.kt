@@ -1,5 +1,6 @@
 package chentian.creep
 
+import chentian.creep.CreepStrategyHarvesterLink.Companion.CREEP_ROLE_HARVESTER_LINK
 import chentian.extensions.containerTargetId
 import chentian.extensions.energy
 import chentian.extensions.energyCapacity
@@ -55,13 +56,18 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
     }
 
     private fun shouldCreate(): Boolean {
+        if (creeps.isEmpty()) {
+            return true
+        }
+
         val sourceSize = room.find(FIND_SOURCES).size
+        val creepSize = creeps.size + room.findCreepByRole(CREEP_ROLE_HARVESTER_LINK).size
         // 最少个数
-        if (creeps.size < sourceSize * 1.5) {
+        if (creepSize <= sourceSize * 1.5) {
             return true
         }
         // 最多个数
-        if (creeps.size > sourceSize * 3) {
+        if (creepSize > sourceSize * 3) {
             return false
         }
 

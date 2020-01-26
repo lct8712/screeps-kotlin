@@ -8,15 +8,15 @@ import chentian.creep.CreepStrategyHarvesterLink
 import chentian.creep.CreepStrategyHarvesterRemote
 import chentian.creep.CreepStrategyMiner
 import chentian.creep.CreepStrategyResourceCarrier
-import chentian.utils.linkTransfer
+import chentian.utils.Stats
+import chentian.utils.runHouseKeeping
+import chentian.utils.runLinkTransfer
 import chentian.utils.runRemoteHarvesters
 import chentian.utils.runResourceCarriers
-import chentian.utils.sellEnergy
-import chentian.utils.towerAttack
+import chentian.utils.runSellEnergy
+import chentian.utils.runTowerAttack
 import screeps.api.Game
 import screeps.api.values
-import chentian.utils.Stats
-import chentian.utils.houseKeeping
 
 /**
  *
@@ -28,12 +28,8 @@ object CreepStrategyController {
     fun gameLoop() {
         Stats.tickStarts()
 
-        houseKeeping()
-        towerAttack()
-        linkTransfer()
-        sellEnergy()
-
         println("Game Loop Start")
+
         Game.spawns.values.forEach { spawn ->
             val room = spawn.room
             Stats.write(room)
@@ -43,21 +39,23 @@ object CreepStrategyController {
                 CreepStrategyMiner(room),
                 CreepStrategyHarvester(room),
                 CreepStrategyBuilder(room),
-//                CreepStrategyDefenceRepair(room),
                 CreepStrategyHarvesterRemote(room),
                 CreepStrategyClaimer(room),
                 CreepStrategyBuilderRemote(room),
                 CreepStrategyResourceCarrier(room),
                 CreepStrategyHarvesterLink(room)
-//                CreepStrategyMinerLink(room)
             ).forEach { strategy ->
                 strategy.tryToCreate(spawn)
                 strategy.runLoop()
             }
         }
 
+        runTowerAttack()
+        runLinkTransfer()
+        runSellEnergy()
         runRemoteHarvesters()
         runResourceCarriers()
+        runHouseKeeping()
 
         Stats.tickEnds()
     }

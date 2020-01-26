@@ -27,7 +27,7 @@ private val TARGET_ROOM_TERMINAL = listOf(
     RoomTerminalInfo("E18S18", "5e2cb4b927eb82e7987a89ac")
 )
 
-fun sellEnergy() {
+fun runSellEnergy() {
     if (GameContext.timeMod16Result != 14) {
         return
     }

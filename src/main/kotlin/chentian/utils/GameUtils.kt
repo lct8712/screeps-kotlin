@@ -6,7 +6,7 @@ package chentian.utils
  * @author chentian
  */
 
-fun houseKeeping() {
+fun runHouseKeeping() {
     js(
         """
         for (var name in Memory.creeps) {
