@@ -2,52 +2,57 @@ package chentian.utils
 
 import chentian.GameContext
 import chentian.extensions.energy
+import chentian.extensions.terminalId
+import screeps.api.FIND_STRUCTURES
 import screeps.api.Game
 import screeps.api.Market
 import screeps.api.ORDER_BUY
 import screeps.api.RESOURCE_ENERGY
+import screeps.api.STRUCTURE_TERMINAL
 import screeps.api.structures.StructureTerminal
+import screeps.utils.unsafe.jsObject
 import kotlin.math.min
 
 /**
- *
+ * 卖出能量
  *
  * @author chentian
  */
 
-private const val MIN_ENERGY_TO_SELL = 50_000
-
-private class RoomTerminalInfo(
-    val roomName: String,
-    val terminalId: String
-)
-
-private val TARGET_ROOM_TERMINAL = listOf(
-    RoomTerminalInfo("E18S19", "5d2e18efae29775e0162b5eb"),
-    RoomTerminalInfo("E18S18", "5e2cb4b927eb82e7987a89ac")
-)
+private const val MIN_ENERGY_TO_SELL = 20_000
 
 fun runSellEnergy() {
     if (GameContext.timeMod16Result != MOD_16_SELL_ENERGY) {
         return
     }
 
-    TARGET_ROOM_TERMINAL.forEach { info ->
-        val terminal = Game.getObjectById<StructureTerminal>(info.terminalId) ?: return@forEach
-        if (terminal.cooldown > 0 || terminal.store.energy() < MIN_ENERGY_TO_SELL) {
-            return@forEach
+    GameContext.myRooms.forEach { (_, room) ->
+        if (room.memory.terminalId.isNotEmpty()) {
+            Game.getObjectById<StructureTerminal>(room.memory.terminalId)?.let {
+                tryToSellEnergy(it)
+                return@forEach
+            }
         }
 
-        val filter = screeps.utils.unsafe.jsObject<Market.Order.Filter> {
-            this.resourceType = RESOURCE_ENERGY
-            this.type = ORDER_BUY
+        room.find(FIND_STRUCTURES).firstOrNull { it.structureType == STRUCTURE_TERMINAL }?.let {
+            room.memory.terminalId = it.id
+            tryToSellEnergy(it as StructureTerminal)
         }
-        Game.market.getAllOrders(filter).maxBy { it.price }?.let { order ->
-            val amount = min(terminal.store.energy(), order.remainingAmount) / 2
-            val result = Game.market.deal(order.id, amount, info.roomName)
-            println("terminal: result: $result. $amount")
-            // 每次成交一单即可
-            return@forEach
-        }
+    }
+}
+
+fun tryToSellEnergy(terminal: StructureTerminal) {
+    if (terminal.cooldown > 0 || terminal.store.energy() < MIN_ENERGY_TO_SELL) {
+        return
+    }
+
+    val filter = jsObject<Market.Order.Filter> {
+        this.resourceType = RESOURCE_ENERGY
+        this.type = ORDER_BUY
+    }
+    Game.market.getAllOrders(filter).maxBy { it.price }?.let { order ->
+        val amount = min(terminal.store.energy(), order.remainingAmount) / 2
+        val result = Game.market.deal(order.id, amount, terminal.room.name)
+        println("sell energy at ${terminal.room.name}, result: $result, amount: $amount")
     }
 }

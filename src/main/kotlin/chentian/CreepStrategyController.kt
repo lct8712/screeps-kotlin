@@ -28,7 +28,7 @@ object CreepStrategyController {
     fun gameLoop() {
         Stats.tickStarts()
 
-        println("Game Loop Start")
+        println("Game Loop Start, mod16: ${GameContext.timeMod16Result}")
 
         Game.spawns.values.forEach { spawn ->
             val room = spawn.room
