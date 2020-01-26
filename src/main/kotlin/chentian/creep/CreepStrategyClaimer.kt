@@ -20,7 +20,8 @@ import screeps.utils.unsafe.jsObject
 
 /**
  * 开分基地时用一次
- * 手动在原房间设置 room.memory.claimerRoomName
+ *   1. 手动在原房间设置 room.memory.claimerRoomName
+ *   2. 占领成功后，手动在目标房间内放置 spawn
  *
  * @author chentian
  */
