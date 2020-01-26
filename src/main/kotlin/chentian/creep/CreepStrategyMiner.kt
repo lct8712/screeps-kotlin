@@ -6,18 +6,17 @@ import chentian.extensions.energy
 import chentian.extensions.energyCapacity
 import chentian.extensions.findStructureMapByType
 import chentian.extensions.role
+import chentian.utils.BODY_COST_FOR_MINER_CREEP
+import chentian.utils.BODY_PART_FOR_MINER_CREEP
 import chentian.utils.createCreepName
-import screeps.api.CARRY
 import screeps.api.CreepMemory
 import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES
-import screeps.api.MOVE
 import screeps.api.RESOURCE_ENERGY
 import screeps.api.Room
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.STRUCTURE_LINK
 import screeps.api.Source
-import screeps.api.WORK
 import screeps.api.options
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureLink
@@ -29,7 +28,7 @@ import screeps.utils.unsafe.jsObject
  *
  * @author chentian
  */
-class CreepStrategyMiner(room: Room): CreepStrategy {
+class CreepStrategyMiner(room: Room) : CreepStrategy {
 
     private val containerMap = room.findStructureMapByType(STRUCTURE_CONTAINER)
     private val creeps = GameContext.creepsMiner[room.name].orEmpty()
@@ -81,8 +80,7 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
     }
 
     private fun create(spawn: StructureSpawn) {
-        val workerCount = (spawn.room.energyAvailable - 50) / 100
-        if (workerCount < MAX_WORKER_BODY_COUNT) {
+        if (spawn.room.energyAvailable < BODY_COST_FOR_MINER_CREEP) {
             return
         }
 
@@ -90,24 +88,18 @@ class CreepStrategyMiner(room: Room): CreepStrategy {
         creeps.forEach { containerIds.remove(it.memory.containerId) }
         val targetId = containerIds.firstOrNull() ?: return
 
-        val bodyList = mutableListOf(MOVE, CARRY).apply {
-            for (i in 0 until MAX_WORKER_BODY_COUNT) {
-                add(WORK)
-            }
-        }
-        val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(CREEP_ROLE_MINER), options {
+        val result = spawn.spawnCreep(BODY_PART_FOR_MINER_CREEP.toTypedArray(), createCreepName(CREEP_ROLE_MINER), options {
             memory = jsObject<CreepMemory> {
                 this.role = CREEP_ROLE_MINER
                 this.containerId = targetId
             }
         })
-        println("create new creep $CREEP_ROLE_MINER. code: $result, $bodyList")
+        println("create new creep $CREEP_ROLE_MINER. code: $result, $BODY_PART_FOR_MINER_CREEP")
     }
 
     companion object {
 
         const val CREEP_ROLE_MINER = "miner"
-        private const val MAX_WORKER_BODY_COUNT = 5
         private const val ENERGY_AMOUNT_TO_LINK = 50
         private const val MIN_CONTAINER_ENERGY = 500
     }
