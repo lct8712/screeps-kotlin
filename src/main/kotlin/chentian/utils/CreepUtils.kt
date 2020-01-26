@@ -116,19 +116,14 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "", forceCreate: Boo
     doCreateCreep(role, "", spawn, bodyList)
 }
 
-fun createMoveOptions(color: String): MoveToOptions {
-    val pathStyle = jsObject<RoomVisual.LineStyle> {
-        this.color = color
+fun createMoveOptions(lineColor: String): MoveToOptions {
+    val pathStyle = options<RoomVisual.LineStyle> {
+        this.color = lineColor
         this.width = 1.0
         this.opacity = .5
         this.lineStyle = LINE_STYLE_DOTTED
     }
-    return object : MoveToOptions {
-        @Suppress("UNUSED_PARAMETER")
-        override var visualizePathStyle: RoomVisual.Style?
-            get() = pathStyle
-            set(value) {}
-    }
+    return options { visualizePathStyle = pathStyle }
 }
 
 private fun doCreateCreep(

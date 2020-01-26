@@ -9,6 +9,7 @@ import chentian.extensions.role
 import chentian.utils.BODY_COST_FOR_MINER_CREEP
 import chentian.utils.BODY_PART_FOR_MINER_CREEP
 import chentian.utils.createCreepName
+import chentian.utils.createMoveOptions
 import screeps.api.CreepMemory
 import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES
@@ -51,7 +52,7 @@ class CreepStrategyMiner(room: Room) : CreepStrategy {
 
             // 移动到 container 的位置
             if (!creep.pos.isEqualTo(container.pos)) {
-                creep.moveTo(container.pos)
+                creep.moveTo(container.pos, MOVE_OPTION)
                 creep.say("move")
                 return
             }
@@ -100,6 +101,8 @@ class CreepStrategyMiner(room: Room) : CreepStrategy {
     companion object {
 
         const val CREEP_ROLE_MINER = "miner"
+
+        private val MOVE_OPTION = createMoveOptions("#584f60")
         private const val ENERGY_AMOUNT_TO_LINK = 50
         private const val MIN_CONTAINER_ENERGY = 500
     }
