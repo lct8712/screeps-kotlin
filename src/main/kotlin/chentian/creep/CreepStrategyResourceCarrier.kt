@@ -5,6 +5,7 @@ import chentian.extensions.extraResourceAmount
 import chentian.extensions.homeRoomName
 import chentian.extensions.role
 import chentian.extensions.targetRoomName
+import chentian.utils.MOD_16_CREATE_RESOURCE_CARRIER
 import chentian.utils.createCreepName
 import chentian.utils.resourceCarriers
 import screeps.api.CARRY
@@ -27,7 +28,7 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
     private val targetRoomIno by lazy { TARGET_ROOM_MAP[room.name] }
 
     override fun tryToCreate(spawn: StructureSpawn) {
-        if (GameContext.timeMod16Result != 6) {
+        if (GameContext.timeMod16Result != MOD_16_CREATE_RESOURCE_CARRIER) {
             return
         }
 

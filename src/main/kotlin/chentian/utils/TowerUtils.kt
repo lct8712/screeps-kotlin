@@ -36,7 +36,7 @@ private val STRUCTURE_PRIORITY = listOf(
 private const val REPAIR_TARGET_COUNT_DOWN = 8
 
 fun runTowerAttack() {
-    GameContext.towers.forEach { tower ->
+    GameContext.myTowers.forEach { tower ->
         // Attack Enemy
         tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS)?.let {
             val result = tower.attack(it)

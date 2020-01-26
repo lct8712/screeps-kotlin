@@ -28,7 +28,7 @@ private val TARGET_ROOM_TERMINAL = listOf(
 )
 
 fun runSellEnergy() {
-    if (GameContext.timeMod16Result != 14) {
+    if (GameContext.timeMod16Result != MOD_16_SELL_ENERGY) {
         return
     }
 

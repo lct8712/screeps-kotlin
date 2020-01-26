@@ -4,6 +4,7 @@ import chentian.GameContext
 import chentian.extensions.findCreepByRole
 import chentian.extensions.findFirstConstructionToBuild
 import chentian.extensions.role
+import chentian.utils.MOD_16_CREATE_BUILDER_REMOTE
 import chentian.utils.createRemoteCreep
 import chentian.utils.harvestEnergyAndDoJobRemote
 import screeps.api.Creep
@@ -26,7 +27,7 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
     }
 
     override fun tryToCreate(spawn: StructureSpawn) {
-        if (GameContext.timeMod16Result != 3) {
+        if (GameContext.timeMod16Result != MOD_16_CREATE_BUILDER_REMOTE) {
             return
         }
 

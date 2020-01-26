@@ -7,6 +7,7 @@ import chentian.extensions.needUpgrade
 import chentian.extensions.role
 import chentian.extensions.targetLinkId
 import chentian.extensions.transferAllTypeOrMove
+import chentian.utils.MOD_16_CREATE_HARVESTER_LINK
 import chentian.utils.TARGET_ROOM_LINK
 import chentian.utils.createCreepName
 import chentian.utils.createMoveOptions
@@ -38,7 +39,7 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
     private val creeps = room.findCreepByRole(CREEP_ROLE_HARVESTER_LINK)
 
     override fun tryToCreate(spawn: StructureSpawn) {
-        if (GameContext.timeMod16Result != 6) {
+        if (GameContext.timeMod16Result != MOD_16_CREATE_HARVESTER_LINK) {
             return
         }
 

@@ -29,12 +29,8 @@ object GameContext {
     val constructionSites: Map<String, ConstructionSite> by lazyPerTick { Game.constructionSites.toMap() }
     val timeMod16Result: Int by lazyPerTick { Game.time % 16 }
 
-    //val towers: List<StructureTower> by lazyPerTick {
-    //    myStuctures.values.filter { it.structureType == STRUCTURE_TOWER }.map { it as StructureTower }
-    //}
-    @Suppress("UNCHECKED_CAST")
-    val towers: List<StructureTower> by lazyPerTick {
-        myStuctures.values.filter { it.structureType == STRUCTURE_TOWER } as List<StructureTower>
+    val myTowers: List<StructureTower> by lazyPerTick {
+        myStuctures.values.filter { it.structureType == STRUCTURE_TOWER }.map { it as StructureTower }
     }
 
     val creepsMiner: Map<String, List<Creep>> by lazyPerTick {
