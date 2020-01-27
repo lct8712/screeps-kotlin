@@ -26,7 +26,7 @@ import screeps.utils.unsafe.jsObject
  *
  * @author chentian
  */
-class CreepStrategyClaimer(val room: Room): CreepStrategy {
+class CreepStrategyClaimer(val room: Room) : CreepStrategy {
 
     private val creeps by lazy {
         Game.creeps.toMap().values.filter { it.memory.role == CREEP_ROLE_CLAIMER }
@@ -41,7 +41,7 @@ class CreepStrategyClaimer(val room: Room): CreepStrategy {
     override fun runLoop() {
         creeps.forEach { creep ->
             if (creep.isInTargetRoom(creep.memory.targetRoomName)) {
-                val controller = creep.room.controller!!
+                val controller = creep.room.controller ?: return@forEach
                 println("$creep ${controller.room} $controller")
                 val result = creep.claimController(controller)
                 if (result == ERR_NOT_IN_RANGE) {
@@ -61,7 +61,7 @@ class CreepStrategyClaimer(val room: Room): CreepStrategy {
     }
 
     private fun create(spawn: StructureSpawn) {
-        val bodyList = mutableListOf(MOVE, CLAIM)
+        val bodyList = mutableListOf(CLAIM, MOVE, MOVE, MOVE, MOVE, MOVE)
         val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(CREEP_ROLE_CLAIMER), options {
             memory = jsObject<CreepMemory> {
                 this.role = CREEP_ROLE_CLAIMER
