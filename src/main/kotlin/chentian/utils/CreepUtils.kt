@@ -8,7 +8,6 @@ import chentian.extensions.homeRoomName
 import chentian.extensions.isEmptyCarry
 import chentian.extensions.isFullCarry
 import chentian.extensions.isInTargetRoom
-import chentian.extensions.isMine
 import chentian.extensions.isWorking
 import chentian.extensions.moveToTargetRoom
 import chentian.extensions.role
@@ -117,10 +116,10 @@ fun createNormalCreep(spawn: StructureSpawn, role: String = "", forceCreate: Boo
 }
 
 fun createMoveOptions(lineColor: String): MoveToOptions {
-    val pathStyle = options<RoomVisual.LineStyle> {
-        this.color = lineColor
-        this.width = 1.0
-        this.opacity = .5
+    val pathStyle = options<RoomVisual.ShapeStyle> {
+        this.stroke = lineColor
+        this.strokeWidth = .1
+        this.opacity = .25
         this.lineStyle = LINE_STYLE_DOTTED
     }
     return options { visualizePathStyle = pathStyle }
@@ -172,20 +171,13 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         creep.say(message)
 
         // 捡坟墓上的，只捡能量
-        creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy() > 0 }?.let { tombstone ->
-            if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(tombstone.pos, moveToOptions)
-            }
-            println("$creep is withdrawing tombstone at $tombstone")
+        if (tryToPickUpFromTomb(creep)) {
             return
         }
 
         // 捡地上掉的，只捡能量
-        creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.let { resource ->
-            if (resource.resourceType == RESOURCE_ENERGY && creep.pickup(resource) == OK) {
-                println("$creep is picking up resource at $resource")
-                return
-            }
+        if (tryToPickUpFromGround(creep)) {
+            return
         }
 
         // 特殊情况，没有 miner
@@ -239,23 +231,90 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
     return
 }
 
-fun tryToMineFromLink(creep: Creep, targetLink: StructureLink) {
+private val TempSet = setOf("E17S20", "E17S19", "E18S19")
 
-    if (!creep.isWorking()) {
-        if (!targetLink.pos.inRangeTo(creep.pos, 1)) {
-            creep.moveTo(targetLink.pos)
-            println("$creep is moving to link")
+fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
+    // 先去到目标房间
+    if (creep.memory.targetRoomName == "E15S19" && creep.room.name in TempSet) {
+        creep.memory.targetRoomName = "E16S20"
+    } else if (creep.room.name == "E16S20") {
+        creep.memory.targetRoomName = "E15S19"
+    }
+    if (creep.memory.targetRoomName.isEmpty()) {
+        println("###### $creep")
+        return
+    }
+    if (!creep.isInTargetRoom(creep.memory.targetRoomName)) {
+        creep.moveToTargetRoom(creep.memory.targetRoomName)
+        return
+    }
+
+
+    // 已采集好资源
+    if (creep.isFullCarry()) {
+        creep.setWorking(true)
+        creep.say("full")
+        jobAction()
+    }
+
+    // 去采集资源
+    if (creep.isEmptyCarry() || !creep.isWorking()) {
+        creep.setWorking(false)
+
+        val message = if (creep.isEmptyCarry()) "empty" else "fill"
+        creep.say(message)
+
+        // 捡坟墓上的，只捡能量
+        if (tryToPickUpFromTomb(creep)) {
             return
         }
 
-        creep.setWorking(true)
+        // 捡地上掉的，只捡能量
+        if (tryToPickUpFromGround(creep)) {
+            return
+        }
+
+        // 从 source 中采集
+        val sourceList = creep.room.find(FIND_SOURCES)
+        val index = creep.name[creep.name.length - 2].toInt() % sourceList.size
+        val source = sourceList.getOrNull(index)
+        if (source == null) {
+            creep.say("source not found")
+            println("$creep source in room not found harvesting")
+            return
+        }
+
+        if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(source.pos, moveToOptions)
+        }
+
+        println("$creep is harvesting remote.")
+        return
     }
 
-    // 从 Link 中充能
-    if (creep.isEmptyCarry()) {
-        creep.withdraw(targetLink, RESOURCE_ENERGY)
-        println("$creep is withdraw from link")
+    creep.say("action")
+    jobAction()
+}
+
+private fun tryToPickUpFromTomb(creep: Creep): Boolean {
+    creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy() > 0 }?.let { tombstone ->
+        if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(tombstone.pos, moveToOptions)
+        }
+        println("$creep is withdrawing tombstone at $tombstone")
+        return true
     }
+    return false
+}
+
+private fun tryToPickUpFromGround(creep: Creep): Boolean {
+    creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.let { resource ->
+        if (resource.resourceType == RESOURCE_ENERGY && creep.pickup(resource) == OK) {
+            println("$creep is picking up resource at $resource")
+            return true
+        }
+    }
+    return false
 }
 
 private fun tryToMineFromSource(creep: Creep) {
@@ -294,66 +353,4 @@ private fun tryToWithdraw(creep: Creep, container: IStructure) {
         // 让开采矿的位置
         creep.move(TOP)
     }
-}
-
-fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
-    if (creep.isFullCarry()) {
-        creep.setWorking(true)
-        creep.say("full")
-        if (creep.room.isMine()) {
-            jobAction()
-        } else {
-            creep.moveToTargetRoom(creep.memory.homeRoomName)
-        }
-        return
-    }
-
-    if (creep.isEmptyCarry() || !creep.isWorking()) {
-        creep.setWorking(false)
-
-        val message = if (creep.isEmptyCarry()) "empty" else "fill"
-        creep.say(message)
-
-        // 捡坟墓上的
-        creep.pos.findInRange(FIND_TOMBSTONES, 3).firstOrNull { it.store.energy() > 0 }?.let { tombstone ->
-            if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(tombstone.pos, moveToOptions)
-            }
-            println("$creep is withdrawing tombstone at $tombstone")
-            return
-        }
-        // 捡地上掉的
-        creep.pos.findInRange(FIND_DROPPED_RESOURCES, 2).firstOrNull()?.let { resource ->
-            if (creep.pickup(resource) == OK) {
-                println("$creep is picking up resource at $resource")
-                return
-            }
-        }
-
-        val roomNameTarget = creep.memory.targetRoomName
-        val inTargetRoom = creep.isInTargetRoom(roomNameTarget)
-        if (inTargetRoom) {
-            val sourceList = creep.room.find(FIND_SOURCES)
-            val index = creep.name[creep.name.length - 2].toInt() % sourceList.size
-            val source = sourceList.getOrNull(index)
-            if (source == null) {
-                creep.say("source not found")
-                println("$creep source in room not found harvesting")
-                return
-            }
-
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source.pos, moveToOptions)
-            }
-        } else {
-            creep.moveToTargetRoom(roomNameTarget)
-        }
-
-        println("$creep is harvesting remote, in target room: $inTargetRoom")
-        return
-    }
-
-    creep.say("action")
-    jobAction()
-    return
 }
