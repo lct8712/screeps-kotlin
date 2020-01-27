@@ -5,6 +5,7 @@ import chentian.extensions.findCreepByRole
 import chentian.extensions.findFirstConstructionToBuild
 import chentian.extensions.role
 import chentian.utils.MOD_16_CREATE_BUILDER_REMOTE
+import chentian.utils.createMoveOptions
 import chentian.utils.createRemoteCreep
 import chentian.utils.harvestEnergyAndDoJobRemote
 import screeps.api.Creep
@@ -16,7 +17,7 @@ import screeps.api.structures.StructureSpawn
 import screeps.utils.toMap
 
 /**
- *
+ * 新的房间，有待建造的 spawn 时使用
  *
  * @author chentian
  */
@@ -56,7 +57,7 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
                 // RCL 快要降级了
                 if (controller.ticksToDowngrade <= 4000) {
                     if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(controller.pos)
+                        creep.moveTo(controller.pos, MOVE_OPTION)
                     }
                     return@harvestEnergyAndDoJobRemote
                 }
@@ -70,7 +71,7 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
             }
 
             if (creep.build(spawnToBuild) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(spawnToBuild.pos)
+                creep.moveTo(spawnToBuild.pos, MOVE_OPTION)
                 println("$creep is building remote $spawnToBuild")
                 return@harvestEnergyAndDoJobRemote
             }
@@ -78,6 +79,8 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
     }
 
     companion object {
+
+        private val MOVE_OPTION = createMoveOptions("#0B6623")
 
         private const val CREEP_ROLE_BUILDER_REMOTE = "builder-remote"
         private const val MAX_REMOTE_BUILDER_COUNT = 3
