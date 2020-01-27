@@ -5,6 +5,7 @@ import chentian.extensions.memory.homeRoomName
 import chentian.extensions.memory.role
 import chentian.extensions.memory.targetFlagName
 import chentian.utils.createCreepName
+import chentian.utils.creepAttackers
 import screeps.api.ATTACK
 import screeps.api.CreepMemory
 import screeps.api.Flag
@@ -41,7 +42,7 @@ class CreepStrategyAttacker(val room: Room) : CreepStrategy {
 
     private fun shouldCreate(): Boolean {
         val flag = targetFlag ?: return false
-        return flag.memory.creepCreatedCount < MAX_ATTACKER_COUNT
+        return flag.memory.creepCreatedCount < MAX_ATTACKER_COUNT_TOTAL && creepAttackers.size < MAX_ATTACKER_COUNT
     }
 
     private fun create(spawn: StructureSpawn, flag: Flag) {
@@ -63,5 +64,6 @@ class CreepStrategyAttacker(val room: Room) : CreepStrategy {
 
         const val CREEP_ROLE_ATTACKER = "attacker"
         const val MAX_ATTACKER_COUNT = 5
+        const val MAX_ATTACKER_COUNT_TOTAL = 1_000
     }
 }

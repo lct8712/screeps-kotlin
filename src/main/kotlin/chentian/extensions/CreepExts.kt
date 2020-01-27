@@ -37,9 +37,19 @@ fun Creep.isInTargetRoom(roomName: String): Boolean {
     return room.name == roomName
 }
 
+private val UNSAFE_TARGET_ROOMS = setOf("E15S19", "E14S21")
+private val FIRST_PART_ROOMS = setOf("E17S20", "E17S19", "E18S19")
+private const val MIDDLE_SAFE_ROOM = "E16S20"
+
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE", "CAST_NEVER_SUCCEEDS")
 fun Creep.moveToTargetRoom(roomName: String, opts: MoveToOptions? = null) {
-    val exit = room.findExitTo(roomName)
+    val targetRoomName = if (roomName in UNSAFE_TARGET_ROOMS && room.name in FIRST_PART_ROOMS) {
+        MIDDLE_SAFE_ROOM
+    } else {
+        roomName
+    }
+
+    val exit = room.findExitTo(targetRoomName)
     val target = pos.findClosestByRange(exit) as RoomPosition
 
     if (opts == null) {

@@ -14,14 +14,14 @@ import screeps.utils.toMap
  * @author chentian
  */
 
-val remoteHarvesters: List<Creep> by lazyPerTick {
+val creepRemoteHarvesters: List<Creep> by lazyPerTick {
     Game.creeps.toMap().values.filter { it.memory.role == CreepStrategyHarvesterRemote.CREEP_ROLE_HARVESTER_REMOTE }
 }
 
 private val MOVE_OPTION = createMoveOptions("#aaffaa")
 
 fun runRemoteHarvesters() {
-    remoteHarvesters.forEach {
+    creepRemoteHarvesters.forEach {
         harvestEnergyAndDoJobRemote(it) {
             upgradeController(it)
         }

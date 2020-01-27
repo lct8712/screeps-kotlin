@@ -5,7 +5,7 @@ import chentian.extensions.findCreepByRole
 import chentian.extensions.memory.targetRoomName
 import chentian.utils.MOD_16_CREATE_HARVESTER_REMOTE
 import chentian.utils.createRemoteCreep
-import chentian.utils.remoteHarvesters
+import chentian.utils.creepRemoteHarvesters
 import screeps.api.FIND_HOSTILE_CREEPS
 import screeps.api.Game
 import screeps.api.Room
@@ -19,7 +19,7 @@ import screeps.api.structures.StructureSpawn
  */
 class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
 
-    private val creeps by lazy { remoteHarvesters }
+    private val creeps by lazy { creepRemoteHarvesters }
 
     override fun tryToCreate(spawn: StructureSpawn) {
         if (GameContext.timeMod16Result != MOD_16_CREATE_HARVESTER_REMOTE) {
@@ -34,6 +34,7 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
     }
 
     override fun runLoop() {
+        // 在 runRemoteHarvesters() 中执行
     }
 
     private fun shouldCreate(roomName: String): Boolean {

@@ -19,14 +19,14 @@ import screeps.utils.toMap
  * @author chentian
  */
 
-private val attackers: List<Creep> by lazyPerTick {
+val creepAttackers: List<Creep> by lazyPerTick {
     Game.creeps.toMap().values.filter { it.memory.role == CreepStrategyAttacker.CREEP_ROLE_ATTACKER }
 }
 
 private val MOVE_OPTION = createMoveOptions("#f51b00")
 
 fun runCreepAttack() {
-    attackers.forEach { creep ->
+    creepAttackers.forEach { creep ->
         tryToAttack(creep)
     }
 }
@@ -36,7 +36,6 @@ private fun tryToAttack(creep: Creep) {
     val targetRoomName = targetFlag.pos.roomName
 
     // 进入目标房间
-//    println("roomName: ${targetFlag.pos} ${targetFlag.pos.roomName} $targetRoomName")
     if (!creep.isInTargetRoom(targetRoomName)) {
         creep.moveToTargetRoom(targetRoomName, MOVE_OPTION)
         return
