@@ -1,4 +1,4 @@
-package chentian.creep
+package chentian.strategy
 
 import chentian.GameContext
 import chentian.extensions.findCreepByRole

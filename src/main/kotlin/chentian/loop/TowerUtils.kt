@@ -1,4 +1,4 @@
-package chentian.utils
+package chentian.loop
 
 import chentian.GameContext
 import chentian.extensions.controlLevel
@@ -49,7 +49,7 @@ fun runTowerAttack() {
             it.my && it.hits < it.hitsMax
         }?.let {
             val result = tower.heal(it)
-            println("$tower is healing creep: $result")
+            println("$tower is healing strategy: $result")
             return@forEach
         }
 

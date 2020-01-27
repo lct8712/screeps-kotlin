@@ -1,11 +1,11 @@
-package chentian.creep
+package chentian.strategy
 
 import chentian.extensions.memory.creepCreatedCount
 import chentian.extensions.memory.homeRoomName
 import chentian.extensions.memory.role
 import chentian.extensions.memory.targetFlagName
 import chentian.utils.createCreepName
-import chentian.utils.creepAttackers
+import chentian.loop.creepAttackers
 import screeps.api.ATTACK
 import screeps.api.CreepMemory
 import screeps.api.Flag
@@ -57,7 +57,7 @@ class CreepStrategyAttacker(val room: Room) : CreepStrategy {
         if (result == OK) {
             flag.memory.creepCreatedCount++
         }
-        println("create new creep $CREEP_ROLE_ATTACKER. code: $result, $bodyList")
+        println("create new strategy $CREEP_ROLE_ATTACKER. code: $result, $bodyList")
     }
 
     companion object {

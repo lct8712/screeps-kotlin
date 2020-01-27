@@ -1,4 +1,4 @@
-package chentian.utils
+package chentian.loop
 
 import chentian.GameContext
 import chentian.extensions.controlLevel
@@ -9,6 +9,7 @@ import chentian.extensions.memory.linkIdFrom1
 import chentian.extensions.memory.linkIdFrom2
 import chentian.extensions.memory.linkIdTo
 import chentian.extensions.needUpgrade
+import chentian.utils.MOD_16_REBUILD_LINK_IDS
 import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES
 import screeps.api.FilterOption

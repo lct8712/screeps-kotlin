@@ -1,4 +1,4 @@
-package chentian.creep
+package chentian.strategy
 
 import chentian.extensions.memory.claimerRoomName
 import chentian.extensions.memory.homeRoomName
@@ -47,7 +47,7 @@ class CreepStrategyClaimer(val room: Room) : CreepStrategy {
                 if (result == ERR_NOT_IN_RANGE) {
                     creep.moveTo(controller.pos)
                 } else {
-                    println("$creep claim controller error. creep $CREEP_ROLE_CLAIMER. code: $result")
+                    println("$creep claim controller error. strategy $CREEP_ROLE_CLAIMER. code: $result")
                 }
             } else {
                 creep.moveToTargetRoom(creep.memory.targetRoomName)
@@ -72,7 +72,7 @@ class CreepStrategyClaimer(val room: Room) : CreepStrategy {
         if (result == OK) {
             room.memory.claimerRoomName = ""
         }
-        println("create new creep $CREEP_ROLE_CLAIMER. code: $result, $bodyList")
+        println("create new strategy $CREEP_ROLE_CLAIMER. code: $result, $bodyList")
     }
 
     companion object {

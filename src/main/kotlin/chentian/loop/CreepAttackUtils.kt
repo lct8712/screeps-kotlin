@@ -1,10 +1,11 @@
-package chentian.utils
+package chentian.loop
 
-import chentian.creep.CreepStrategyAttacker
 import chentian.extensions.isInTargetRoom
 import chentian.extensions.memory.role
 import chentian.extensions.memory.targetFlagName
 import chentian.extensions.moveToTargetRoom
+import chentian.strategy.CreepStrategyAttacker
+import chentian.utils.createMoveOptions
 import screeps.api.Creep
 import screeps.api.FIND_HOSTILE_CREEPS
 import screeps.api.FIND_HOSTILE_STRUCTURES
@@ -41,7 +42,7 @@ private fun tryToAttack(creep: Creep) {
         return
     }
 
-    // 附近有敌方 creep
+    // 附近有敌方 strategy
     creep.pos.findInRange(FIND_HOSTILE_CREEPS, 1).getOrNull(0)?.let { targetCreep ->
         creep.attack(targetCreep)
         return

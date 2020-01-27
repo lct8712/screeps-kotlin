@@ -1,8 +1,9 @@
-package chentian.utils
+package chentian.loop
 
 import chentian.GameContext
 import chentian.extensions.energy
 import chentian.extensions.memory.terminalId
+import chentian.utils.MOD_16_SELL_ENERGY
 import screeps.api.FIND_STRUCTURES
 import screeps.api.Game
 import screeps.api.Market

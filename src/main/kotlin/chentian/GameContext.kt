@@ -1,7 +1,7 @@
 package chentian
 
-import chentian.creep.CreepStrategyMiner
 import chentian.extensions.findCreepByRole
+import chentian.strategy.CreepStrategyMiner
 import screeps.api.ConstructionSite
 import screeps.api.Creep
 import screeps.api.Game

@@ -84,7 +84,7 @@ val BODY_PART_FOR_MIN_CREEP = listOf(MOVE, CARRY, WORK)
 val BODY_COST_FOR_MIN_CREEP = BODY_PART_FOR_MIN_CREEP.sumBy { (BODYPART_COST[it])!! }
 
 fun createNormalCreep(spawn: StructureSpawn, role: String = "", forceCreate: Boolean = false) {
-    // 一个小房间，创建最基本的 creep
+    // 一个小房间，创建最基本的 strategy
     if (forceCreate || spawn.room.energyCapacityAvailable < BODY_COST_FOR_NORMAL_CREEP) {
         if (spawn.room.energyAvailable >= BODY_COST_FOR_MIN_CREEP) {
             doCreateCreep(role, "", spawn, BODY_PART_FOR_MIN_CREEP.toMutableList())
@@ -143,9 +143,9 @@ private fun doCreateCreep(
             this.homeRoomName = spawn.room.name
         }
     })
-    println("create new creep $role. code: $result, $bodyList")
+    println("create new strategy $role. code: $result, $bodyList")
     if (result != OK && result != ERR_BUSY && result != ERR_NAME_EXISTS) {
-        Game.notify("create creep $role error at ${spawn.room.name} code: ${result.value}. $bodyList")
+        Game.notify("create strategy $role error at ${spawn.room.name} code: ${result.value}. $bodyList")
     }
     return result == OK
 }

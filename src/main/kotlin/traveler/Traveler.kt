@@ -125,7 +125,7 @@ external interface TravelToOptions {
     var offRoad: Boolean? get() = definedExternally; set(value) = definedExternally
 
     /**
-     * Number of ticks of non-movement before a creep considers itself stuck. Default is 2.
+     * Number of ticks of non-movement before a strategy considers itself stuck. Default is 2.
      */
     var stuckValue: Int? get() = definedExternally; set(value) = definedExternally
 
@@ -135,8 +135,8 @@ external interface TravelToOptions {
     var maxRooms: Number? get() = definedExternally; set(value) = definedExternally
 
     /**
-     * Float value between 0 and 1 representing the probability that creep will randomly invalidate its current path.
-     * Setting it to 1 would cause the creep to repath every tick. Default is undefined.
+     * Float value between 0 and 1 representing the probability that strategy will randomly invalidate its current path.
+     * Setting it to 1 would cause the strategy to repath every tick. Default is undefined.
      */
     var repath: Double? get() = definedExternally; set(value) = definedExternally
 

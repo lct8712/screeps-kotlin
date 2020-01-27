@@ -1,11 +1,11 @@
-package chentian.creep
+package chentian.strategy
 
 import chentian.GameContext
 import chentian.extensions.findCreepByRole
 import chentian.extensions.memory.targetRoomName
 import chentian.utils.MOD_16_CREATE_HARVESTER_REMOTE
 import chentian.utils.createRemoteCreep
-import chentian.utils.creepRemoteHarvesters
+import chentian.loop.creepRemoteHarvesters
 import screeps.api.FIND_HOSTILE_CREEPS
 import screeps.api.Game
 import screeps.api.Room

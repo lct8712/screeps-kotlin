@@ -1,6 +1,6 @@
-package chentian.creep
+package chentian.strategy
 
-import chentian.creep.CreepStrategyHarvesterLink.Companion.CREEP_ROLE_HARVESTER_LINK
+import chentian.strategy.CreepStrategyHarvesterLink.Companion.CREEP_ROLE_HARVESTER_LINK
 import chentian.extensions.memory.containerTargetId
 import chentian.extensions.energy
 import chentian.extensions.energyCapacity

@@ -1,4 +1,4 @@
-package chentian.creep
+package chentian.strategy
 
 import chentian.extensions.memory.buildTargetId
 import chentian.extensions.findClosest

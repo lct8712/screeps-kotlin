@@ -1,7 +1,9 @@
-package chentian.utils
+package chentian.loop
 
-import chentian.creep.CreepStrategyHarvesterRemote
 import chentian.extensions.memory.role
+import chentian.strategy.CreepStrategyHarvesterRemote
+import chentian.utils.createMoveOptions
+import chentian.utils.harvestEnergyAndDoJobRemote
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.Game

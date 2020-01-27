@@ -1,4 +1,4 @@
-package chentian.creep
+package chentian.strategy
 
 import chentian.GameContext
 import chentian.extensions.memory.containerTargetId
@@ -77,7 +77,7 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
                 this.targetLinkId = linkId
             }
         })
-        println("create new creep $CREEP_ROLE_HARVESTER_LINK. code: $result, $bodyList")
+        println("create new strategy $CREEP_ROLE_HARVESTER_LINK. code: $result, $bodyList")
     }
 
     /**

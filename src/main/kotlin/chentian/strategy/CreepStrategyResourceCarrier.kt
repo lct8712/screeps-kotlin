@@ -1,4 +1,4 @@
-package chentian.creep
+package chentian.strategy
 
 import chentian.GameContext
 import chentian.extensions.extraResourceAmount
@@ -7,7 +7,7 @@ import chentian.extensions.memory.role
 import chentian.extensions.memory.targetRoomName
 import chentian.utils.MOD_16_CREATE_RESOURCE_CARRIER
 import chentian.utils.createCreepName
-import chentian.utils.resourceCarriers
+import chentian.loop.resourceCarriers
 import screeps.api.CARRY
 import screeps.api.CreepMemory
 import screeps.api.Game
@@ -65,7 +65,7 @@ class CreepStrategyResourceCarrier(val room: Room) : CreepStrategy {
                 this.targetRoomName = roomName
             }
         })
-        println("create new creep $CREEP_ROLE_RESOURCE_CARRIER. code: $result, $bodyList")
+        println("create new strategy $CREEP_ROLE_RESOURCE_CARRIER. code: $result, $bodyList")
     }
 
     private class TargetRoomInfo(

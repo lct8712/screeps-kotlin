@@ -1,4 +1,4 @@
-package chentian.creep
+package chentian.strategy
 
 import chentian.GameContext
 import chentian.extensions.memory.containerId
@@ -97,7 +97,7 @@ class CreepStrategyMiner(room: Room) : CreepStrategy {
                 this.containerId = targetId
             }
         })
-        println("create new creep $CREEP_ROLE_MINER. code: $result, $BODY_PART_FOR_MINER_CREEP")
+        println("create new strategy $CREEP_ROLE_MINER. code: $result, $BODY_PART_FOR_MINER_CREEP")
     }
 
     companion object {

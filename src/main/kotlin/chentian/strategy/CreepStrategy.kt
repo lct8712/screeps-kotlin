@@ -1,4 +1,4 @@
-package chentian.creep
+package chentian.strategy
 
 import screeps.api.structures.StructureSpawn
 
