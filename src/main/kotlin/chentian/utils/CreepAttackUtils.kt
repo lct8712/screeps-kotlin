@@ -42,20 +42,21 @@ private fun tryToAttack(creep: Creep) {
     }
 
     // 附近有敌方 creep
-    targetFlag.pos.findInRange(FIND_HOSTILE_CREEPS, 1).getOrNull(0)?.let { targetCreep ->
+    creep.pos.findInRange(FIND_HOSTILE_CREEPS, 1).getOrNull(0)?.let { targetCreep ->
         creep.attack(targetCreep)
         return
     }
 
     // 走到 flag 附近
-    if (!targetFlag.pos.isNearTo(targetFlag.pos)) {
+    if (!creep.pos.isNearTo(targetFlag.pos)) {
         creep.moveTo(targetFlag.pos, MOVE_OPTION)
         return
     }
 
     // 攻击离 flag 最近的目标
-    targetFlag.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES)?.let { structure ->
-        creep.attack(structure)
+    creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES)?.let { structure ->
+        val result = creep.attack(structure)
+        println("$creep is attacking ${structure.id}, result: $result")
         return
     }
 

@@ -42,7 +42,7 @@ class CreepStrategyAttacker(val room: Room) : CreepStrategy {
 
     private fun shouldCreate(): Boolean {
         val flag = targetFlag ?: return false
-        return flag.memory.creepCreatedCount < MAX_ATTACKER_COUNT_TOTAL && creepAttackers.size < MAX_ATTACKER_COUNT
+        return flag.memory.creepCreatedCount < MAX_ATTACKER_COUNT_TOTAL && creepAttackers.size < MAX_ATTACKER_COUNT_AT_SAME_TIME
     }
 
     private fun create(spawn: StructureSpawn, flag: Flag) {
@@ -63,7 +63,7 @@ class CreepStrategyAttacker(val room: Room) : CreepStrategy {
     companion object {
 
         const val CREEP_ROLE_ATTACKER = "attacker"
-        const val MAX_ATTACKER_COUNT = 5
+        const val MAX_ATTACKER_COUNT_AT_SAME_TIME = 4
         const val MAX_ATTACKER_COUNT_TOTAL = 1_000
     }
 }

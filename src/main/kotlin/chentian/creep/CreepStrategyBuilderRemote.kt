@@ -18,6 +18,7 @@ import screeps.utils.toMap
 
 /**
  * 新的房间，有待建造的 spawn 时使用
+ * 手动在刚 claim 的房间创建 spawn 即可
  *
  * @author chentian
  */
