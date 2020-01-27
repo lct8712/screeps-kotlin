@@ -231,24 +231,12 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
     return
 }
 
-private val TempSet = setOf("E17S20", "E17S19", "E18S19")
-
 fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
     // 先去到目标房间
-    if (creep.memory.targetRoomName == "E15S19" && creep.room.name in TempSet) {
-        creep.memory.targetRoomName = "E16S20"
-    } else if (creep.room.name == "E16S20") {
-        creep.memory.targetRoomName = "E15S19"
-    }
-    if (creep.memory.targetRoomName.isEmpty()) {
-        println("###### $creep")
-        return
-    }
     if (!creep.isInTargetRoom(creep.memory.targetRoomName)) {
         creep.moveToTargetRoom(creep.memory.targetRoomName)
         return
     }
-
 
     // 已采集好资源
     if (creep.isFullCarry()) {

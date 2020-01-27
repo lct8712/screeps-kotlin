@@ -42,14 +42,6 @@ fun Creep.moveToTargetRoom(roomName: String) {
     moveTo(target)
 }
 
-fun Creep.moveToTargetPos(pos: RoomPosition) {
-    moveTo(pos)
-//    if (room.name == pos.roomName) {
-//    } else {
-//        moveToTargetRoom(pos.roomName)
-//    }
-}
-
 fun Creep.transferAllTypeOrMove(target: Structure): Boolean {
     store.keys.forEach { resourceType ->
         val transferResult = transfer(target, resourceType)

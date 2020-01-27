@@ -6,7 +6,6 @@ import chentian.extensions.homeRoomName
 import chentian.extensions.isEmptyCarry
 import chentian.extensions.isFullCarry
 import chentian.extensions.isWorking
-import chentian.extensions.moveToTargetPos
 import chentian.extensions.moveToTargetRoom
 import chentian.extensions.role
 import chentian.extensions.setWorking
@@ -76,7 +75,7 @@ fun runSingleResourceCarriers(creep: Creep) {
         val targetContainer = findContainerToCarrier(creep)
         targetContainer?.pos?.findInRange(FIND_DROPPED_RESOURCES, 1)?.maxBy { it.amount }?.let { resource ->
             if (creep.pickup(resource) == ERR_NOT_IN_RANGE) {
-                creep.moveToTargetPos(resource.pos)
+                creep.moveTo(resource.pos)
             }
             println("$creep is carrying resource, in room: $targetContainer")
             return
