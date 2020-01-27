@@ -1,7 +1,7 @@
 package chentian.creep
 
 import chentian.creep.CreepStrategyHarvesterLink.Companion.CREEP_ROLE_HARVESTER_LINK
-import chentian.extensions.containerTargetId
+import chentian.extensions.memory.containerTargetId
 import chentian.extensions.energy
 import chentian.extensions.energyCapacity
 import chentian.extensions.findClosest
@@ -9,7 +9,7 @@ import chentian.extensions.findCreepByRole
 import chentian.extensions.isFullCarry
 import chentian.extensions.needUpgrade
 import chentian.extensions.transferAllTypeOrMove
-import chentian.extensions.transferTargetId
+import chentian.extensions.memory.transferTargetId
 import chentian.utils.createMoveOptions
 import chentian.utils.createNormalCreep
 import chentian.utils.harvestEnergyAndDoJob

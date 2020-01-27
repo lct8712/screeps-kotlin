@@ -1,5 +1,6 @@
 package chentian.extensions
 
+import chentian.extensions.memory.transferTargetId
 import screeps.api.Creep
 import screeps.api.ERR_FULL
 import screeps.api.ERR_NOT_IN_RANGE

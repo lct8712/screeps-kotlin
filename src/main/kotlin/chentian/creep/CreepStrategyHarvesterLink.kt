@@ -1,13 +1,13 @@
 package chentian.creep
 
 import chentian.GameContext
-import chentian.extensions.containerTargetId
+import chentian.extensions.memory.containerTargetId
 import chentian.extensions.findCreepByRole
-import chentian.extensions.homeRoomName
-import chentian.extensions.linkIdTo
+import chentian.extensions.memory.homeRoomName
+import chentian.extensions.memory.linkIdTo
 import chentian.extensions.needUpgrade
-import chentian.extensions.role
-import chentian.extensions.targetLinkId
+import chentian.extensions.memory.role
+import chentian.extensions.memory.targetLinkId
 import chentian.extensions.transferAllTypeOrMove
 import chentian.utils.MOD_16_CREATE_HARVESTER_LINK
 import chentian.utils.createCreepName

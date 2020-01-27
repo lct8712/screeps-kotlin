@@ -3,7 +3,7 @@ package chentian.creep
 import chentian.GameContext
 import chentian.extensions.findCreepByRole
 import chentian.extensions.findFirstConstructionToBuild
-import chentian.extensions.role
+import chentian.extensions.memory.role
 import chentian.utils.MOD_16_CREATE_BUILDER_REMOTE
 import chentian.utils.createMoveOptions
 import chentian.utils.createRemoteCreep

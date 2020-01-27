@@ -1,11 +1,11 @@
 package chentian.creep
 
-import chentian.extensions.buildTargetId
+import chentian.extensions.memory.buildTargetId
 import chentian.extensions.findClosest
 import chentian.extensions.findConstructionsToBuild
 import chentian.extensions.findCreepByRole
 import chentian.extensions.isBuildFinished
-import chentian.extensions.role
+import chentian.extensions.memory.role
 import chentian.utils.createNormalCreep
 import chentian.utils.harvestEnergyAndDoJob
 import screeps.api.ConstructionSite

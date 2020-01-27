@@ -1,22 +1,22 @@
 package chentian.utils
 
 import chentian.GameContext
-import chentian.extensions.containerTargetId
+import chentian.extensions.memory.containerTargetId
 import chentian.extensions.energy
 import chentian.extensions.findClosest
-import chentian.extensions.homeRoomName
+import chentian.extensions.memory.homeRoomName
 import chentian.extensions.isEmptyCarry
 import chentian.extensions.isFullCarry
 import chentian.extensions.isInTargetRoom
 import chentian.extensions.isWorking
 import chentian.extensions.moveToTargetRoom
-import chentian.extensions.role
+import chentian.extensions.memory.role
 import chentian.extensions.setWorking
-import chentian.extensions.sourceTargetId
-import chentian.extensions.targetLinkId
-import chentian.extensions.targetRoomName
-import chentian.extensions.transferTargetId
-import chentian.extensions.withdrawTargetId
+import chentian.extensions.memory.sourceTargetId
+import chentian.extensions.memory.targetLinkId
+import chentian.extensions.memory.targetRoomName
+import chentian.extensions.memory.transferTargetId
+import chentian.extensions.memory.withdrawTargetId
 import screeps.api.ActiveBodyPartConstant
 import screeps.api.BODYPART_COST
 import screeps.api.CARRY
@@ -60,7 +60,6 @@ import kotlin.math.min
 fun createCreepName(role: String): String {
     return "creep_${role}_${Game.time}"
 }
-
 
 val BODY_PART_FOR_MINER_CREEP = listOf(MOVE, CARRY, WORK, WORK, WORK, WORK, WORK)
 val BODY_COST_FOR_MINER_CREEP = BODY_PART_FOR_MINER_CREEP.sumBy { (BODYPART_COST[it])!! }

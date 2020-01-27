@@ -2,9 +2,9 @@ package chentian.creep
 
 import chentian.GameContext
 import chentian.extensions.extraResourceAmount
-import chentian.extensions.homeRoomName
-import chentian.extensions.role
-import chentian.extensions.targetRoomName
+import chentian.extensions.memory.homeRoomName
+import chentian.extensions.memory.role
+import chentian.extensions.memory.targetRoomName
 import chentian.utils.MOD_16_CREATE_RESOURCE_CARRIER
 import chentian.utils.createCreepName
 import chentian.utils.resourceCarriers

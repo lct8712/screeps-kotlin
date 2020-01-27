@@ -4,8 +4,8 @@ import chentian.GameContext
 import chentian.extensions.controlLevel
 import chentian.extensions.energy
 import chentian.extensions.energyCapacity
-import chentian.extensions.repairTargetCountDown
-import chentian.extensions.repairTargetId
+import chentian.extensions.memory.repairTargetCountDown
+import chentian.extensions.memory.repairTargetId
 import screeps.api.FIND_CREEPS
 import screeps.api.FIND_HOSTILE_CREEPS
 import screeps.api.FIND_STRUCTURES

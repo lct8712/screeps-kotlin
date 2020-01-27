@@ -1,7 +1,7 @@
 package chentian.utils
 
 import chentian.creep.CreepStrategyHarvesterRemote
-import chentian.extensions.role
+import chentian.extensions.memory.role
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.Game

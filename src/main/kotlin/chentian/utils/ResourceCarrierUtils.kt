@@ -1,16 +1,16 @@
 package chentian.utils
 
 import chentian.creep.CreepStrategyResourceCarrier
-import chentian.extensions.containerTargetId
-import chentian.extensions.homeRoomName
+import chentian.extensions.memory.containerTargetId
+import chentian.extensions.memory.homeRoomName
 import chentian.extensions.isEmptyCarry
 import chentian.extensions.isFullCarry
 import chentian.extensions.isWorking
 import chentian.extensions.moveToTargetRoom
-import chentian.extensions.role
+import chentian.extensions.memory.role
 import chentian.extensions.setWorking
-import chentian.extensions.storageTargetId
-import chentian.extensions.targetRoomName
+import chentian.extensions.memory.storageTargetId
+import chentian.extensions.memory.targetRoomName
 import chentian.extensions.transferAllTypeOrMove
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE

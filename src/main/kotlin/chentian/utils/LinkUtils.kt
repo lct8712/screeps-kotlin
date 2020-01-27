@@ -5,9 +5,9 @@ import chentian.extensions.controlLevel
 import chentian.extensions.energy
 import chentian.extensions.energyCapacity
 import chentian.extensions.isFull
-import chentian.extensions.linkIdFrom1
-import chentian.extensions.linkIdFrom2
-import chentian.extensions.linkIdTo
+import chentian.extensions.memory.linkIdFrom1
+import chentian.extensions.memory.linkIdFrom2
+import chentian.extensions.memory.linkIdTo
 import chentian.extensions.needUpgrade
 import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES

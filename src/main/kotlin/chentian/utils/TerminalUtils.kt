@@ -2,7 +2,7 @@ package chentian.utils
 
 import chentian.GameContext
 import chentian.extensions.energy
-import chentian.extensions.terminalId
+import chentian.extensions.memory.terminalId
 import screeps.api.FIND_STRUCTURES
 import screeps.api.Game
 import screeps.api.Market

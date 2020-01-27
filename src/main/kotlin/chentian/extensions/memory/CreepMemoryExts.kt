@@ -1,4 +1,4 @@
-package chentian.extensions
+package chentian.extensions.memory
 
 import screeps.api.CreepMemory
 import screeps.utils.memory.memory

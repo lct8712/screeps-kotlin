@@ -2,7 +2,7 @@ package chentian.creep
 
 import chentian.GameContext
 import chentian.extensions.findCreepByRole
-import chentian.extensions.targetRoomName
+import chentian.extensions.memory.targetRoomName
 import chentian.utils.MOD_16_CREATE_HARVESTER_REMOTE
 import chentian.utils.createRemoteCreep
 import chentian.utils.remoteHarvesters

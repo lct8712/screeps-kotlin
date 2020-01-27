@@ -1,12 +1,12 @@
 package chentian.creep
 
 import chentian.GameContext
-import chentian.extensions.containerId
+import chentian.extensions.memory.containerId
 import chentian.extensions.energy
 import chentian.extensions.energyCapacity
 import chentian.extensions.findStructureMapByType
-import chentian.extensions.homeRoomName
-import chentian.extensions.role
+import chentian.extensions.memory.homeRoomName
+import chentian.extensions.memory.role
 import chentian.utils.BODY_COST_FOR_MINER_CREEP
 import chentian.utils.BODY_PART_FOR_MINER_CREEP
 import chentian.utils.createCreepName

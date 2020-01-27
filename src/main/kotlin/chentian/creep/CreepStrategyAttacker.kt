@@ -1,11 +1,11 @@
 package chentian.creep
 
+import chentian.extensions.isInTargetRoom
 import chentian.extensions.memory.claimerRoomName
 import chentian.extensions.memory.homeRoomName
-import chentian.extensions.isInTargetRoom
-import chentian.extensions.moveToTargetRoom
 import chentian.extensions.memory.role
 import chentian.extensions.memory.targetRoomName
+import chentian.extensions.moveToTargetRoom
 import chentian.utils.createCreepName
 import screeps.api.CLAIM
 import screeps.api.CreepMemory
@@ -20,13 +20,13 @@ import screeps.utils.toMap
 import screeps.utils.unsafe.jsObject
 
 /**
- * 占领新房间，开分基地时用一次
+ * 进攻
  *   1. 手动在原房间设置 room.memory.claimerRoomName
  *   2. 占领成功后，手动在目标房间内放置 spawn
  *
  * @author chentian
  */
-class CreepStrategyClaimer(val room: Room) : CreepStrategy {
+class CreepStrategyAttacker(val room: Room) : CreepStrategy {
 
     private val creeps by lazy {
         Game.creeps.toMap().values.filter { it.memory.role == CREEP_ROLE_CLAIMER }
@@ -39,6 +39,7 @@ class CreepStrategyClaimer(val room: Room) : CreepStrategy {
     }
 
     override fun runLoop() {
+//        Game.flags.values[0].pos.findClosestByRange(FIND_HOSTILE_STRUCTURES)
         creeps.forEach { creep ->
             if (creep.isInTargetRoom(creep.memory.targetRoomName)) {
                 val controller = creep.room.controller ?: return@forEach

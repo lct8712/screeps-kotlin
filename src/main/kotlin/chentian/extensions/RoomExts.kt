@@ -1,6 +1,7 @@
 package chentian.extensions
 
 import chentian.GameContext
+import chentian.extensions.memory.role
 import screeps.api.BuildableStructureConstant
 import screeps.api.ConstructionSite
 import screeps.api.Creep
