@@ -4,6 +4,7 @@ import chentian.extensions.memory.transferTargetId
 import screeps.api.Creep
 import screeps.api.ERR_FULL
 import screeps.api.ERR_NOT_IN_RANGE
+import screeps.api.MoveToOptions
 import screeps.api.OK
 import screeps.api.RoomObject
 import screeps.api.RoomPosition
@@ -37,10 +38,15 @@ fun Creep.isInTargetRoom(roomName: String): Boolean {
 }
 
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE", "CAST_NEVER_SUCCEEDS")
-fun Creep.moveToTargetRoom(roomName: String) {
+fun Creep.moveToTargetRoom(roomName: String, opts: MoveToOptions? = null) {
     val exit = room.findExitTo(roomName)
     val target = pos.findClosestByRange(exit) as RoomPosition
-    moveTo(target)
+
+    if (opts == null) {
+        moveTo(target)
+    } else {
+        moveTo(target, opts)
+    }
 }
 
 fun Creep.transferAllTypeOrMove(target: Structure): Boolean {

@@ -1,83 +1,67 @@
 package chentian.creep
 
-import chentian.extensions.isInTargetRoom
-import chentian.extensions.memory.claimerRoomName
+import chentian.extensions.memory.creepCreatedCount
 import chentian.extensions.memory.homeRoomName
 import chentian.extensions.memory.role
-import chentian.extensions.memory.targetRoomName
-import chentian.extensions.moveToTargetRoom
+import chentian.extensions.memory.targetFlagName
 import chentian.utils.createCreepName
-import screeps.api.CLAIM
+import screeps.api.ATTACK
 import screeps.api.CreepMemory
-import screeps.api.ERR_NOT_IN_RANGE
+import screeps.api.Flag
 import screeps.api.Game
 import screeps.api.MOVE
 import screeps.api.OK
 import screeps.api.Room
 import screeps.api.options
 import screeps.api.structures.StructureSpawn
-import screeps.utils.toMap
+import screeps.api.values
 import screeps.utils.unsafe.jsObject
 
 /**
  * 进攻
- *   1. 手动在原房间设置 room.memory.claimerRoomName
- *   2. 占领成功后，手动在目标房间内放置 spawn
+ *   手动创建一个名为 FlagAttack_{RoomName} 的 flag，例如 FlagAttack_E18S19
  *
  * @author chentian
  */
 class CreepStrategyAttacker(val room: Room) : CreepStrategy {
 
-    private val creeps by lazy {
-        Game.creeps.toMap().values.filter { it.memory.role == CREEP_ROLE_CLAIMER }
+    private val targetFlag by lazy {
+        Game.flags.values.firstOrNull { flag -> flag.name.contains(room.name) }
     }
 
     override fun tryToCreate(spawn: StructureSpawn) {
         if (shouldCreate()) {
-            create(spawn)
+            create(spawn, targetFlag!!)
         }
     }
 
     override fun runLoop() {
-//        Game.flags.values[0].pos.findClosestByRange(FIND_HOSTILE_STRUCTURES)
-        creeps.forEach { creep ->
-            if (creep.isInTargetRoom(creep.memory.targetRoomName)) {
-                val controller = creep.room.controller ?: return@forEach
-                println("$creep ${controller.room} $controller")
-                val result = creep.claimController(controller)
-                if (result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(controller.pos)
-                } else {
-                    println("$creep claim controller error. creep $CREEP_ROLE_CLAIMER. code: $result")
-                }
-            } else {
-                creep.moveToTargetRoom(creep.memory.targetRoomName)
-            }
-            creep.say("claim")
-        }
+        // 在 runCreepAttack() 中执行
     }
 
     private fun shouldCreate(): Boolean {
-        return room.memory.claimerRoomName.isNotEmpty()
+        val flag = targetFlag ?: return false
+        return flag.memory.creepCreatedCount < MAX_ATTACKER_COUNT
     }
 
-    private fun create(spawn: StructureSpawn) {
-        val bodyList = mutableListOf(CLAIM, MOVE, MOVE, MOVE, MOVE, MOVE)
-        val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(CREEP_ROLE_CLAIMER), options {
+    private fun create(spawn: StructureSpawn, flag: Flag) {
+        val bodyList = mutableListOf(MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK)
+        val result = spawn.spawnCreep(bodyList.toTypedArray(), createCreepName(CREEP_ROLE_ATTACKER), options {
             memory = jsObject<CreepMemory> {
-                this.role = CREEP_ROLE_CLAIMER
+                this.role = CREEP_ROLE_ATTACKER
                 this.homeRoomName = spawn.room.name
-                this.targetRoomName = room.memory.claimerRoomName
+                this.targetFlagName = flag.name
             }
         })
         if (result == OK) {
-            room.memory.claimerRoomName = ""
+            flag.memory.creepCreatedCount++
         }
-        println("create new creep $CREEP_ROLE_CLAIMER. code: $result, $bodyList")
+        println("create new creep $CREEP_ROLE_ATTACKER. code: $result, $bodyList")
     }
 
     companion object {
 
-        private const val CREEP_ROLE_CLAIMER = "claimer"
+        const val CREEP_ROLE_ATTACKER = "attacker"
+        const val MAX_ATTACKER_COUNT = 5
     }
 }
