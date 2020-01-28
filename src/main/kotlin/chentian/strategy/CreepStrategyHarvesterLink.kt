@@ -1,13 +1,14 @@
 package chentian.strategy
 
 import chentian.GameContext
-import chentian.extensions.memory.containerTargetId
+import chentian.extensions.controlLevel
 import chentian.extensions.findCreepByRole
+import chentian.extensions.memory.containerTargetId
 import chentian.extensions.memory.homeRoomName
 import chentian.extensions.memory.linkIdTo
-import chentian.extensions.needUpgrade
 import chentian.extensions.memory.role
 import chentian.extensions.memory.targetLinkId
+import chentian.extensions.needUpgrade
 import chentian.extensions.transferAllTypeOrMove
 import chentian.utils.MOD_16_CREATE_HARVESTER_LINK
 import chentian.utils.createCreepName
@@ -21,12 +22,14 @@ import screeps.api.FIND_STRUCTURES
 import screeps.api.Game
 import screeps.api.MOVE
 import screeps.api.Room
+import screeps.api.STRUCTURE_STORAGE
 import screeps.api.STRUCTURE_TERMINAL
 import screeps.api.WORK
 import screeps.api.options
 import screeps.api.structures.Structure
 import screeps.api.structures.StructureController
 import screeps.api.structures.StructureSpawn
+import screeps.api.structures.StructureStorage
 import screeps.api.structures.StructureTerminal
 import screeps.utils.unsafe.jsObject
 
@@ -54,7 +57,7 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
     override fun runLoop() {
         creeps.forEach { creep ->
             harvestEnergyAndDoJob(creep) {
-                upgradeController(creep) || transferToTerminal(creep)
+                transferToStorage(creep) || upgradeController(creep) || transferToTerminal(creep)
             }
         }
     }
@@ -78,6 +81,23 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
             }
         })
         println("create new strategy $CREEP_ROLE_HARVESTER_LINK. code: $result, $bodyList")
+    }
+
+    /**
+     * 传输到 storage
+     */
+    private fun transferToStorage(creep: Creep): Boolean {
+        // RCL >= 6 时，才往 storage 充能
+        if (room.controlLevel() < 6) {
+            return false
+        }
+
+        val terminal = room.find(FIND_STRUCTURES)
+            .firstOrNull { it.structureType == STRUCTURE_STORAGE }
+            as? StructureStorage
+            ?: return false
+
+        return transferOrMove(creep, terminal)
     }
 
     /**
@@ -109,10 +129,7 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
             as? StructureTerminal
             ?: return false
 
-        if (transferOrMove(creep, terminal)) {
-            return true
-        }
-        return false
+        return transferOrMove(creep, terminal)
     }
 
     private fun upgradeOrMove(creep: Creep, controller: StructureController) {

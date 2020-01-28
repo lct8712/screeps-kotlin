@@ -1,10 +1,10 @@
 package chentian.strategy
 
 import chentian.GameContext
-import chentian.extensions.memory.containerId
 import chentian.extensions.energy
 import chentian.extensions.energyCapacity
 import chentian.extensions.findStructureMapByType
+import chentian.extensions.memory.containerId
 import chentian.extensions.memory.homeRoomName
 import chentian.extensions.memory.role
 import chentian.utils.BODY_COST_FOR_MINER_CREEP
@@ -73,7 +73,7 @@ class CreepStrategyMiner(room: Room) : CreepStrategy {
 
             // 正常采集
             creep.harvest(source)
-            creep.say("mine")
+            creep.say("⚒")
         }
     }
 

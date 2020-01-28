@@ -27,6 +27,9 @@ import screeps.api.structures.StructureLink
  * @author chentian
  */
 
+/**
+ * 每回合通过 Link 传输能量
+ */
 fun runLinkTransfer() {
     GameContext.myRooms.forEach { room ->
         // 低等级的房间没有 Link
@@ -59,7 +62,7 @@ fun runLinkTransfer() {
  * 如果两个 link 都找过，则不再寻找
  */
 fun rebuildRoomLinkId(room: Room) {
-    if (room.memory.linkIdFrom2.isNotEmpty() && room.memory.linkIdTo.isNotEmpty()) {
+    if (isAllLinkReadyInRoom(room)) {
         return
     }
 
@@ -85,6 +88,13 @@ fun rebuildRoomLinkId(room: Room) {
     room.memory.linkIdTo = pos?.findClosestByRange(FIND_STRUCTURES, options<FilterOption<Structure>> {
         filter = { it.structureType == STRUCTURE_LINK }
     })?.id.orEmpty()
+}
+
+/**
+ * 一个房间两个 link 是否都齐备
+ */
+fun isAllLinkReadyInRoom(room: Room): Boolean {
+    return room.memory.linkIdFrom2.isNotEmpty() && room.memory.linkIdTo.isNotEmpty()
 }
 
 /**
