@@ -1,5 +1,6 @@
 package chentian.strategy
 
+import chentian.GameContext
 import chentian.extensions.energy
 import chentian.extensions.energyCapacity
 import chentian.extensions.findClosest
@@ -10,7 +11,6 @@ import chentian.extensions.memory.transferTargetId
 import chentian.extensions.needUpgrade
 import chentian.extensions.transferAllTypeOrMove
 import chentian.loop.isAllLinkReadyInRoom
-import chentian.strategy.CreepStrategyHarvesterLink.Companion.CREEP_ROLE_HARVESTER_LINK
 import chentian.utils.createMoveOptions
 import chentian.utils.createNormalCreep
 import chentian.utils.harvestEnergyAndDoJob
@@ -62,7 +62,7 @@ class CreepStrategyHarvester(val room: Room) : CreepStrategy {
         }
 
         // 使用 link mining 时，只需要一个普通的 harvest 即可
-        val creepLinkSize = room.findCreepByRole(CREEP_ROLE_HARVESTER_LINK).size
+        val creepLinkSize = GameContext.creepsHarvesterLink[room.name].orEmpty().size
         if (creepLinkSize >= 2 && isAllLinkReadyInRoom(room)) {
             return false
         }

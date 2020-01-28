@@ -2,7 +2,6 @@ package chentian.strategy
 
 import chentian.GameContext
 import chentian.extensions.controlLevel
-import chentian.extensions.findCreepByRole
 import chentian.extensions.memory.containerTargetId
 import chentian.extensions.memory.homeRoomName
 import chentian.extensions.memory.linkIdTo
@@ -40,7 +39,7 @@ import screeps.utils.unsafe.jsObject
  */
 class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
 
-    private val creeps = room.findCreepByRole(CREEP_ROLE_HARVESTER_LINK)
+    private val creeps = GameContext.creepsHarvesterLink[room.name].orEmpty()
 
     override fun tryToCreate(spawn: StructureSpawn) {
         if (GameContext.timeMod16Result != MOD_16_CREATE_HARVESTER_LINK) {

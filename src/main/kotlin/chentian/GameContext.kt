@@ -1,6 +1,7 @@
 package chentian
 
 import chentian.extensions.findCreepByRole
+import chentian.strategy.CreepStrategyHarvesterLink
 import chentian.strategy.CreepStrategyMiner
 import screeps.api.ConstructionSite
 import screeps.api.Creep
@@ -35,5 +36,9 @@ object GameContext {
 
     val creepsMiner: Map<String, List<Creep>> by lazyPerTick {
         rooms.values.map { it.name to it.findCreepByRole(CreepStrategyMiner.CREEP_ROLE_MINER) }.toMap()
+    }
+
+    val creepsHarvesterLink: Map<String, List<Creep>> by lazyPerTick {
+        rooms.values.map { it.name to it.findCreepByRole(CreepStrategyHarvesterLink.CREEP_ROLE_HARVESTER_LINK) }.toMap()
     }
 }

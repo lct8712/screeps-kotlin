@@ -1,22 +1,22 @@
 package chentian.utils
 
 import chentian.GameContext
-import chentian.extensions.memory.containerTargetId
 import chentian.extensions.energy
 import chentian.extensions.findClosest
-import chentian.extensions.memory.homeRoomName
 import chentian.extensions.isEmptyCarry
 import chentian.extensions.isFullCarry
 import chentian.extensions.isInTargetRoom
 import chentian.extensions.isWorking
-import chentian.extensions.moveToTargetRoom
+import chentian.extensions.memory.containerTargetId
+import chentian.extensions.memory.homeRoomName
 import chentian.extensions.memory.role
-import chentian.extensions.setWorking
 import chentian.extensions.memory.sourceTargetId
 import chentian.extensions.memory.targetLinkId
 import chentian.extensions.memory.targetRoomName
 import chentian.extensions.memory.transferTargetId
 import chentian.extensions.memory.withdrawTargetId
+import chentian.extensions.moveToTargetRoom
+import chentian.extensions.setWorking
 import screeps.api.ActiveBodyPartConstant
 import screeps.api.BODYPART_COST
 import screeps.api.CARRY
@@ -232,7 +232,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
 
 fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
     // 先去到目标房间
-    if (!creep.isInTargetRoom(creep.memory.targetRoomName)) {
+    if (!creep.isWorking() && !creep.isInTargetRoom(creep.memory.targetRoomName)) {
         creep.moveToTargetRoom(creep.memory.targetRoomName)
         return
     }

@@ -39,13 +39,13 @@ object CreepStrategyController {
 
             listOf(
                 CreepStrategyMiner(room),
+                CreepStrategyHarvesterLink(room),
                 CreepStrategyHarvester(room),
                 CreepStrategyBuilder(room),
                 CreepStrategyHarvesterRemote(room),
                 CreepStrategyClaimer(room),
                 CreepStrategyBuilderRemote(room),
                 CreepStrategyResourceCarrier(room),
-                CreepStrategyHarvesterLink(room),
                 CreepStrategyAttacker(room)
             ).forEach { strategy ->
                 strategy.tryToCreate(spawn)

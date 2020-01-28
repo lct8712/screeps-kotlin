@@ -3,9 +3,10 @@ package chentian.strategy
 import chentian.GameContext
 import chentian.extensions.findCreepByRole
 import chentian.extensions.memory.targetRoomName
+import chentian.extensions.needUpgrade
+import chentian.loop.creepRemoteHarvesters
 import chentian.utils.MOD_16_CREATE_HARVESTER_REMOTE
 import chentian.utils.createRemoteCreep
-import chentian.loop.creepRemoteHarvesters
 import screeps.api.FIND_HOSTILE_CREEPS
 import screeps.api.Game
 import screeps.api.Room
@@ -13,7 +14,7 @@ import screeps.api.get
 import screeps.api.structures.StructureSpawn
 
 /**
- *
+ * 去隔壁房间采矿，升级本房间的 controller
  *
  * @author chentian
  */
@@ -23,6 +24,10 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
 
     override fun tryToCreate(spawn: StructureSpawn) {
         if (GameContext.timeMod16Result != MOD_16_CREATE_HARVESTER_REMOTE) {
+            return
+        }
+
+        if (room.controller?.needUpgrade() != true) {
             return
         }
 
@@ -65,6 +70,7 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
             "E18S18" to listOf("E17S18"),
             "W8N3" to listOf("W8N2"),
             "W7N2" to listOf("W8N2")
+//            "W9N8" to listOf("W8N8")
         )
     }
 }
