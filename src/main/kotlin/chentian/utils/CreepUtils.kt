@@ -8,6 +8,7 @@ import chentian.extensions.isFullCarry
 import chentian.extensions.isInTargetRoom
 import chentian.extensions.isWorking
 import chentian.extensions.memory.containerTargetId
+import chentian.extensions.memory.harvestedEnergy
 import chentian.extensions.memory.homeRoomName
 import chentian.extensions.memory.role
 import chentian.extensions.memory.sourceTargetId
@@ -182,7 +183,9 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         // 特殊情况，没有 miner
         val minerCreepCount = GameContext.creepsMiner[creep.room.name].orEmpty().size
         if (minerCreepCount == 0) {
-            tryToMineFromSource(creep)
+            tryToMineFromSource(creep) {
+                creep.pos.findClosestByPath(FIND_SOURCES)
+            }
             return
         }
 
@@ -222,7 +225,9 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         }
 
         // 找最近的 source
-        tryToMineFromSource(creep)
+        tryToMineFromSource(creep) {
+            creep.pos.findClosestByPath(FIND_SOURCES)
+        }
     }
 
     creep.say("action")
@@ -262,20 +267,13 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         }
 
         // 从 source 中采集
-        val sourceList = creep.room.find(FIND_SOURCES)
-        val index = creep.name[creep.name.length - 2].toInt() % sourceList.size
-        val source = sourceList.getOrNull(index)
-        if (source == null) {
-            creep.say("source not found")
-            println("$creep source in room not found harvesting")
-            return
+        tryToMineFromSource(creep) { ->
+            val sourceList = creep.room.find(FIND_SOURCES).apply {
+                sortBy { it.id }
+            }
+            val index = creep.name[creep.name.length - 2].toInt() % sourceList.size
+            sourceList.getOrNull(index)
         }
-
-        if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(source.pos, moveToOptions)
-        }
-
-        println("$creep is harvesting remote.")
         return
     }
 
@@ -304,12 +302,16 @@ private fun tryToPickUpFromGround(creep: Creep): Boolean {
     return false
 }
 
-private fun tryToMineFromSource(creep: Creep) {
+private fun tryToMineFromSource(creep: Creep, findSourceAction: () -> Source?) {
     fun harvestOrMove(creep: Creep, source: Source) {
-        if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+        val result = creep.harvest(source)
+        if (result == ERR_NOT_IN_RANGE) {
             creep.moveTo(source.pos, moveToOptions)
         }
-        println("$creep is harvesting from source")
+        if (result == OK) {
+            creep.memory.harvestedEnergy += 2 * creep.body.count { it.type == WORK }
+        }
+        println("$creep is harvesting")
     }
 
     Game.getObjectById<Source>(creep.memory.sourceTargetId)?.let { source ->
@@ -317,7 +319,7 @@ private fun tryToMineFromSource(creep: Creep) {
         return
     }
 
-    creep.pos.findClosestByPath(FIND_SOURCES)?.let { source ->
+    findSourceAction()?.let { source ->
         creep.memory.sourceTargetId = source.id
         harvestOrMove(creep, source)
         return

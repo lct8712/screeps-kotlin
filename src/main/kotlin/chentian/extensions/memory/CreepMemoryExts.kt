@@ -22,3 +22,4 @@ var CreepMemory.containerTargetId: String by memory { "" }
 var CreepMemory.storageTargetId: String by memory { "" }
 var CreepMemory.targetLinkId: String by memory { "" }
 var CreepMemory.targetFlagName: String by memory { "" }
+var CreepMemory.harvestedEnergy: Int by memory { 0 }

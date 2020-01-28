@@ -69,8 +69,8 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
 //            "E18S19" to listOf("E17S19"),
             "E18S18" to listOf("E17S18"),
             "W8N3" to listOf("W8N2"),
-            "W7N2" to listOf("W8N2")
-//            "W9N8" to listOf("W8N8")
+            "W7N2" to listOf("W8N2"),
+            "W9N8" to listOf("W8N8")
         )
     }
 }
