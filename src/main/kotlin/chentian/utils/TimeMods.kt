@@ -9,7 +9,7 @@ package chentian.utils
 
 const val MOD_16_CREATE_HARVESTER_LINK = 1
 
-const val MOD_16_CREATE_BUILDER_REMOTE = 2
+const val MOD_16_CREATE_BUILDER_SPAWN = 2
 
 const val MOD_16_CREATE_HARVESTER_REMOTE = 3
 

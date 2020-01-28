@@ -4,7 +4,7 @@ import chentian.GameContext
 import chentian.extensions.findCreepByRole
 import chentian.extensions.findFirstConstructionToBuild
 import chentian.extensions.memory.role
-import chentian.utils.MOD_16_CREATE_BUILDER_REMOTE
+import chentian.utils.MOD_16_CREATE_BUILDER_SPAWN
 import chentian.utils.createMoveOptions
 import chentian.utils.createRemoteCreep
 import chentian.utils.harvestEnergyAndDoJobRemote
@@ -22,14 +22,14 @@ import screeps.utils.toMap
  *
  * @author chentian
  */
-class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
+class CreepStrategyBuilderSpawn(val room: Room) : CreepStrategy {
 
     private val roomToBuild by lazy {
         GameContext.myRooms.firstOrNull { it.findFirstConstructionToBuild(STRUCTURE_SPAWN) != null }
     }
 
     override fun tryToCreate(spawn: StructureSpawn) {
-        if (GameContext.timeMod16Result != MOD_16_CREATE_BUILDER_REMOTE) {
+        if (GameContext.timeMod16Result != MOD_16_CREATE_BUILDER_SPAWN) {
             return
         }
 
@@ -39,7 +39,7 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
     }
 
     override fun runLoop() {
-        val creepsInAllRoom = Game.creeps.toMap().values.filter { it.memory.role == CREEP_ROLE_BUILDER_REMOTE }
+        val creepsInAllRoom = Game.creeps.toMap().values.filter { it.memory.role == CREEP_ROLE_BUILDER_SPAWN }
         creepsInAllRoom.forEach { buildStructure(it) }
     }
 
@@ -47,12 +47,12 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
         if (room.name == "E17S17") {
             return false
         }
-        val size = roomToBuild?.findCreepByRole(CREEP_ROLE_BUILDER_REMOTE)?.size ?: return false
+        val size = roomToBuild?.findCreepByRole(CREEP_ROLE_BUILDER_SPAWN)?.size ?: return false
         return size < MAX_REMOTE_BUILDER_COUNT
     }
 
     private fun create(spawn: StructureSpawn) {
-        createRemoteCreep(spawn, CREEP_ROLE_BUILDER_REMOTE, roomToBuild!!.name)
+        createRemoteCreep(spawn, CREEP_ROLE_BUILDER_SPAWN, roomToBuild!!.name)
     }
 
     private fun buildStructure(creep: Creep) {
@@ -76,7 +76,7 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
 
             if (creep.build(spawnToBuild) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(spawnToBuild.pos, MOVE_OPTION)
-                println("$creep is building remote $spawnToBuild")
+                println("$creep is building spawn $spawnToBuild")
                 return@harvestEnergyAndDoJobRemote
             }
         }
@@ -86,7 +86,7 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
 
         private val MOVE_OPTION = createMoveOptions("#0B6623")
 
-        private const val CREEP_ROLE_BUILDER_REMOTE = "builder-remote"
+        private const val CREEP_ROLE_BUILDER_SPAWN = "builder-spawn"
         private const val MAX_REMOTE_BUILDER_COUNT = 3
     }
 }

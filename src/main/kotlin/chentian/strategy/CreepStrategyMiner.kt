@@ -11,6 +11,7 @@ import chentian.utils.BODY_COST_FOR_MINER_CREEP
 import chentian.utils.BODY_PART_FOR_MINER_CREEP
 import chentian.utils.createCreepName
 import chentian.utils.createMoveOptions
+import screeps.api.Creep
 import screeps.api.CreepMemory
 import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES
@@ -78,7 +79,11 @@ class CreepStrategyMiner(room: Room) : CreepStrategy {
     }
 
     private fun shouldCreate(): Boolean {
-        return containerMap.size > creeps.size
+        return containerMap.size > creeps.size || creeps.any { almostDie(it) }
+    }
+
+    private fun almostDie(creep: Creep): Boolean {
+        return creep.ticksToLive < 200
     }
 
     private fun create(spawn: StructureSpawn) {
