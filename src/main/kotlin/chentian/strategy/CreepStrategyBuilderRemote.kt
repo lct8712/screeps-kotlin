@@ -44,6 +44,9 @@ class CreepStrategyBuilderRemote(val room: Room) : CreepStrategy {
     }
 
     private fun shouldCreate(): Boolean {
+        if (room.name == "E17S17") {
+            return false
+        }
         val size = roomToBuild?.findCreepByRole(CREEP_ROLE_BUILDER_REMOTE)?.size ?: return false
         return size < MAX_REMOTE_BUILDER_COUNT
     }

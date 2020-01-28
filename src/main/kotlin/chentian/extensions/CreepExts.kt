@@ -37,7 +37,7 @@ fun Creep.isInTargetRoom(roomName: String): Boolean {
     return room.name == roomName
 }
 
-private val UNSAFE_TARGET_ROOMS = setOf("E15S19", "E14S21")
+private val UNSAFE_TARGET_ROOMS = setOf("E15S19", "E14S21", "E13S21")
 private val FIRST_PART_ROOMS = setOf("E17S20", "E17S19", "E18S19")
 private const val MIDDLE_SAFE_ROOM = "E16S20"
 
