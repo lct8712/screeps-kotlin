@@ -1,14 +1,5 @@
 import chentian.CreepStrategyController
 
-@Suppress("unused")
-private object Traveler {
-    init {
-        js("var Traveler = require('Traveler');")
-        println("global reset!")
-        println("============================================================================================")
-        println("imported traveler")
-    }
-}
 /**
  * Entry point
  * is called by screeps
@@ -17,8 +8,5 @@ private object Traveler {
  */
 @Suppress("unused")
 fun loop() {
-    Traveler
-//    gameLoop()
-//    gameLoopChentianLearn()
     CreepStrategyController.gameLoop()
 }
