@@ -16,6 +16,7 @@ import screeps.utils.toMap
 
 /**
  * 控制进攻的 creeps
+ * [CreepStrategyAttacker]
  *
  * @author chentian
  */

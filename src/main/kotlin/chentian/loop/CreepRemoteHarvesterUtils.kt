@@ -13,7 +13,8 @@ import screeps.utils.lazyPerTick
 import screeps.utils.toMap
 
 /**
- *
+ * 远程采矿
+ * [CreepStrategyHarvesterRemote]
  *
  * @author chentian
  */

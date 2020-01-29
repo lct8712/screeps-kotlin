@@ -9,7 +9,7 @@ import chentian.extensions.memory.homeRoomName
 import chentian.extensions.memory.role
 import chentian.extensions.memory.targetRoomName
 import chentian.extensions.moveToTargetRoom
-import chentian.strategy.CreepStrategyBuilderRemote.Companion.CREEP_ROLE_BUILDER_REMOTE
+import chentian.strategy.CreepStrategyBuilderRemote
 import chentian.strategy.CreepStrategyHarvester
 import chentian.utils.harvestEnergyAndDoJobRemote
 import chentian.utils.tryToBuild
@@ -21,13 +21,14 @@ import screeps.utils.lazyPerTick
 import screeps.utils.toMap
 
 /**
- *
+ * 远程建设
+ * [CreepStrategyBuilderRemote]
  *
  * @author chentian
  */
 
 val creepBuilderRemote: List<Creep> by lazyPerTick {
-    Game.creeps.toMap().values.filter { it.memory.role == CREEP_ROLE_BUILDER_REMOTE }
+    Game.creeps.toMap().values.filter { it.memory.role == CreepStrategyBuilderRemote.CREEP_ROLE_BUILDER_REMOTE }
 }
 
 fun runBuilderRemote() {
