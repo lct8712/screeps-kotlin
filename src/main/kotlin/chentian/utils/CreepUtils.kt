@@ -21,6 +21,7 @@ import chentian.extensions.setWorking
 import screeps.api.ActiveBodyPartConstant
 import screeps.api.BODYPART_COST
 import screeps.api.CARRY
+import screeps.api.ConstructionSite
 import screeps.api.Creep
 import screeps.api.CreepMemory
 import screeps.api.ERR_BUSY
@@ -279,6 +280,25 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
 
     creep.say("action")
     jobAction()
+}
+
+
+private val MOVE_OPTION_BUILDER = createMoveOptions("#FFA500")
+
+fun tryToBuild(creep: Creep, target: ConstructionSite): Boolean {
+    return when (creep.build(target)) {
+        OK -> {
+            true
+        }
+        ERR_NOT_IN_RANGE -> {
+            creep.moveTo(target.pos, MOVE_OPTION_BUILDER)
+            true
+        }
+        else -> {
+            println("$creep build ${target.structureType} failed at ${target.pos}, result: ${creep.build(target)}")
+            false
+        }
+    }
 }
 
 private fun tryToPickUpFromTomb(creep: Creep): Boolean {

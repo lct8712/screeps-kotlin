@@ -52,7 +52,9 @@ class CreepStrategyBuilderSpawn(val room: Room) : CreepStrategy {
     }
 
     private fun create(spawn: StructureSpawn) {
-        createRemoteCreep(spawn, CREEP_ROLE_BUILDER_SPAWN, roomToBuild!!.name)
+        roomToBuild?.let {
+            createRemoteCreep(spawn, CREEP_ROLE_BUILDER_SPAWN, it.name)
+        }
     }
 
     private fun buildStructure(creep: Creep) {

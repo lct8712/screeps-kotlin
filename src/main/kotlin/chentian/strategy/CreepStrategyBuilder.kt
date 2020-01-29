@@ -8,6 +8,7 @@ import chentian.extensions.isBuildFinished
 import chentian.extensions.memory.role
 import chentian.utils.createNormalCreep
 import chentian.utils.harvestEnergyAndDoJob
+import chentian.utils.tryToBuild
 import screeps.api.ConstructionSite
 import screeps.api.Creep
 import screeps.api.ERR_NOT_IN_RANGE
@@ -90,22 +91,6 @@ class CreepStrategyBuilder(val room: Room): CreepStrategy {
             }
 
             println("$creep build failed: no target")
-        }
-    }
-
-    private fun tryToBuild(creep: Creep, target: ConstructionSite): Boolean {
-        return when (creep.build(target)) {
-            OK -> {
-                true
-            }
-            ERR_NOT_IN_RANGE -> {
-                creep.moveTo(target.pos)
-                true
-            }
-            else -> {
-                println("$creep build ${target.structureType} failed at ${target.pos}, result: ${creep.build(target)}")
-                false
-            }
         }
     }
 

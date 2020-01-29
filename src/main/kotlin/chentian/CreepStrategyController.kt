@@ -1,5 +1,6 @@
 package chentian
 
+import chentian.loop.runBuilderRemote
 import chentian.loop.runCreepAttack
 import chentian.loop.runLinkTransfer
 import chentian.loop.runRemoteHarvesters
@@ -8,6 +9,7 @@ import chentian.loop.runSellEnergy
 import chentian.loop.runTowerAttack
 import chentian.strategy.CreepStrategyAttacker
 import chentian.strategy.CreepStrategyBuilder
+import chentian.strategy.CreepStrategyBuilderRemote
 import chentian.strategy.CreepStrategyBuilderSpawn
 import chentian.strategy.CreepStrategyClaimer
 import chentian.strategy.CreepStrategyHarvester
@@ -45,6 +47,7 @@ object CreepStrategyController {
                 CreepStrategyHarvesterRemote(room),
                 CreepStrategyClaimer(room),
                 CreepStrategyBuilderSpawn(room),
+                CreepStrategyBuilderRemote(room),
                 CreepStrategyResourceCarrier(room),
                 CreepStrategyAttacker(room)
             ).forEach { strategy ->
@@ -54,11 +57,12 @@ object CreepStrategyController {
         }
 
         runTowerAttack()
+        runCreepAttack()
         runLinkTransfer()
         runSellEnergy()
         runRemoteHarvesters()
         runResourceCarriers()
-        runCreepAttack()
+        runBuilderRemote()
 
         runHouseKeeping()
 
