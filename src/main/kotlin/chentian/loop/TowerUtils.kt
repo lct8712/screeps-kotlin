@@ -18,7 +18,8 @@ import screeps.api.structures.Structure
 import screeps.api.structures.StructureTower
 
 /**
- *
+ * 塔
+ * 攻击 & 回血 & 修理
  *
  * @author chentian
  */

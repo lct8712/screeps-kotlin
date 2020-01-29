@@ -22,7 +22,7 @@ import screeps.api.structures.Structure
 import screeps.api.structures.StructureLink
 
 /**
- *
+ * 房间内传输能量
  *
  * @author chentian
  */
