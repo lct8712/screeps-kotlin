@@ -4,7 +4,6 @@ import chentian.loop.runBuilderRemote
 import chentian.loop.runCreepAttack
 import chentian.loop.runLinkTransfer
 import chentian.loop.runRemoteHarvesters
-import chentian.loop.runResourceCarriers
 import chentian.loop.runSellEnergy
 import chentian.loop.runTowerAttack
 import chentian.strategy.CreepStrategyAttacker
@@ -16,7 +15,6 @@ import chentian.strategy.CreepStrategyHarvester
 import chentian.strategy.CreepStrategyHarvesterLink
 import chentian.strategy.CreepStrategyHarvesterRemote
 import chentian.strategy.CreepStrategyMiner
-import chentian.strategy.CreepStrategyResourceCarrier
 import chentian.utils.Stats
 import chentian.utils.runHouseKeeping
 import screeps.api.Game
@@ -48,7 +46,6 @@ object CreepStrategyController {
                 CreepStrategyClaimer(room),
                 CreepStrategyBuilderSpawn(room),
                 CreepStrategyBuilderRemote(room),
-                CreepStrategyResourceCarrier(room),
                 CreepStrategyAttacker(room)
             ).forEach { strategy ->
                 strategy.tryToCreate(spawn)
@@ -61,7 +58,6 @@ object CreepStrategyController {
         runLinkTransfer()
         runSellEnergy()
         runRemoteHarvesters()
-        runResourceCarriers()
         runBuilderRemote()
 
         runHouseKeeping()
