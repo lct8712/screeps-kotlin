@@ -21,7 +21,7 @@ import screeps.api.Game
 import screeps.api.values
 
 /**
- *
+ * 游戏总体控制
  *
  * @author chentian
  */

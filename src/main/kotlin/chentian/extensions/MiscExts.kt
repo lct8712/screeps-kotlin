@@ -7,6 +7,7 @@ import screeps.api.RESOURCE_ENERGY
 import screeps.api.Store
 import screeps.api.size
 import screeps.api.structures.StructureController
+import screeps.api.structures.StructureLink
 import screeps.api.structures.StructureSpawn
 
 /**
@@ -32,4 +33,8 @@ fun Store.energy(): Int {
 
 fun Store.energyCapacity(): Int {
     return getCapacity(RESOURCE_ENERGY) ?: 0
+}
+
+fun StructureLink.isFull(): Boolean {
+    return store.getFreeCapacity() == 0
 }

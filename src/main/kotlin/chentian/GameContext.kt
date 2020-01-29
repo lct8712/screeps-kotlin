@@ -15,7 +15,7 @@ import screeps.utils.lazyPerTick
 import screeps.utils.toMap
 
 /**
- *
+ * [Game] 中可以查到的变量的缓存，每 tick 更新
  *
  * @author chentian
  */

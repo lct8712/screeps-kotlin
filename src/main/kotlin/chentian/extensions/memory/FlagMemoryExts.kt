@@ -10,4 +10,3 @@ import screeps.utils.memory.memory
  */
 
 var FlagMemory.creepCreatedCount: Int by memory { 0 }
-
