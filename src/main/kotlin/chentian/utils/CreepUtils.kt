@@ -267,6 +267,10 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
             return
         }
 
+        if (!creep.isInTargetRoom(creep.memory.targetRoomName)) {
+            return
+        }
+
         // 从 source 中采集
         tryToMineFromSource(creep) { ->
             val sourceList = creep.room.find(FIND_SOURCES).apply {

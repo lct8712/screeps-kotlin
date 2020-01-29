@@ -2,6 +2,7 @@ package chentian.strategy
 
 import chentian.GameContext
 import chentian.extensions.findCreepByRole
+import chentian.extensions.memory.harvestRemoteRoomName
 import chentian.extensions.memory.targetRoomName
 import chentian.extensions.needUpgrade
 import chentian.loop.creepRemoteHarvesters
@@ -15,6 +16,7 @@ import screeps.api.structures.StructureSpawn
 
 /**
  * 去隔壁房间采矿，升级本房间的 controller
+ * 需要手动设置 room 的 harvestRemoteRoomName
  *
  * @author chentian
  */
@@ -31,10 +33,9 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
             return
         }
 
-        TARGET_ROOM_MAP[room.name]?.forEach { remoteRoomName ->
-            if (shouldCreate(remoteRoomName)) {
-                create(spawn, remoteRoomName)
-            }
+        val remoteRoomName = room.memory.harvestRemoteRoomName
+        if (shouldCreate(remoteRoomName)) {
+            create(spawn, remoteRoomName)
         }
     }
 
@@ -43,6 +44,10 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
     }
 
     private fun shouldCreate(roomName: String): Boolean {
+        if (roomName.isBlank()) {
+            return false
+        }
+
         val creepsHarvesterCount = room.findCreepByRole(CreepStrategyHarvester.CREEP_ROLE_HARVESTER).count()
         if (creepsHarvesterCount <= 3) {
             return false
@@ -64,13 +69,5 @@ class CreepStrategyHarvesterRemote(val room: Room) : CreepStrategy {
         const val CREEP_ROLE_HARVESTER_REMOTE = "harvester-remote"
 
         private const val CREEP_PER_TARGET_ROOM = 7
-
-        private val TARGET_ROOM_MAP = mapOf(
-//            "E18S19" to listOf("E17S19"),
-            "E18S18" to listOf("E17S18"),
-            "W8N3" to listOf("W8N2"),
-            "W7N2" to listOf("W8N2"),
-            "W9N8" to listOf("W8N8")
-        )
     }
 }
