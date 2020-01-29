@@ -1,13 +1,17 @@
 package chentian.extensions
 
 import chentian.extensions.memory.transferTargetId
+import screeps.api.BOTTOM
 import screeps.api.Creep
 import screeps.api.ERR_FULL
 import screeps.api.ERR_NOT_IN_RANGE
+import screeps.api.LEFT
 import screeps.api.MoveToOptions
 import screeps.api.OK
+import screeps.api.RIGHT
 import screeps.api.RoomObject
 import screeps.api.RoomPosition
+import screeps.api.TOP
 import screeps.api.keys
 import screeps.api.structures.Structure
 
@@ -35,6 +39,10 @@ fun Creep.setWorking(isWorking: Boolean) {
 
 fun Creep.isInTargetRoom(roomName: String): Boolean {
     return room.name == roomName
+}
+
+fun Creep.needHeal(): Boolean {
+    return hits < hitsMax
 }
 
 private val UNSAFE_TARGET_ROOMS = setOf("E15S19", "E14S21", "E13S21")
@@ -116,6 +124,21 @@ fun <T : RoomObject> Creep.findClosest(roomObjects: Array<out T>): T? {
 fun <T : RoomObject> Creep.findClosestNotEmpty(roomObjects: Array<out T>): T {
     require(roomObjects.isNotEmpty())
     return findClosest(roomObjects)!!
+}
+
+private const val ROOM_SIZE = 50
+
+fun Creep.moveAwayFromRoomEdge() {
+    val direction = when {
+        pos.x == 0 -> RIGHT
+        pos.x == (ROOM_SIZE - 1) -> LEFT
+        pos.y == 0 -> BOTTOM
+        pos.y == (ROOM_SIZE - 1) -> TOP
+        else -> null
+    }
+    direction?.let {
+        move(it)
+    }
 }
 
 private fun Creep.totalCarry(): Int {
