@@ -15,6 +15,7 @@ import chentian.strategy.CreepStrategyClaimer
 import chentian.strategy.CreepStrategyHarvester
 import chentian.strategy.CreepStrategyHarvesterLink
 import chentian.strategy.CreepStrategyHarvesterRemote
+import chentian.strategy.CreepStrategyHarvesterResource
 import chentian.strategy.CreepStrategyHealer
 import chentian.strategy.CreepStrategyMiner
 import chentian.utils.Stats
@@ -48,6 +49,7 @@ object CreepStrategyController {
                 CreepStrategyClaimer(room),
                 CreepStrategyBuilderSpawn(room),
                 CreepStrategyBuilderRemote(room),
+                CreepStrategyHarvesterResource(room),
                 CreepStrategyAttacker(room),
                 CreepStrategyHealer(room)
             ).forEach { strategy ->

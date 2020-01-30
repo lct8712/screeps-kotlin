@@ -10,6 +10,7 @@ import chentian.extensions.isWorking
 import chentian.extensions.memory.containerTargetId
 import chentian.extensions.memory.harvestedEnergy
 import chentian.extensions.memory.homeRoomName
+import chentian.extensions.memory.mineralTargetId
 import chentian.extensions.memory.role
 import chentian.extensions.memory.sourceTargetId
 import chentian.extensions.memory.targetLinkId
@@ -28,6 +29,7 @@ import screeps.api.ERR_BUSY
 import screeps.api.ERR_NAME_EXISTS
 import screeps.api.ERR_NOT_IN_RANGE
 import screeps.api.FIND_DROPPED_RESOURCES
+import screeps.api.FIND_MINERALS
 import screeps.api.FIND_SOURCES
 import screeps.api.FIND_STRUCTURES
 import screeps.api.FIND_TOMBSTONES
@@ -35,16 +37,21 @@ import screeps.api.Game
 import screeps.api.IStructure
 import screeps.api.LINE_STYLE_DOTTED
 import screeps.api.MOVE
+import screeps.api.Mineral
 import screeps.api.MoveToOptions
 import screeps.api.OK
 import screeps.api.RESOURCE_ENERGY
+import screeps.api.RenewableHarvestable
+import screeps.api.ResourceConstant
 import screeps.api.RoomVisual
 import screeps.api.STRUCTURE_CONTAINER
 import screeps.api.Source
+import screeps.api.Store
 import screeps.api.StoreOwner
 import screeps.api.TOP
 import screeps.api.WORK
 import screeps.api.get
+import screeps.api.keys
 import screeps.api.options
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureLink
@@ -184,7 +191,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         // 特殊情况，没有 miner
         val minerCreepCount = GameContext.creepsMiner[creep.room.name].orEmpty().size
         if (minerCreepCount == 0) {
-            tryToMineFromSource(creep) {
+            tryToMineFromHarvestable(creep) {
                 creep.pos.findClosestByPath(FIND_SOURCES)
             }
             return
@@ -226,7 +233,7 @@ fun harvestEnergyAndDoJob(creep: Creep, jobAction: () -> Unit) {
         }
 
         // 找最近的 source
-        tryToMineFromSource(creep) {
+        tryToMineFromHarvestable(creep) {
             creep.pos.findClosestByPath(FIND_SOURCES)
         }
     }
@@ -272,7 +279,7 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
         }
 
         // 从 source 中采集
-        tryToMineFromSource(creep) { ->
+        tryToMineFromHarvestable(creep) { ->
             val sourceList = creep.room.find(FIND_SOURCES).apply {
                 sortBy { it.id }
             }
@@ -284,6 +291,44 @@ fun harvestEnergyAndDoJobRemote(creep: Creep, jobAction: () -> Unit) {
 
     creep.say("action")
     jobAction()
+}
+
+fun harvestResourceAndDoJob(creep: Creep, jobAction: () -> Unit) {
+    if (creep.isFullCarry()) {
+        creep.memory.withdrawTargetId = ""
+        creep.memory.transferTargetId = ""
+        creep.memory.containerTargetId = ""
+        creep.setWorking(true)
+        creep.say("full")
+        jobAction()
+        return
+    }
+
+    if (creep.isEmptyCarry() || !creep.isWorking()) {
+        creep.setWorking(false)
+
+        val message = if (creep.isEmptyCarry()) "empty" else "fill"
+        creep.say(message)
+
+        // 捡坟墓上的，只捡非能量
+        if (tryToPickUpFromTomb(creep, false)) {
+            return
+        }
+
+        // 捡地上掉的，只捡非能量
+        if (tryToPickUpFromGround(creep, false)) {
+            return
+        }
+
+        // 找最近的 minerals
+        tryToMineFromHarvestable(creep) {
+            creep.pos.findClosestByPath(FIND_MINERALS)
+        }
+    }
+
+    creep.say("action")
+    jobAction()
+    return
 }
 
 
@@ -305,9 +350,17 @@ fun tryToBuild(creep: Creep, target: ConstructionSite): Boolean {
     }
 }
 
-private fun tryToPickUpFromTomb(creep: Creep): Boolean {
+private fun tryToPickUpFromTomb(creep: Creep, energyOnly: Boolean = true): Boolean {
+    fun getType(store: Store): ResourceConstant? {
+        if (energyOnly) {
+            return RESOURCE_ENERGY
+        }
+        return store.keys.firstOrNull { it != RESOURCE_ENERGY }
+    }
+
     creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy() > 0 }?.let { tombstone ->
-        if (creep.withdraw(tombstone, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+        val resourceType = getType(tombstone.store) ?: return false
+        if (creep.withdraw(tombstone, resourceType) == ERR_NOT_IN_RANGE) {
             creep.moveTo(tombstone.pos, moveToOptions)
         }
         println("$creep is withdrawing tombstone at $tombstone")
@@ -316,9 +369,17 @@ private fun tryToPickUpFromTomb(creep: Creep): Boolean {
     return false
 }
 
-private fun tryToPickUpFromGround(creep: Creep): Boolean {
+private fun tryToPickUpFromGround(creep: Creep, energyOnly: Boolean = true): Boolean {
+    fun isTypeMatch(resourceType: ResourceConstant): Boolean {
+        return if (energyOnly) {
+            resourceType == RESOURCE_ENERGY
+        } else {
+            resourceType != RESOURCE_ENERGY
+        }
+    }
+
     creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1).firstOrNull()?.let { resource ->
-        if (resource.resourceType == RESOURCE_ENERGY && creep.pickup(resource) == OK) {
+        if (isTypeMatch(resource.resourceType) && creep.pickup(resource) == OK) {
             println("$creep is picking up resource at $resource")
             return true
         }
@@ -326,11 +387,21 @@ private fun tryToPickUpFromGround(creep: Creep): Boolean {
     return false
 }
 
-private fun tryToMineFromSource(creep: Creep, findSourceAction: () -> Source?) {
-    fun harvestOrMove(creep: Creep, source: Source) {
-        val result = creep.harvest(source)
+private fun tryToMineFromHarvestable(creep: Creep, findSourceAction: () -> RenewableHarvestable?) {
+    fun harvestOrMove(creep: Creep, harvestable: RenewableHarvestable) {
+        val (result, pos) = when (harvestable) {
+            is Source -> {
+                Pair(creep.harvest(harvestable), harvestable.pos)
+            }
+            is Mineral -> {
+                Pair(creep.harvest(harvestable), harvestable.pos)
+            }
+            else -> {
+                return
+            }
+        }
         if (result == ERR_NOT_IN_RANGE) {
-            creep.moveTo(source.pos, moveToOptions)
+            creep.moveTo(pos, moveToOptions)
         }
         if (result == OK) {
             creep.memory.harvestedEnergy += 2 * creep.body.count { it.type == WORK }
@@ -343,9 +414,15 @@ private fun tryToMineFromSource(creep: Creep, findSourceAction: () -> Source?) {
         return
     }
 
-    findSourceAction()?.let { source ->
-        creep.memory.sourceTargetId = source.id
+    Game.getObjectById<Mineral>(creep.memory.mineralTargetId)?.let { source ->
         harvestOrMove(creep, source)
+        return
+    }
+
+    findSourceAction()?.let { harvestable ->
+        creep.memory.sourceTargetId = (harvestable as? Source)?.id.orEmpty()
+        creep.memory.mineralTargetId = (harvestable as? Mineral)?.id.orEmpty()
+        harvestOrMove(creep, harvestable)
         return
     }
 }
