@@ -5,7 +5,7 @@ import chentian.loop.runCreepAttack
 import chentian.loop.runCreepHealer
 import chentian.loop.runLinkTransfer
 import chentian.loop.runRemoteHarvesters
-import chentian.loop.runSellEnergy
+import chentian.loop.runSellEnergyAndResource
 import chentian.loop.runTowerAttack
 import chentian.strategy.CreepStrategyAttacker
 import chentian.strategy.CreepStrategyBuilder
@@ -60,7 +60,7 @@ object CreepStrategyController {
 
         runTowerAttack()
         runLinkTransfer()
-        runSellEnergy()
+        runSellEnergyAndResource()
         runRemoteHarvesters()
         runBuilderRemote()
         runCreepAttack()

@@ -4,7 +4,9 @@ import screeps.api.CONTROLLER_DOWNGRADE_SAFEMODE_THRESHOLD
 import screeps.api.CONTROLLER_LEVELS
 import screeps.api.ConstructionSite
 import screeps.api.RESOURCE_ENERGY
+import screeps.api.ResourceConstant
 import screeps.api.Store
+import screeps.api.keys
 import screeps.api.size
 import screeps.api.structures.StructureController
 import screeps.api.structures.StructureLink
@@ -33,6 +35,10 @@ fun Store.energy(): Int {
 
 fun Store.energyCapacity(): Int {
     return getCapacity(RESOURCE_ENERGY) ?: 0
+}
+
+fun Store.firstResourceType(): ResourceConstant? {
+    return keys.firstOrNull { it != RESOURCE_ENERGY }
 }
 
 fun StructureLink.isFull(): Boolean {

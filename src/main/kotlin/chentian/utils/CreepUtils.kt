@@ -3,6 +3,7 @@ package chentian.utils
 import chentian.GameContext
 import chentian.extensions.energy
 import chentian.extensions.findClosest
+import chentian.extensions.firstResourceType
 import chentian.extensions.isEmptyCarry
 import chentian.extensions.isFullCarry
 import chentian.extensions.isInTargetRoom
@@ -355,7 +356,7 @@ private fun tryToPickUpFromTomb(creep: Creep, energyOnly: Boolean = true): Boole
         if (energyOnly) {
             return RESOURCE_ENERGY
         }
-        return store.keys.firstOrNull { it != RESOURCE_ENERGY }
+        return store.firstResourceType()
     }
 
     creep.pos.findInRange(FIND_TOMBSTONES, 2).firstOrNull { it.store.energy() > 0 }?.let { tombstone ->
