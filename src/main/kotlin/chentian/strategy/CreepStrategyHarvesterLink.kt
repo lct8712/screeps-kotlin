@@ -91,12 +91,16 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
             return false
         }
 
-        val terminal = room.find(FIND_STRUCTURES)
+        val storage = room.find(FIND_STRUCTURES)
             .firstOrNull { it.structureType == STRUCTURE_STORAGE }
             as? StructureStorage
             ?: return false
 
-        return transferOrMove(creep, terminal)
+        if (storage.store.getFreeCapacity() == 0) {
+            return false
+        }
+
+        return transferOrMove(creep, storage)
     }
 
     /**
