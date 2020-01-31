@@ -17,6 +17,7 @@ import screeps.api.get
 import screeps.api.options
 import screeps.api.structures.StructureSpawn
 import screeps.utils.unsafe.jsObject
+import kotlin.math.min
 
 /**
  * 回血
@@ -51,15 +52,15 @@ class CreepStrategyHealer(val room: Room) : CreepStrategy {
     }
 
     private fun create(spawn: StructureSpawn) {
-        val bodyCost = BODYPART_COST[TOUGH]!! * 5 + BODYPART_COST[MOVE]!! + BODYPART_COST[HEAL]!!
-        val healerBodyParCount = spawn.room.energyAvailable / bodyCost
+        val bodyCost = BODYPART_COST[TOUGH]!! * 3 + BODYPART_COST[MOVE]!! + BODYPART_COST[HEAL]!!
+        val healerBodyParCount = min(spawn.room.energyAvailable / bodyCost, MIN_HEALER_BODY_PART_COUNT)
         if (healerBodyParCount < MIN_HEALER_BODY_PART_COUNT) {
             return
         }
 
         val bodyList = mutableListOf<ActiveBodyPartConstant>().apply {
             for (i in 0 until healerBodyParCount) {
-                addAll(listOf(TOUGH, TOUGH, TOUGH, TOUGH, TOUGH))
+                addAll(listOf(TOUGH, TOUGH, TOUGH))
             }
             for (i in 0 until healerBodyParCount) {
                 add(MOVE)
@@ -82,7 +83,7 @@ class CreepStrategyHealer(val room: Room) : CreepStrategy {
 
         const val CREEP_ROLE_HEALER = "healer"
 
-        const val MIN_HEALER_BODY_PART_COUNT = 5
+        const val MIN_HEALER_BODY_PART_COUNT = 10
         const val MAX_HEALER_COUNT_AT_SAME_TIME = 2
     }
 }

@@ -3,6 +3,7 @@ package chentian.strategy
 import chentian.GameContext
 import chentian.extensions.controlLevel
 import chentian.extensions.memory.containerTargetId
+import chentian.extensions.memory.healRemoteRoomName
 import chentian.extensions.memory.homeRoomName
 import chentian.extensions.memory.linkIdTo
 import chentian.extensions.memory.role
@@ -33,7 +34,7 @@ import screeps.api.structures.StructureTerminal
 import screeps.utils.unsafe.jsObject
 
 /**
- *
+ * 从 link 中吸取能量，升级 controller 或传到 terminal
  *
  * @author chentian
  */
@@ -47,6 +48,11 @@ class CreepStrategyHarvesterLink(val room: Room) : CreepStrategy {
         }
 
         if (room.memory.linkIdTo.isEmpty() || creeps.count() >= MAX_CREEP_COUNT_PER_ROOM) {
+            return
+        }
+
+        // 在 heal 模式下，有一个 link creep 即可
+        if (room.memory.healRemoteRoomName.isNotEmpty() && creeps.isNotEmpty()) {
             return
         }
 

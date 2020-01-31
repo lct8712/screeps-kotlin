@@ -6,8 +6,10 @@ import chentian.extensions.energy
 import chentian.extensions.energyCapacity
 import chentian.extensions.memory.repairTargetCountDown
 import chentian.extensions.memory.repairTargetId
-import screeps.api.FIND_CREEPS
+import chentian.extensions.memory.role
+import chentian.strategy.CreepStrategyHealer.Companion.CREEP_ROLE_HEALER
 import screeps.api.FIND_HOSTILE_CREEPS
+import screeps.api.FIND_MY_CREEPS
 import screeps.api.FIND_STRUCTURES
 import screeps.api.Game
 import screeps.api.STRUCTURE_CONTAINER
@@ -46,8 +48,8 @@ fun runTowerAttack() {
         }
 
         // Heal Creeps
-        tower.room.find(FIND_CREEPS).firstOrNull {
-            it.my && it.hits < it.hitsMax
+        tower.room.find(FIND_MY_CREEPS).firstOrNull {
+            it.hits < it.hitsMax && it.memory.role != CREEP_ROLE_HEALER
         }?.let {
             val result = tower.heal(it)
             println("$tower is healing strategy: $result")

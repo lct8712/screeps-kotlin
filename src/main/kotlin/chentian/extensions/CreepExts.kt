@@ -1,5 +1,6 @@
 package chentian.extensions
 
+import chentian.extensions.memory.isWorking
 import chentian.extensions.memory.transferTargetId
 import screeps.api.BOTTOM
 import screeps.api.Creep
@@ -30,11 +31,11 @@ fun Creep.isEmptyCarry(): Boolean {
 }
 
 fun Creep.isWorking(): Boolean {
-    return memory.asDynamic().working != null
+    return memory.isWorking
 }
 
 fun Creep.setWorking(isWorking: Boolean) {
-    memory.asDynamic().working = if (isWorking) "true" else null
+    memory.isWorking = isWorking
 }
 
 fun Creep.isInTargetRoom(roomName: String): Boolean {

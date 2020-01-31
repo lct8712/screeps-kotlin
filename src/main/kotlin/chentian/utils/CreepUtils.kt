@@ -52,7 +52,6 @@ import screeps.api.StoreOwner
 import screeps.api.TOP
 import screeps.api.WORK
 import screeps.api.get
-import screeps.api.keys
 import screeps.api.options
 import screeps.api.structures.StructureContainer
 import screeps.api.structures.StructureLink
@@ -325,13 +324,13 @@ fun harvestResourceAndDoJob(creep: Creep, jobAction: () -> Unit) {
         tryToMineFromHarvestable(creep) {
             creep.pos.findClosestByPath(FIND_MINERALS)
         }
+        return
     }
 
     creep.say("action")
     jobAction()
     return
 }
-
 
 private val MOVE_OPTION_BUILDER = createMoveOptions("#FFA500")
 
